@@ -1,4 +1,4 @@
-package com.example.eventscan.Entities;
+package com.example.eventscan.Activities;
 
 import android.os.Bundle;
 import android.view.View;
