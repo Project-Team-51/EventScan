@@ -4,4 +4,7 @@
     <string name="username">Username</string>
     <string name="login">Login</string>
     <string name="signup">SignUp</string>
+    <string name="attendee">Attendee</string>
+    <string name="organizer">Organizer</string>
+    <string name="administrator">Administrator</string>
 </resources>

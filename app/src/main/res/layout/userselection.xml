@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background_gradient">
+
+    <TextView
+        android:id="@+id/eventscantext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/chooseyourusertype"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="100dp"
+        android:fontFamily="sans-serif-light"
+        android:text="EventScan"
+        android:textColor="#D3E2F2"
+        android:textSize="48sp">
+
+    </TextView>
+
+    <TextView
+        android:id="@+id/chooseyourusertype"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/buttonOrganizer"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp"
+        android:fontFamily="sans-serif-light"
+        android:text="What type of user are you?"
+        android:textColor="#D3E2F2"
+        android:textSize="24sp">
+
+    </TextView>
+
+    <Button
+        android:id="@+id/buttonAttendee"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_above="@+id/buttonAdministrator"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="#414E6E"
+        android:text="@string/attendee"
+        android:textColor="#D3E2F2" />
+
+
+    <Button
+        android:id="@+id/buttonOrganizer"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_above="@+id/buttonAttendee"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="#414E6E"
+        android:text="@string/organizer"
+        android:textColor="#D3E2F2" />
+
+    <Button
+        android:id="@+id/buttonAdministrator"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="280dp"
+        android:backgroundTint="#414E6E"
+        android:layout_centerHorizontal="true"
+        android:text="@string/administrator"
+        android:textColor="#D3E2F2" />
+
+
+</RelativeLayout>
