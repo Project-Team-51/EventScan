@@ -1,4 +1,4 @@
-package com.example.eventscan;
+package com.example.eventscan.Entities;
 
 import android.os.Bundle;
 import android.view.View;
@@ -6,6 +6,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.eventscan.R;
 
 public class Login extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {

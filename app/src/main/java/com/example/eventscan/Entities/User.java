@@ -1,4 +1,6 @@
-package com.example.eventscan;
+package com.example.eventscan.Entities;
+
+import com.example.eventscan.Entities.Location;
 
 public class User {
     private String name;
