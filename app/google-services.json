@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "714324971859",
+    "project_id": "eventscan-50aa5",
+    "storage_bucket": "eventscan-50aa5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714324971859:android:ac6723cb79f7bbb41851a6",
+        "android_client_info": {
+          "package_name": "com.example.eventscan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "714324971859-6bcmcf5i5agtc0l8aus087478i5qufe8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFLKKnb2M1W438JlVxkD3TsoNbCjigZSc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "714324971859-6bcmcf5i5agtc0l8aus087478i5qufe8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
