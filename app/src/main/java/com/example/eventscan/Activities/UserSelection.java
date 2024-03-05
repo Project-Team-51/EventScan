@@ -17,7 +17,7 @@ public class UserSelection extends AppCompatActivity {
         setContentView(R.layout.userselection);
 
         // Handle user type selection
-        Button userType1Button = findViewById(R.id.buttonOrganizer);
+        final Button organizerButton = findViewById(R.id.buttonOrganizer);
         Button userType2Button = findViewById(R.id.buttonAttendee);
         final Button adminButton = findViewById(R.id.buttonAdministrator);
 
@@ -28,6 +28,16 @@ public class UserSelection extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        organizerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserSelection.this, OrganizerEventsView.class);
+                startActivity(intent);
+            }
+        });
+=======
+
 
     }
 
