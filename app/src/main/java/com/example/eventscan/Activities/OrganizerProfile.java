@@ -1,5 +1,6 @@
 package com.example.eventscan.Activities;
 
-public class OrganizerProfile {
+import androidx.appcompat.app.AppCompatActivity;
+public class OrganizerProfile extends AppCompatActivity {
 
 }

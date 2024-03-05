@@ -1,5 +1,6 @@
 package com.example.eventscan.Activities;
 
-public class AttendeeProfile {
+import androidx.appcompat.app.AppCompatActivity;
+public class AttendeeProfile extends AppCompatActivity {
 
 }

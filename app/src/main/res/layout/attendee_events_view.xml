@@ -12,7 +12,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"
         android:textColor="#D3E2F2"
-        android:text="UpcomingEvents"
+        android:text="Upcoming Events"
         android:textSize="30sp" />
     <RelativeLayout
         android:id="@+id/bubbleContainer"
@@ -36,7 +36,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="350dp"
         android:textColor="#D3E2F2"
-        android:text="Event Announcement"
+        android:text="Event Announcements"
         android:textSize="30sp" />
     <RelativeLayout
         android:id="@+id/bubbleContainer2"
