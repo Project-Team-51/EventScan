@@ -23,10 +23,10 @@ public class Login extends AppCompatActivity {
     private FirebaseAuth mAuth;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        FirebaseApp.initializeApp(this);
+        //FirebaseApp.initializeApp(this);
         setContentView(R.layout.login_activity);
 
-
+        mAuth = FirebaseAuth.getInstance();
         EditText email = findViewById(R.id.editTextUsername);
         EditText password = findViewById(R.id.editTextPassword);
         Button buttonLogin = findViewById(R.id.buttonLogin);
