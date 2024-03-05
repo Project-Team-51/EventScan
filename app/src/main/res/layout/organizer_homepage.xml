@@ -1,80 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient"
     tools:context=".Activities.OrganizerHomePage">
 
+    <!-- TextView or other content if needed -->
 
-<!--    <EditText-->
-<!--        android:id="@+id/editTextUsername"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_alignParentEnd="true"-->
-<!--        android:layout_marginStart="65dp"-->
-<!--        android:layout_marginTop="212dp"-->
-<!--        android:layout_marginEnd="65dp"-->
-<!--        android:hint="@string/username"-->
-<!--        android:backgroundTint="#D3E2F2"-->
-<!--        android:inputType="textPersonName"-->
-<!--        android:textColorHint="#D3E2F2"-->
-<!--        android:textColor="#D3E2F2"/>-->
+    <!-- Add Event Button -->
 
-<!--    <EditText-->
-<!--        android:id="@+id/editTextPassword"-->
-<!--        android:layout_width="281dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_below="@id/editTextUsername"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_alignParentEnd="true"-->
-<!--        android:layout_marginStart="65dp"-->
-<!--        android:layout_marginTop="20dp"-->
-<!--        android:layout_marginEnd="65dp"-->
-<!--        android:hint="@string/password"-->
-<!--        android:backgroundTint="#D3E2F2"-->
-<!--        android:inputType="textPassword"-->
-<!--        android:textColorHint="#D3E2F2"-->
-<!--        android:textColor="#D3E2F2"/>-->
+    <!-- View Events Button -->
 
-<!--    <Button-->
-<!--        android:id="@+id/buttonLogin"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="38dp"-->
-<!--        android:layout_below="@+id/editTextPassword"-->
-<!--        android:layout_alignParentEnd="true"-->
-<!--        android:layout_marginTop="15dp"-->
-<!--        android:layout_marginEnd="85dp"-->
-<!--        android:backgroundTint="#414E6E"-->
-<!--        android:text="@string/login"-->
-<!--        android:textColor="#D3E2F2"/>-->
-
-<!--    <Button-->
-<!--        android:id="@+id/buttonSignUp"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="38dp"-->
-<!--        android:layout_below="@+id/editTextPassword"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_marginStart="85dp"-->
-<!--        android:layout_marginTop="15dp"-->
-<!--        android:backgroundTint="#414E6E"-->
-<!--        android:text="@string/signup"-->
-<!--        android:textColor="#D3E2F2"/>-->
-
-    <TextView
-        android:id="@+id/loginText"
+    <Button
+        android:id="@+id/buttonAddEvent"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
+        android:layout_height="38dp"
         android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="750dp"
+        android:backgroundTint="#414E6E"
+        android:text="@string/addEvent"
+        android:textColor="#D3E2F2" />
+
+    <Button
+        android:id="@+id/buttonSendEventNoti"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="20dp"
+        android:backgroundTint="#414E6E"
+        android:text="@string/sendNoti"
+        android:textColor="#D3E2F2" />
+
+    <!-- Send Notification Button -->
+    <Button
+        android:id="@+id/buttonViewEvents"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="#414E6E"
+        android:text="@string/viewEvents"
+        android:textColor="#D3E2F2" />
+
+    <!-- Profile Button -->
+    <Button
+        android:id="@+id/buttonOrganizerProfilePage"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="167dp"
-        android:layout_marginTop="154dp"
-        android:layout_marginEnd="167dp"
-        android:textColor="#D3E2F2"
-        android:text="Hello"
-        android:textSize="30sp" />
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="20dp"
+        android:backgroundTint="#414E6E"
+        android:text="@string/profile"
+        android:textColor="#D3E2F2" />
 
 </RelativeLayout>
