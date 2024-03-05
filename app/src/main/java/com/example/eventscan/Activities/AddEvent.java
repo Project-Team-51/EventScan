@@ -1,5 +1,5 @@
 package com.example.eventscan.Activities;
 
-public class OrganizerProfile {
+public class AddEvent {
 
 }
