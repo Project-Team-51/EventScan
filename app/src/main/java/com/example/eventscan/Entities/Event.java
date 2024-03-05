@@ -7,7 +7,8 @@ import java.util.ArrayList;
 public class Event {
     private Location location;
     private String desc;
-    private ArrayList<Attendee> attendees;
+    private String name;
+    public ArrayList<Attendee> attendees;
     private Organizer organizer;
     private Image poster;
 
@@ -37,6 +38,10 @@ public class Event {
     public void setDesc(String desc) {
         this.desc = desc;
     }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public String getName() { return name; }
 
     // Method to add an attendee to the event
     public void addAttendee(Attendee attendee) {
@@ -70,6 +75,7 @@ public class Event {
     public void setPoster(Image poster) {
         this.poster = poster;
     }
+
 
 }
 

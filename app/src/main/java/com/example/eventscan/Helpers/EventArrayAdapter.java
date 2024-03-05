@@ -17,10 +17,10 @@ import java.util.ArrayList;
 public class EventArrayAdapter extends ArrayAdapter<Event> {
     // The class responsible for displaying the list and the list's objects //
     //  -- Pretty simple, just has the View method to show individual list objects, and within View-
-    // retrieves the necessary information about the book object, and pcik -- //
+    // retrieves the necessary information about the event object, and pcik -- //
     // seems to be bug free //
     public EventArrayAdapter(Context context, ArrayList<Event> events) {
-        super(context, 0, books);
+        super(context, 0, events);
     }
     @NonNull
     @Override
@@ -32,17 +32,16 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
             view = convertView;
         }
 
-        Event book = getItem(position);
-        TextView bookName = view.findViewById(R.id.book_name);
+        Event event = getItem(position);
+        TextView eventName = view.findViewById(R.id.event_name);
         TextView authorName = view.findViewById(R.id.author_name);
-        TextView genre = view.findViewById(R.id.book_genre);
+        TextView genre = view.findViewById(R.id.event_genre);
         TextView readStatus = view.findViewById(R.id.read_status);
 
-        assert book != null;
-        bookName.setText(book.getName());
-        authorName.setText(book.getAuthor());
-        genre.setText(book.getGenre());
-        String statusText = book.getRead() ? "Read" : "Unread";
+        assert event != null;
+        eventName.setText(event.getDesc());
+        genre.setText(event.getGenre());
+        String statusText = event.getRead() ? "Read" : "Unread";
         readStatus.setText(statusText);
         readStatus.setVisibility(View.VISIBLE);
 
