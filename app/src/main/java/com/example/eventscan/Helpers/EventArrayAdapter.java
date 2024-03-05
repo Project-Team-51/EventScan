@@ -34,16 +34,11 @@ public class EventArrayAdapter extends ArrayAdapter<Event> {
 
         Event event = getItem(position);
         TextView eventName = view.findViewById(R.id.event_name);
-        TextView authorName = view.findViewById(R.id.author_name);
-        TextView genre = view.findViewById(R.id.event_genre);
-        TextView readStatus = view.findViewById(R.id.read_status);
+        TextView eventDesc = view.findViewById(R.id.author_name);
 
         assert event != null;
-        eventName.setText(event.getDesc());
-        genre.setText(event.getGenre());
-        String statusText = event.getRead() ? "Read" : "Unread";
-        readStatus.setText(statusText);
-        readStatus.setVisibility(View.VISIBLE);
+        eventName.setText(event.getName());
+        eventDesc.setText(event.getDesc());
 
         return view;
     }
