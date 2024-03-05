@@ -36,8 +36,6 @@ public class UserSelection extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-=======
-
 
     }
 
