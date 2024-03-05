@@ -1,19 +1,13 @@
 package com.example.eventscan.Activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.eventscan.Entities.Administrator;
-import com.example.eventscan.Entities.Attendee;
-import com.example.eventscan.Entities.Organizer;
-import com.example.eventscan.Entities.User;
 import com.example.eventscan.R;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
 
 public class UserSelection extends AppCompatActivity {
     @Override
@@ -30,13 +24,11 @@ public class UserSelection extends AppCompatActivity {
         adminButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(UserSelection.this, Login.class);
+                Intent intent = new Intent(UserSelection.this, LoginActivity.class);
                 startActivity(intent);
             }
         });
-        //userType1Button.setOnClickListener(view -> startApp(Organizer.class));
-        //userType2Button.setOnClickListener(view -> startApp(Attendee.class));
-        //userType3Button.setOnClickListener(view -> startApp(Administrator.class));
+
     }
 
 }
