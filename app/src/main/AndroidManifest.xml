@@ -40,8 +40,11 @@
             android:label="Add Event"
             android:exported="true">
         </activity>
-
-
+        <activity
+            android:name=".Activities.AttendeeEventsView"
+            android:label="Attendee Events View"
+            android:exported="true">
+        </activity>
 
     </application>
 
