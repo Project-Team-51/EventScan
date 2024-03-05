@@ -41,9 +41,7 @@ public class UserSelection extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        //userType1Button.setOnClickListener(view -> startApp(Organizer.class));
-        //userType2Button.setOnClickListener(view -> startApp(Attendee.class));
-        //userType3Button.setOnClickListener(view -> startApp(Administrator.class));
+
     }
 
 }
