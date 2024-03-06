@@ -14,6 +14,7 @@ public class Event {
     private Bitmap poster;
 
 
+
     // empty constructor so it works with firestore
     public Event() {};
 
@@ -70,6 +71,7 @@ public class Event {
     public void setOrganizer(Organizer organizer) {
         this.organizer = organizer;
     }
+
 
     public Bitmap getPoster() {
         return poster;
