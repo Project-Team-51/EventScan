@@ -7,6 +7,7 @@
     android:background="@drawable/background_gradient"
     tools:context=".Activities.AdminActivity">
 
+
     <RelativeLayout
         android:id="@+id/navigationBar"
         android:layout_width="match_parent"
@@ -16,12 +17,14 @@
         android:padding="19dp">
 
 
+
     </RelativeLayout>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
 
 
 </RelativeLayout>

@@ -1,7 +1,11 @@
 package com.example.eventscan.Entities;
 
+
+import android.media.Image;
+
 import android.graphics.Bitmap;
 import android.location.Location;
+
 
 import java.util.ArrayList;
 
@@ -11,17 +15,26 @@ public class Event {
     private String name;
     public ArrayList<Attendee> attendees;
     private Organizer organizer;
+
+    private Image poster;
+
+    // Constructor
+    public Event(Location location, String desc, Organizer organizer, Image poster) {
+        this.location = location;
+
     private Bitmap poster;
 
     public Event() {}
 
     public Event(String eventName, String desc, Organizer organizer, Bitmap poster) {
+
         this.desc = desc;
         this.attendees = new ArrayList<>();
         this.organizer = organizer;
         this.poster = poster;
     }
 
+    // Getter and Setter methods for Location
     public Location getLocation() {
         return location;
     }
@@ -30,6 +43,8 @@ public class Event {
         this.location = location;
     }
 
+
+    // Getter and Setter methods for Description
     public String getDesc() {
         return desc;
     }
@@ -37,6 +52,7 @@ public class Event {
     public void setDesc(String desc) {
         this.desc = desc;
     }
+
 
     public void setName(String name) {
         this.name = name;
@@ -46,17 +62,21 @@ public class Event {
         return name;
     }
 
+
     public void addAttendee(Attendee attendee) {
         attendees.add(attendee);
     }
+
 
     public void removeAttendee(Attendee attendee) {
         attendees.remove(attendee);
     }
 
+
     public ArrayList<Attendee> getAttendees() {
         return attendees;
     }
+
 
     public Organizer getOrganizer() {
         return organizer;
@@ -66,6 +86,7 @@ public class Event {
         this.organizer = organizer;
     }
 
+
     public Bitmap getPoster() {
         return poster;
     }
@@ -73,5 +94,6 @@ public class Event {
     public void setPoster(Bitmap poster) {
         this.poster = poster;
     }
+
 }
 
