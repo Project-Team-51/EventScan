@@ -45,6 +45,10 @@
             android:label="Attendee Events View"
             android:exported="true">
         </activity>
+            android:name=".Activities.AdminActivity"
+            android:label="AdminActivity"
+            android:exported="true">
+        </activity>
 
     </application>
 
