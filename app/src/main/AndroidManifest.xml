@@ -42,7 +42,6 @@
         </activity>
         <activity
             android:name=".Activities.AttendeeEventsView"
-
             android:label="Attendee Home Page"
             android:exported="true">
         </activity>
@@ -56,7 +55,6 @@
             android:label="AdminActivity"
             android:exported="true">
         </activity>
-
 
     </application>
 
