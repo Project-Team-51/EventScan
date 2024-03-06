@@ -12,11 +12,24 @@ public class User {
     private String bio;
     private Boolean checkedIn;
     private Location location;
+    private String deviceID;
+    private String profilePictureID;
     public ArrayList<Event> inEvents;
 
     public User(String name, String password) {
         this.name = name;
         this.password = password;
+    }
+
+    public User(String name, String deviceID, String email, String phoneNum, String bio, String profilePictureID) {
+        this.name = name;
+        this.deviceID = deviceID;
+        this.email = email;
+        this.phoneNum = phoneNum;
+        this.bio = bio;
+        this.profilePictureID = profilePictureID;
+
+
     }
 
     public String getName() {
@@ -42,6 +55,13 @@ public class User {
     public Location getLocation() {
         return location;
     }
+
+    public String getDeviceID() {
+        return deviceID;
+    }
+
+    public String getProfilePictureID(){ return profilePictureID;}
+
     public void setName(String name) {
         this.name = name;
     }
@@ -68,6 +88,9 @@ public class User {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+    public void setDeviceID(String deviceID){this.deviceID = deviceID;}
+    public void setProfilePictureID(String profilePictureID){this.profilePictureID = profilePictureID;}
     public ArrayList<Event> getInEvents(){ return this.inEvents; }
 
 }
