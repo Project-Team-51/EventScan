@@ -13,14 +13,15 @@ public class Event {
     private Organizer organizer;
     private Bitmap poster;
 
-    public Event() {}
-
+    // Constructor
     public Event(String eventName, String desc, Organizer organizer, Bitmap poster) {
+        this.name = eventName;
         this.desc = desc;
         this.attendees = new ArrayList<>();
         this.organizer = organizer;
         this.poster = poster;
     }
+
 
     public Location getLocation() {
         return location;
