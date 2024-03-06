@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient"
-
     tools:context=".Activities.AttendeeEventsView">
     <TextView
         android:id="@+id/upcomingEventsText"
@@ -13,48 +12,57 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"
         android:textColor="#D3E2F2"
-
-        android:text="Attending Events"
+        android:text="Upcoming Events"
         android:textSize="30sp" />
-
     <RelativeLayout
         android:id="@+id/bubbleContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="75dp"
         android:layout_marginHorizontal="30dp"
-
-        android:layout_above="@id/buttonScanQR"
+        android:layout_marginBottom="400dp"
         android:background="@drawable/background_rounded">
-
+        <ListView
+            android:id="@+id/allEvents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="1dp"/>
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/EventAnnouncements"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="350dp"
+        android:textColor="#D3E2F2"
+        android:text="Event Announcements"
+        android:textSize="30sp" />
+    <RelativeLayout
+        android:id="@+id/bubbleContainer2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="400dp"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginBottom="100dp"
+        android:background="@drawable/background_rounded">
         <ListView
             android:id="@+id/inEvents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp" />
+            android:dividerHeight="1dp"/>
     </RelativeLayout>
 
     <Button
-        android:id="@+id/buttonScanQR"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="20dp"
-        android:layout_marginStart="20dp"
-        android:backgroundTint="#414E6E"
-        android:text="@string/scanQR"
-        android:textColor="#D3E2F2" />
-
-    <Button
         android:id="@+id/buttonViewEvents"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="38dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="47dp"
         android:layout_marginBottom="20dp"
-
+        android:layout_toStartOf="@+id/buttonAttendeeProfile"
         android:backgroundTint="#414E6E"
         android:text="@string/viewEvents"
         android:textColor="#D3E2F2" />
@@ -63,11 +71,10 @@
         android:id="@+id/buttonAttendeeProfile"
         android:layout_width="wrap_content"
         android:layout_height="38dp"
-
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="65dp"
         android:layout_marginBottom="20dp"
-        android:layout_marginEnd="20dp"
         android:backgroundTint="#414E6E"
         android:text="@string/profile"
         android:textColor="#D3E2F2" />
