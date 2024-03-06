@@ -12,7 +12,6 @@
 
 
 
-
     <EditText
         android:id="@+id/editTextUsername"
         android:layout_width="wrap_content"
