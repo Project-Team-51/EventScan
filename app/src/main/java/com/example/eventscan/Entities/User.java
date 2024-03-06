@@ -26,7 +26,7 @@ public class User {
     public User() {}
 
 
-    }
+
 
     public User(String name, String deviceID, String email, String phoneNum, String bio, String profilePictureID) {
             this.name = name;
