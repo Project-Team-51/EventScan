@@ -1,7 +1,12 @@
 package com.example.eventscan.Entities;
 
-import com.example.eventscan.Entities.Location;
+import android.location.Location;
 
+<<<<<<< Updated upstream
+=======
+import java.util.ArrayList;
+
+>>>>>>> Stashed changes
 public class User {
     private String name;
     private String phoneNum;
