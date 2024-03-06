@@ -3,7 +3,6 @@ package com.example.eventscan.Entities;
 
 import android.media.Image;
 
-import android.graphics.Bitmap;
 import android.location.Location;
 
 
@@ -21,13 +20,6 @@ public class Event {
     // Constructor
     public Event(Location location, String desc, Organizer organizer, Image poster) {
         this.location = location;
-
-    private Bitmap poster;
-
-    public Event() {}
-
-    public Event(String eventName, String desc, Organizer organizer, Bitmap poster) {
-
         this.desc = desc;
         this.attendees = new ArrayList<>();
         this.organizer = organizer;
@@ -87,11 +79,11 @@ public class Event {
     }
 
 
-    public Bitmap getPoster() {
+    public Image getPoster() {
         return poster;
     }
 
-    public void setPoster(Bitmap poster) {
+    public void setPoster(Image poster) {
         this.poster = poster;
     }
 
