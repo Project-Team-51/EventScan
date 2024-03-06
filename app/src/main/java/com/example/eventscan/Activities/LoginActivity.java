@@ -34,20 +34,20 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 String user = username.getText().toString();
-                String pass = password.getText().toString();
+                String pass = password.getText().toString(); // access firestore, compare user and passowrds with the inputted details
                 db.collection("admin")
                         .whereEqualTo("user", user)
                         .whereEqualTo("pass", pass)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) { // if comparison complete and firestore data retrieved,  either start the admin activity or display invalid credentials
                                 if (task.isSuccessful()) {
                                     if (task.getResult() != null && !task.getResult().isEmpty()) {
                                         Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
                                         startActivity(intent);
                                     } else {
-                                        result.setText("Invalid Credentials");
+                                        result.setText("Invalid Login");
                                     }
                                 } else {
                                     result.setText("Error");
