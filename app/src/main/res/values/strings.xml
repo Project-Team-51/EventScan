@@ -11,9 +11,4 @@
     <string name="sendNoti">Notify</string>
     <string name="addEvent">Add Event</string>
     <string name="viewEvents">View Events</string>
-    <string name="scanQR">Scan QR</string>
-    <string name="buttonBack">Back</string>
-    <string name="edit_info">Edit Info</string>
-    <string name="previousEvents">Previous Events</string>
-
 </resources>
