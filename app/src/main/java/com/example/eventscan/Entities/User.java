@@ -1,7 +1,6 @@
 package com.example.eventscan.Entities;
 
-import com.example.eventscan.Entities.Location;
-
+import android.location.Location;
 import java.util.ArrayList;
 import java.util.Collection;
 
