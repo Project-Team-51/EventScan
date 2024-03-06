@@ -13,11 +13,11 @@ public class Event {
     private Organizer organizer;
     private Bitmap poster;
 
-
-
-
+  
+  
     // empty constructor so it works with firestore
     public Event() {};
+  
 
     public Event(String eventName, String desc, Organizer organizer, Bitmap poster) {
         this.name = eventName;
