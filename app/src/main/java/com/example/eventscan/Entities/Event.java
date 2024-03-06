@@ -12,10 +12,14 @@ public class Event {
     public ArrayList<Attendee> attendees;
     private Organizer organizer;
     private Bitmap poster;
-
-    // Constructor
+  
+  
+    // empty constructor so it works with firestore
+    public Event() {};
+  
     public Event(String eventName, String desc, Organizer organizer, Bitmap poster) {
         this.name = eventName;
+
         this.desc = desc;
         this.attendees = new ArrayList<>();
         this.organizer = organizer;
