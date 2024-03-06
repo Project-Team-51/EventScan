@@ -1,6 +1,8 @@
 package com.example.eventscan.Entities;
 
-import com.example.eventscan.Entities.Location;
+import android.location.Location;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class User {
     private String name;
@@ -10,6 +12,7 @@ public class User {
     private String bio;
     private Boolean checkedIn;
     private Location location;
+    public ArrayList<Event> inEvents;
 
     public User(String name, String password) {
         this.name = name;
@@ -65,4 +68,6 @@ public class User {
     public void setLocation(Location location) {
         this.location = location;
     }
+    public ArrayList<Event> getInEvents(){ return this.inEvents; }
+
 }

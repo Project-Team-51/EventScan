@@ -16,8 +16,15 @@ import com.example.eventscan.R;
 import java.util.ArrayList;
 
 public class EventArrayAdapter extends ArrayAdapter<Event> {
-    public EventArrayAdapter(Context context, ArrayList<Event> events) {
-        super(context, 0, events);
+
+    // The class responsible for displaying the list and the list's objects //
+    //  -- Pretty simple, just has the View method to show individual list objects, and within View-
+    // retrieves the necessary information about the book object, and pcik -- //
+    // seems to be bug free //
+
+    public EventArrayAdapter(Context context, int resource, ArrayList<Event> events) {
+        super(context, resource, events);
+
     }
     @NonNull
     @Override

@@ -24,5 +24,8 @@ public class AttendeeEventsView extends AppCompatActivity {
             }
         });
 
+
+
+
     }
 }

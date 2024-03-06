@@ -1,5 +1,8 @@
 package com.example.eventscan.Activities;
 
+
+import android.content.Intent;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,6 +11,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+
+import com.example.eventscan.Database.DatabaseHelper;
 
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -42,7 +48,12 @@ public class LoginActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
                                     if (task.getResult() != null && !task.getResult().isEmpty()) {
+
                                         result.setText("Login Successful");
+
+                                        Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
+                                        startActivity(intent);
+
                                     } else {
                                         result.setText("Invalid Credentials");
                                     }

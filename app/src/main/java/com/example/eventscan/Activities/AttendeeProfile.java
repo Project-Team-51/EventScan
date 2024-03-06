@@ -1,5 +1,6 @@
 package com.example.eventscan.Activities;
 
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -66,5 +67,6 @@ public class AttendeeProfile extends AppCompatActivity {
             currentProfileIndex = index;
         }
     }
+
 
 }
