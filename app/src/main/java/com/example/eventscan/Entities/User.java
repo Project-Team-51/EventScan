@@ -20,6 +20,10 @@ public class User {
         this.password = password;
     }
 
+    // empty constructor so it works with firestore
+    public User() {
+    }
+
     public String getName() {
         return name;
     }

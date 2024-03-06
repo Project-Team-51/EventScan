@@ -12,9 +12,16 @@ public class Event {
     private Organizer organizer;
     private Image poster;
 
+<<<<<<< Updated upstream
     // Constructor
     public Event(Location location, String desc, Organizer organizer, Image poster) {
         this.location = location;
+=======
+    // empty constructor so it works with firestore
+    public Event() {}
+
+    public Event(String eventName, String desc, Organizer organizer, Bitmap poster) {
+>>>>>>> Stashed changes
         this.desc = desc;
         this.attendees = new ArrayList<>();
         this.organizer = organizer;
