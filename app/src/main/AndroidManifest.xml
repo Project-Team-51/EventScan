@@ -46,11 +46,6 @@
             android:exported="true">
         </activity>
         <activity
-            android:name=".Activities.AttendeeProfile"
-            android:label="Attendee Profile"
-            android:exported="true">
-        </activity>
-        <activity
             android:name=".Activities.AdminActivity"
             android:label="AdminActivity"
             android:exported="true">
