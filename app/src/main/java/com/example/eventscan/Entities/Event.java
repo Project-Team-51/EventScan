@@ -15,6 +15,7 @@ public class Event {
 
 
 
+
     // empty constructor so it works with firestore
     public Event() {};
 
@@ -26,6 +27,7 @@ public class Event {
         this.organizer = organizer;
         this.poster = poster;
     }
+
 
 
     public Location getLocation() {
