@@ -18,7 +18,7 @@ public class UserSelection extends AppCompatActivity {
 
         // Handle user type selection
         final Button organizerButton = findViewById(R.id.buttonOrganizer);
-        Button userType2Button = findViewById(R.id.buttonAttendee);
+        final Button attendeeButton = findViewById(R.id.buttonAttendee);
         final Button adminButton = findViewById(R.id.buttonAdministrator);
 
         adminButton.setOnClickListener(new View.OnClickListener() {
@@ -33,6 +33,14 @@ public class UserSelection extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UserSelection.this, OrganizerEventsView.class);
+                startActivity(intent);
+            }
+        });
+
+        attendeeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserSelection.this, AttendeeEventsView.class);
                 startActivity(intent);
             }
         });

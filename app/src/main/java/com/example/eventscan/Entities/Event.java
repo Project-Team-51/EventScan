@@ -1,6 +1,7 @@
 package com.example.eventscan.Entities;
 
-import android.media.Image;
+import android.graphics.Bitmap;
+import android.location.Location;
 
 import java.util.ArrayList;
 
@@ -10,25 +11,22 @@ public class Event {
     private String name;
     public ArrayList<Attendee> attendees;
     private Organizer organizer;
-    private Image poster;
-
-<<<<<<< Updated upstream
-    // Constructor
-    public Event(Location location, String desc, Organizer organizer, Image poster) {
-        this.location = location;
-=======
+    private Bitmap poster;
+  
+  
     // empty constructor so it works with firestore
-    public Event() {}
-
+    public Event() {};
+  
     public Event(String eventName, String desc, Organizer organizer, Bitmap poster) {
->>>>>>> Stashed changes
+        this.name = eventName;
+
         this.desc = desc;
         this.attendees = new ArrayList<>();
         this.organizer = organizer;
         this.poster = poster;
     }
 
-    // Getter and Setter methods for Location
+
     public Location getLocation() {
         return location;
     }
@@ -37,7 +35,6 @@ public class Event {
         this.location = location;
     }
 
-    // Getter and Setter methods for Description
     public String getDesc() {
         return desc;
     }
@@ -45,27 +42,27 @@ public class Event {
     public void setDesc(String desc) {
         this.desc = desc;
     }
+
     public void setName(String name) {
         this.name = name;
     }
-    public String getName() { return name; }
 
-    // Method to add an attendee to the event
+    public String getName() {
+        return name;
+    }
+
     public void addAttendee(Attendee attendee) {
         attendees.add(attendee);
     }
 
-    // Method to remove an attendee from the event
     public void removeAttendee(Attendee attendee) {
         attendees.remove(attendee);
     }
 
-    // Getter method for Attendees
     public ArrayList<Attendee> getAttendees() {
         return attendees;
     }
 
-    // Getter and Setter methods for Organizer
     public Organizer getOrganizer() {
         return organizer;
     }
@@ -74,15 +71,12 @@ public class Event {
         this.organizer = organizer;
     }
 
-    // Getter and Setter methods for Poster
-    public Image getPoster() {
+    public Bitmap getPoster() {
         return poster;
     }
 
-    public void setPoster(Image poster) {
+    public void setPoster(Bitmap poster) {
         this.poster = poster;
     }
-
-
 }
 

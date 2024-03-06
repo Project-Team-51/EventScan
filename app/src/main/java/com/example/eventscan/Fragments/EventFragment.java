@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -15,7 +16,9 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventscan.Entities.Administrator;
 import com.example.eventscan.Entities.Event;
+
 import com.example.eventscan.Entities.User;
+
 import com.example.eventscan.Helpers.EventArrayAdapter;
 import com.example.eventscan.R;
 import com.google.firebase.firestore.CollectionReference;
@@ -26,6 +29,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 public class EventFragment extends Fragment {

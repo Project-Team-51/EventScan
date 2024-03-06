@@ -1,7 +1,6 @@
 package com.example.eventscan.Entities;
 
-import com.example.eventscan.Entities.Location;
-
+import android.location.Location;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -13,6 +12,8 @@ public class User {
     private String bio;
     private Boolean checkedIn;
     private Location location;
+    private String deviceID;
+    private String profilePictureID;
     public ArrayList<Event> inEvents;
 
     public User(String name, String password) {
@@ -20,8 +21,20 @@ public class User {
         this.password = password;
     }
 
+
     // empty constructor so it works with firestore
     public User() {
+
+    public User(String name, String deviceID, String email, String phoneNum, String bio, String profilePictureID) {
+        this.name = name;
+        this.deviceID = deviceID;
+        this.email = email;
+        this.phoneNum = phoneNum;
+        this.bio = bio;
+        this.profilePictureID = profilePictureID;
+
+
+
     }
 
     public String getName() {
@@ -47,6 +60,13 @@ public class User {
     public Location getLocation() {
         return location;
     }
+
+    public String getDeviceID() {
+        return deviceID;
+    }
+
+    public String getProfilePictureID(){ return profilePictureID;}
+
     public void setName(String name) {
         this.name = name;
     }
@@ -73,6 +93,9 @@ public class User {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+    public void setDeviceID(String deviceID){this.deviceID = deviceID;}
+    public void setProfilePictureID(String profilePictureID){this.profilePictureID = profilePictureID;}
     public ArrayList<Event> getInEvents(){ return this.inEvents; }
 
 }
