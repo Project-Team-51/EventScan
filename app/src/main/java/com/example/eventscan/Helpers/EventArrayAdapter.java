@@ -11,45 +11,36 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.eventscan.Entities.Event;
+import com.example.eventscan.R;
 
 import java.util.ArrayList;
 
 public class EventArrayAdapter extends ArrayAdapter<Event> {
-<<<<<<< Updated upstream
     // The class responsible for displaying the list and the list's objects //
     //  -- Pretty simple, just has the View method to show individual list objects, and within View-
     // retrieves the necessary information about the book object, and pcik -- //
     // seems to be bug free //
-    public EventArrayAdapter(Context context, ArrayList<Event> events) {
-        super(context, 0, books);
-=======
+
     public EventArrayAdapter(Context context, int resource, ArrayList<Event> events) {
         super(context, resource, events);
->>>>>>> Stashed changes
     }
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View view;
         if (convertView == null) {
-            view = LayoutInflater.from(getContext()).inflate(R.layout.content, parent, false);
+            view = LayoutInflater.from(getContext()).inflate(R.layout.event_list_content, parent, false);
         } else {
             view = convertView;
         }
 
-        Event book = getItem(position);
-        TextView bookName = view.findViewById(R.id.book_name);
-        TextView authorName = view.findViewById(R.id.author_name);
-        TextView genre = view.findViewById(R.id.book_genre);
-        TextView readStatus = view.findViewById(R.id.read_status);
+        Event event = getItem(position);
+        TextView eventName = view.findViewById(R.id.event_name);
+        TextView eventDesc = view.findViewById(R.id.event_desc);
 
-        assert book != null;
-        bookName.setText(book.getName());
-        authorName.setText(book.getAuthor());
-        genre.setText(book.getGenre());
-        String statusText = book.getRead() ? "Read" : "Unread";
-        readStatus.setText(statusText);
-        readStatus.setVisibility(View.VISIBLE);
+        assert event != null;
+        eventName.setText(event.getName());
+        eventDesc.setText(event.getDesc());
 
         return view;
     }
