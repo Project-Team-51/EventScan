@@ -18,23 +18,13 @@ public class Event {
     private Bitmap poster;
 
     // Constructor
-    public Event(Location location, String desc, Organizer organizer, Bitmap poster) {
-        this.location = location;
+    public Event(String name, String desc, Organizer organizer, Bitmap poster) {
+        this.name = name;
         this.desc = desc;
         this.attendees = new ArrayList<>();
         this.organizer = organizer;
         this.poster = poster;
     }
-
-    // Getter and Setter methods for Location
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
-        this.location = location;
-    }
-
 
     // Getter and Setter methods for Description
     public String getDesc() {
