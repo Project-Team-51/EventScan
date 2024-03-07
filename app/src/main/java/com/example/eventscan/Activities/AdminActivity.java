@@ -3,9 +3,11 @@ package com.example.eventscan.Activities;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventscan.Database.DatabaseHelper;
+import com.example.eventscan.Fragments.AttendeeFragment;
 import com.example.eventscan.Fragments.EventFragment;
 import com.example.eventscan.Fragments.qrCodeTestFrag;
 import com.example.eventscan.R;
@@ -19,10 +21,12 @@ public class AdminActivity extends AppCompatActivity {
         eventRepository.addSampleEvents();
 
         if (savedInstanceState == null) {
-            EventFragment eventFragment = new EventFragment();
+            AttendeeFragment eventFragment = new AttendeeFragment();
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container_view, eventFragment);
             transaction.commit();
+
+            AddEvent addevent = new AddEvent();
         }
     }
 }

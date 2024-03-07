@@ -11,6 +11,7 @@
     <string name="sendNoti">Notify</string>
     <string name="addEvent">Add Event</string>
     <string name="viewEvents">View Events</string>
+    <string name="allUsersString">All Users</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
