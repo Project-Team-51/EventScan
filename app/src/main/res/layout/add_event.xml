@@ -108,7 +108,7 @@
         android:text="Confirm Event" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/posterView"
         android:layout_width="139dp"
         android:layout_height="150dp"
         android:layout_below="@+id/confirmEvent"

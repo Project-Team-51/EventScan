@@ -5,6 +5,7 @@ import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 import android.app.FragmentManager;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -16,6 +17,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -40,6 +44,8 @@ import java.util.Random;
 public class AddEvent extends DialogFragment {
 
     private Event event;
+    private ImageView imageView;
+    private Uri posterUri;
 
     public AddEvent() {
         // Required empty public constructor
@@ -66,12 +72,21 @@ public class AddEvent extends DialogFragment {
         Button returnToEventsButton = view.findViewById(R.id.return_to_event);
         Button generateQRCodeButton = view.findViewById(R.id.generate_QRCode);
         Button confirmEvent = view.findViewById(R.id.confirmEvent);
+        Button uploadPoster = view.findViewById(R.id.upload_poster);
+        imageView = view.findViewById(R.id.posterView);
 
         returnToEventsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dismiss(); // Close the dialog when the button is clicked
                 // You can perform other actions here if needed
+            }
+        });
+        uploadPoster.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Launch the image selection activity
+                pickImageLauncher.launch("image/*");
             }
         });
 
@@ -199,6 +214,16 @@ public class AddEvent extends DialogFragment {
         }
     }
 
-
+    private final ActivityResultLauncher<String> pickImageLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri result) {
+                    if (result != null) {
+                        posterUri = result;
+                        imageView.setImageURI(result);
+                    }
+                }
+            });
 
 }
