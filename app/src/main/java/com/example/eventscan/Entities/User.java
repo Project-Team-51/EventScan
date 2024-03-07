@@ -25,9 +25,6 @@ public class User {
     // empty constructor so it works with firestore
     public User() {}
 
-
-
-
     public User(String name, String deviceID, String email, String phoneNum, String bio, String profilePictureID) {
             this.name = name;
             this.deviceID = deviceID;

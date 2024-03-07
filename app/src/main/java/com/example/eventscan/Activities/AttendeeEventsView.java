@@ -9,29 +9,29 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventscan.Fragments.AttendeeProfile;
+import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.R;
 
-public class AttendeeEventsView extends AppCompatActivity {
+public class AttendeeEventsView extends AppCompatActivity implements View.OnClickListener {
 
+    Button buttonAttendeeProfile;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.attendee_events_view);
 
 
-        final Button buttonAttendeeProfile = findViewById(R.id.buttonAttendeeProfile);
-        buttonAttendeeProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openAttendeeProfileFragment();
-            }
-        });
+
+        buttonAttendeeProfile = findViewById(R.id.buttonAttendeeProfile);
+        buttonAttendeeProfile.setOnClickListener(this);
+
+
     }
 
-    private void openAttendeeProfileFragment() {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, new AttendeeProfile())
-                .commit();
-    }
 
+    @Override
+    public void onClick(View v) {
+        if(v.getId()==R.id.buttonAttendeeProfile){
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ProfileFragment()).commit();
+        }
+    }
 }

@@ -53,6 +53,12 @@
             android:divider="@android:color/darker_gray"
             android:dividerHeight="1dp"/>
     </RelativeLayout>
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="168dp"
+        tools:layout_editor_absoluteY="223dp" />
 
     <Button
         android:id="@+id/buttonViewEvents"
