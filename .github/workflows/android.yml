@@ -13,6 +13,8 @@ jobs:
     - uses: actions/checkout@v3
     - name: Merge main with PR branch
       run: |
+        git config user.name "Doesnt Matter"
+        git config user.email "actionsrunner@dummydomain.com"
         git fetch origin main:main
         git merge main --allow-unrelated-histories
     - name: set up JDK 17
