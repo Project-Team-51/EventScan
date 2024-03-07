@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="5dp"
         android:textColor="#D3E2F2"
         android:text="Your Events"
         android:textSize="30sp" />
@@ -19,9 +19,11 @@
         android:id="@+id/bubbleContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="75dp"
+        android:layout_marginTop="5dp"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginBottom="400dp"
+        android:layout_marginBottom="-320dp"
+        android:layout_below="@id/yourEventsText"
+        android:layout_above="@+id/atEventsText"
         android:background="@drawable/background_rounded">
         <ListView
             android:id="@+id/ownedEvents"
@@ -30,12 +32,13 @@
             android:divider="@android:color/darker_gray"
             android:dividerHeight="1dp"/>
     </RelativeLayout>
+
     <TextView
         android:id="@+id/atEventsText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="350dp"
+        android:layout_marginTop="330dp"
         android:textColor="#D3E2F2"
         android:text="Attending Events"
         android:textSize="30sp" />
@@ -43,8 +46,10 @@
         android:id="@+id/bubbleContainer2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="400dp"
+        android:layout_below="@id/atEventsText"
+        android:layout_marginTop="5dp"
         android:layout_marginHorizontal="30dp"
+        android:layout_alignParentBottom="true"
         android:layout_marginBottom="100dp"
         android:background="@drawable/background_rounded">
         <ListView
@@ -52,6 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp"/>
+            android:dividerHeight="1dp" />
     </RelativeLayout>
+
 </RelativeLayout>

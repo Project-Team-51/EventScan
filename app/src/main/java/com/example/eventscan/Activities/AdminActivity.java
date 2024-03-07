@@ -1,6 +1,8 @@
 package com.example.eventscan.Activities;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -15,20 +17,43 @@ import com.example.eventscan.R;
 
 public class AdminActivity extends AppCompatActivity {
     @Override
-    protected void onCreate( Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.admin_activity);
-        DatabaseHelper eventRepository = new DatabaseHelper();
-        eventRepository.addSampleEvents();
 
         if (savedInstanceState == null) {
-            AttendeeFragment eventFragment = new AttendeeFragment();
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container_view, eventFragment);
-            transaction.commit();
-
-//            AddEvent addevent = new AddEvent();
-
+            // Load the default fragment (EventFragment)
+            EventFragment eventFragment = new EventFragment();
+            loadFragment(eventFragment);
         }
+
+        // Set click listeners for navigation buttons
+        ImageButton buttonEvents = findViewById(R.id.buttonEvents);
+        ImageButton buttonProfile = findViewById(R.id.buttonProfile);
+
+        buttonEvents.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Load the EventFragment
+                EventFragment eventFragment = new EventFragment();
+                loadFragment(eventFragment);
+            }
+        });
+
+        buttonProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Load the AttendeeFragment
+                AttendeeFragment attendeeFragment = new AttendeeFragment();
+                loadFragment(attendeeFragment);
+            }
+        });
+    }
+
+    private void loadFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container_view, fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }

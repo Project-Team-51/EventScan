@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -32,7 +33,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 
-public class EventFragment extends Fragment {
+public class EventFragment extends Fragment implements DeleteEvent.DeleteEventListener{
     private ListView ownedEventsListView;
     private ListView inEventsListView;
     private ArrayList<Event> ownedEvents;
@@ -85,6 +86,35 @@ public class EventFragment extends Fragment {
             }
         });
 
+        ownedEventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Event selectedBook = ownedEvents.get(position);
+                openDeleteEventFragment(selectedBook);
+            }
+        });
+
         return view;
+    }
+
+    private void openDeleteEventFragment(Event selectedEvent) {
+        DeleteEvent deleteEventFragment = new DeleteEvent();
+        deleteEventFragment.setDeleteEventListener(this);
+        // Create a Bundle and put the selected Event information
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("selectedEvent", selectedEvent);
+        deleteEventFragment.setArguments(bundle);
+        // Show the DeleteEvent fragment
+        deleteEventFragment.show(getParentFragmentManager(), "DeleteEventFragment");
+    }
+
+    public void onDeleteEvent(Event event) {
+        deleteEvent(event);
+    }
+
+    public void deleteEvent(Event event) {
+        ownedEventsAdapter.remove(event);
+        ownedEventsAdapter.notifyDataSetChanged();
+        db.collection("events").document(event.getEventID()).delete();
     }
 }

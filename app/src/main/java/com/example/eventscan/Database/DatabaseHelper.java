@@ -21,19 +21,23 @@ public class DatabaseHelper {
 
     // Adds sample events to Firestore
     public void addSampleEvents() {
-        // Placeholder organizer for sample events
         Organizer placeholderOrganizer = new Organizer("gojo satoru", "password");
 
+        Integer eventID1 = (int) Math.floor(Math.random() * 90000) + 10000;
+        String eventID12 = eventID1.toString();
+
         // Creating and adding sample events
-        Event event1 = new Event("Sample Event1", "sample desc1", placeholderOrganizer, posterBitmap);
+        Event event1 = new Event("Sample Event1", "sample desc1", placeholderOrganizer, posterBitmap, eventID12);
         event1.setName("Event 1");
 
-        Event event2 = new Event("Sample Event2", "sample desc2", placeholderOrganizer, posterBitmap);
+        Integer eventID2 = (int) Math.floor(Math.random() * 90000) + 10000;
+        String eventID22 = eventID2.toString();
+
+        Event event2 = new Event("Sample Event2", "sample desc2", placeholderOrganizer, posterBitmap, eventID22);
         event2.setName("Event 2");
 
-        // Setting documents in "events" collection with specific IDs for sample events
-        db.collection("events").document("placeholder event id 123").set(event1);
-        db.collection("events").document("placeholder event id 456").set(event2);
+        db.collection("events").document(event1.getEventID()).set(event1);
+        db.collection("events").document(event2.getEventID()).set(event2);
     }
 
     // Adds sample users (Attendee and Organizer) to Firestore
