@@ -19,8 +19,6 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.attendee_events_view);
 
-
-
         buttonAttendeeProfile = findViewById(R.id.buttonAttendeeProfile);
         buttonAttendeeProfile.setOnClickListener(this);
 
