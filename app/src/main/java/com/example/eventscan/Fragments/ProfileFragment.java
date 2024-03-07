@@ -84,13 +84,9 @@ public class ProfileFragment extends Fragment {
                 .document(attendee.getEmail()) // Use email as a document ID
                 .set(attendee)
                 .addOnSuccessListener(aVoid -> {
-                    // Handle success, e.g., show a success message
-                    // Toast.makeText(getContext(), "Profile saved successfully", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Profile saved successfully");
                 })
                 .addOnFailureListener(e -> {
-                    // Handle failure, e.g., show an error message
-                    // Toast.makeText(getContext(), "Error saving profile", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Error saving profile");
                 });
     }
