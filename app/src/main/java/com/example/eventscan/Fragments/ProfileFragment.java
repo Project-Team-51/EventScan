@@ -25,6 +25,9 @@ import com.example.eventscan.Helpers.ImageUploader;
 import com.example.eventscan.R;
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import android.provider.Settings.Secure;
 
 import kotlin.Unit;
@@ -42,6 +45,7 @@ public class ProfileFragment extends Fragment {
     Button saveProfileBtn;
     ActivityResultLauncher<Intent> imagePickLauncher;
     Uri selectedImageUri;
+    public String deviceID;
 
 
 
@@ -68,6 +72,8 @@ public class ProfileFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
+        deviceID = Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
+
         profilePic = view.findViewById(R.id.profileImageView);
         usernameInput = view.findViewById(R.id.nameEditText);
         phoneInput = view.findViewById(R.id.phoneEditText);
@@ -84,7 +90,7 @@ public class ProfileFragment extends Fragment {
                 String email = emailInput.getText().toString();
                 String bio = bioInput.getText().toString();
 
-                String deviceID = Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
+
                 String profilePictureID = "exampleProfilePictureID";
 
                 // Create a new Attendee object with the input values
@@ -109,10 +115,11 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
+
     private void saveAttendeeProfile(Attendee attendee) {
         // Replace "attendees" with the appropriate Firestore collection name
         db.collection("attendees")
-                .document(attendee.getEmail()) // Use email as a document ID
+                .document(deviceID) // Use deviceID as a document ID
                 .set(attendee)
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "Profile saved successfully");
@@ -120,6 +127,14 @@ public class ProfileFragment extends Fragment {
                 .addOnFailureListener(e -> {
                     Log.d(TAG, "Error saving profile");
                 });
+
+        if(selectedImageUri !=null){
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+            StorageReference profilePicRef = storageRef.child("profile_pics").child(deviceID);
+
+            profilePicRef.putFile(selectedImageUri);
+
+        }
     }
 
 }
