@@ -44,13 +44,17 @@ public class DatabaseHelper {
     public void addSampleUsers() {
         // Adding a sample Attendee
         Attendee sampleAttendee = new Attendee("John Doe", "device1", "john@example.com", "123456789", "Bio for John", "profile1");
-
+        Integer attendeeID1 = (int) Math.floor(Math.random() * 90000) + 10000;
+        String attendeeID12 = attendeeID1.toString();
+        sampleAttendee.setDeviceID(attendeeID12);
         // Adding a sample Organizer
         Organizer sampleOrganizer = new Organizer("Jane Doe", "password");
-
+        Integer attendeeID2 = (int) Math.floor(Math.random() * 90000) + 10000;
+        String attendeeID22 = attendeeID2.toString();
+        sampleOrganizer.setDeviceID(attendeeID22);
         // Setting documents in "users" collection with specific IDs for sample users
-        db.collection("users").document("placeholder attendee").set(sampleAttendee);
-        db.collection("users").document("placeholder organizer").set(sampleOrganizer);
+        db.collection("users").document(sampleAttendee.getDeviceID()).set(sampleAttendee);
+        db.collection("users").document(sampleOrganizer.getDeviceID()).set(sampleOrganizer);
     }
 }
 

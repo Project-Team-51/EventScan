@@ -45,12 +45,6 @@ public class ProfileFragment extends Fragment {
 
 
 
-
-    public ProfileFragment() {
-        // Required empty public constructor
-    }
-
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,7 +95,6 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-
         profilePic.setOnClickListener((v)->{
             ImagePicker.with(this).cropSquare().compress(512).maxResultSize(512, 512).createIntent(new Function1<Intent, Unit>() {
                 @Override
@@ -116,9 +109,6 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
-
-
-
     private void saveAttendeeProfile(Attendee attendee) {
         // Replace "attendees" with the appropriate Firestore collection name
         db.collection("attendees")
@@ -131,7 +121,5 @@ public class ProfileFragment extends Fragment {
                     Log.d(TAG, "Error saving profile");
                 });
     }
-
-
 
 }

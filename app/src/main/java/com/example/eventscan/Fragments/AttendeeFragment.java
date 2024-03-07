@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import androidx.annotation.Nullable;
@@ -24,7 +25,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-public class AttendeeFragment extends Fragment {
+public class AttendeeFragment extends Fragment implements DeleteProfile.DeleteProfileListener{
 
     private ArrayList<User> allUser;
     private ListView allUserList;
@@ -62,8 +63,37 @@ public class AttendeeFragment extends Fragment {
                 }
             }
         });
-
+        allUserList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                User selectedBook = allUser.get(position);
+                openDeleteProfileFragment(selectedBook);
+            }
+        });
         return view;
     }
+    public void onDeleteProfile(User user) {
+        deleteProfile(user);
+    }
 
+    private void openDeleteProfileFragment(User selectedUser) {
+        DeleteProfile deleteProfileFragment = new DeleteProfile();
+        deleteProfileFragment.setDeleteProfileListener(this);
+
+        // Create a Bundle and put the selected User information
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("selectedProfile", selectedUser);
+        deleteProfileFragment.setArguments(bundle);
+
+        // Show the DeleteProfile fragment
+        deleteProfileFragment.show(getParentFragmentManager(), "DeleteProfileFragment");
+    }
+
+    private void deleteProfile(User user) {
+        // Implement the logic to delete the user profile
+        // For example, you can remove the user from the adapter and update the UI.
+        userAdapter.remove(user);
+        userAdapter.notifyDataSetChanged();
+        db.collection("users").document(user.getDeviceID()).delete();
+    }
 }
