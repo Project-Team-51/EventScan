@@ -16,7 +16,6 @@ public class DatabaseHelper {
     public DatabaseHelper() {
         db = FirebaseFirestore.getInstance();
     }
-
     public void addSampleEvents() {
 
         Organizer placeholderOrganizer = new Organizer("gojo satoru", "password");
