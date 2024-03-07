@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient">
+
     <TextView
         android:id="@+id/create_event"
         android:layout_width="wrap_content"
@@ -104,6 +105,19 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="30dp"
         android:backgroundTint="#414E6E"
-        android:text="Make QR Code" />
+        android:text="Confirm Event" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="139dp"
+        android:layout_height="150dp"
+        android:layout_below="@+id/confirmEvent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginBottom="30dp"
+        android:contentDescription="TODO"
+        android:scaleType="centerInside" />
 
 </RelativeLayout>
