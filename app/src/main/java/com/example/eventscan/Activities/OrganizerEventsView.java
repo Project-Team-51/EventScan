@@ -11,16 +11,17 @@ import com.example.eventscan.Fragments.AddEvent;
 import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.R;
 
-public class OrganizerEventsView extends AppCompatActivity {
+public class OrganizerEventsView extends AppCompatActivity implements View.OnClickListener {
 
+    Button buttonAddEvent;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.organizer_events_view);
 
-        final Button buttonAddEvent = findViewById(R.id.buttonAddEvent);
         final Button buttonOrganizerProfile = findViewById(R.id.buttonOrganizerProfile);
         final Button buttonSendNoti = findViewById(R.id.buttonSendEventNoti);
         final Button buttonViewEvents = findViewById(R.id.buttonViewEvents);
+        buttonAddEvent = findViewById(R.id.buttonAddEvent);
 
         buttonViewEvents.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -38,12 +39,15 @@ public class OrganizerEventsView extends AppCompatActivity {
             }
         });
 
-        buttonAddEvent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, new AddEvent()).commit();
-            }
-        });
+        buttonAddEvent.setOnClickListener(this);
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId()==R.id.buttonAddEvent){
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new AddEvent()).commit();
+        }
 
     }
 
