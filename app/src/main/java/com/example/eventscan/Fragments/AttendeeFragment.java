@@ -36,11 +36,8 @@ public class AttendeeFragment extends Fragment {
         View view = inflater.inflate(R.layout.attendee_list_content, container, false);
 
         allUser = new ArrayList<>();
-
         userAdapter = new UserArrayAdapter(getActivity(), R.layout.event_list_content, allUser);
-
         allUserList = view.findViewById(R.id.allUserList);
-
         allUserList.setAdapter(userAdapter);
 
         // initialize firestore

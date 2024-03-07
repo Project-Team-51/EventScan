@@ -47,6 +47,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.0")
 
     implementation ("com.github.dhaval2404:imagepicker:2.1")
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
    
 

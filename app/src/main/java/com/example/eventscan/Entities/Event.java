@@ -3,15 +3,17 @@ package com.example.eventscan.Entities;
 import android.graphics.Bitmap;
 import android.location.Location;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Event {
+public class Event implements Serializable {
     private Location location;
     private String desc;
     private String name;
     public ArrayList<Attendee> attendees;
     private Organizer organizer;
     private Bitmap poster;
+    private String eventID;
 
   
   
@@ -19,12 +21,13 @@ public class Event {
     public Event() {};
   
 
-    public Event(String eventName, String desc, Organizer organizer, Bitmap poster) {
+    public Event(String eventName, String desc, Organizer organizer, Bitmap poster, String eventID) {
         this.name = eventName;
         this.desc = desc;
         this.attendees = new ArrayList<>();
         this.organizer = organizer;
         this.poster = poster;
+        this.eventID = eventID;
     }
 
 
@@ -35,6 +38,9 @@ public class Event {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+    public String getEventID(){
+        return this.eventID;
     }
 
     public String getDesc() {
