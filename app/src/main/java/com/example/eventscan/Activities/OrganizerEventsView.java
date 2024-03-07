@@ -7,6 +7,8 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.eventscan.Fragments.AddEvent;
+import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.R;
 
 public class OrganizerEventsView extends AppCompatActivity {
@@ -28,8 +30,6 @@ public class OrganizerEventsView extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-
         buttonOrganizerProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -41,10 +41,10 @@ public class OrganizerEventsView extends AppCompatActivity {
         buttonAddEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(OrganizerEventsView.this, AddEvent.class);
-                startActivity(intent);
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, new AddEvent()).commit();
             }
         });
 
     }
+
 }
