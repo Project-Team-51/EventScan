@@ -21,7 +21,6 @@ public class Event {
 
     public Event(String eventName, String desc, Organizer organizer, Bitmap poster) {
         this.name = eventName;
-
         this.desc = desc;
         this.attendees = new ArrayList<>();
         this.organizer = organizer;
