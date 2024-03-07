@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    // xml file that provides a shape and color to the event list layout
+    <!-- xml file that provides a shape and color to the event list layout-->
     <solid android:color="#535A6C"/> 
     <corners android:radius="16dp"/> 
 </shape>
