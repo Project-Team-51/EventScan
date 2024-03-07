@@ -1,16 +1,17 @@
 package com.example.eventscan.Activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
 
-import com.example.eventscan.Fragments.AttendeeProfile;
 import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.R;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class AttendeeEventsView extends AppCompatActivity implements View.OnClickListener {
 
@@ -34,4 +35,6 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
             getSupportFragmentManager().beginTransaction().replace(R.id.container, new ProfileFragment()).commit();
         }
     }
+
+
 }

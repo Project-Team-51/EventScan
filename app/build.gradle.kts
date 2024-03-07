@@ -41,8 +41,11 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
 
 
+
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.3.0")
+
+    implementation ("com.github.dhaval2404:imagepicker:2.1")
 
 
     testImplementation("junit:junit:4.13.2")
