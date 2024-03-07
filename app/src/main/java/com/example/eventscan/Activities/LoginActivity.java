@@ -28,6 +28,10 @@ public class LoginActivity extends AppCompatActivity {
 
         // firestore initialization
         db = FirebaseFirestore.getInstance();
+        DatabaseHelper dbh = new DatabaseHelper();
+        dbh.addSampleEvents();
+        dbh.addSampleUsers();
+
 
         // UI components
         EditText username = findViewById(R.id.editTextUsername);
