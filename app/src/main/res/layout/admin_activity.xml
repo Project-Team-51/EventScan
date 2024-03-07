@@ -24,7 +24,6 @@
             android:layout_alignParentRight="true"
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="Button 2"
-            android:onClick="onButtonClick"
             android:scaleType="centerInside"
             android:src="@drawable/profile" />
 
@@ -37,7 +36,6 @@
             android:scaleType="centerInside"
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="Button 1"
-            android:onClick="onButtonClick"
             android:src="@drawable/events" />
     </RelativeLayout>
 
