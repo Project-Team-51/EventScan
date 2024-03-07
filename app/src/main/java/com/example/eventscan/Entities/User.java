@@ -1,10 +1,12 @@
 package com.example.eventscan.Entities;
 
 import android.location.Location;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class User {
+public class User implements Serializable {
     private String name;
     private String phoneNum;
     private String password;
