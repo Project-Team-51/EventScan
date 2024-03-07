@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient">
-
 
     <TextView
         android:id="@+id/create_event"
@@ -16,88 +14,110 @@
         android:textColor="#D3E2F2"
         android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/add_edit_event_Name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="25dp" />
+
+    <RelativeLayout
+        android:id="@+id/bubbleContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="125dp"
+        android:layout_marginBottom="300dp"
+        android:background="@drawable/background_rounded"
+        android:padding="15dp">
+
+
+        <EditText
+            android:id="@+id/addEventDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Event Description"
+            android:textColor="#D3E2F2"
+            android:textColorHint="#D3E2F2"
+            android:textSize="20sp"
+            android:background="@null"
+            android:inputType="textMultiLine"
+            android:gravity="top|start"
+            android:maxLines="10" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/editTextContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="75dp"
+        android:layout_marginBottom="100dp"
+        android:background="@drawable/background_rounded"
+        android:padding="5dp">
+
+        <EditText
+            android:id="@+id/add_edit_event_Name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="center"
+            android:hint="Enter Event Name"
+            android:textColor="#D3E2F2"
+            android:textColorHint="#D3E2F2"
+            android:textSize="20sp" />
+
+    </RelativeLayout>
+
 
     <Button
         android:id="@+id/return_to_event"
-        android:layout_width="198dp"
-        android:layout_height="44dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="440dp"
         android:backgroundTint="#414E6E"
-        android:text="Return to Events"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.437"
-        app:layout_constraintStart_toEndOf="@+id/generate_QRCode"
-        app:layout_constraintTop_toBottomOf="@+id/addEventDescription" />
-
-    <Button
-        android:id="@+id/generate_QRCode"
-        android:layout_width="185dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="#414E6E"
-        android:text="Generate QR Code"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/upload_poster" />
+        android:text="Return" />
 
     <Button
         android:id="@+id/upload_poster"
-        android:layout_width="185dp"
-        android:layout_height="44dp"
-        android:layout_marginStart="12dp"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="440dp"
+        android:layout_marginRight="30dp"
         android:backgroundTint="#414E6E"
-        android:text="Upload Poster"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.481" />
+        android:text="Upload Poster" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayout"
-        android:layout_width="350dp"
+    <Button
+        android:id="@+id/generate_QRCode"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
-        app:boxBackgroundColor="#414E6E"
-        app:boxBackgroundMode="outline"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_event">
+        android:layout_marginTop="490dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="30dp"
+        android:backgroundTint="#414E6E"
+        android:text="Make QR Code" />
 
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/addEventDescription"
-        android:layout_width="197dp"
-        android:layout_height="287dp"
-        android:layout_marginStart="204dp"
-        android:layout_marginTop="96dp"
-        android:hint="Enter Event Description"
-        android:textColor="#D3E2F2"
-        android:textColorHint="#D3E2F2"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/add_edit_event_Name"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/confirmEvent"
+        android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:hint="Enter Event Name"
-        android:textColor="#D3E2F2"
-        android:textColorHint="#D3E2F2"
-        app:layout_constraintBottom_toTopOf="@+id/addEventDescription"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        android:layout_marginTop="490dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30dp"
+        android:backgroundTint="#414E6E"
+        android:text="Confirm Event" />
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="139dp"
+        android:layout_height="150dp"
+        android:layout_below="@+id/confirmEvent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginBottom="30dp"
+        android:contentDescription="TODO"
+        android:scaleType="centerInside" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

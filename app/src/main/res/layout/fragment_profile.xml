@@ -17,7 +17,9 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="50dp"
-        android:background="#CCCCCC"
+        android:background="@drawable/circular_background"
+        android:backgroundTint="#CCCCCC"
+        android:src="@drawable/profile_icon"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toTopOf="@+id/nameEditText"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,7 +27,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.2" />
 
-    <!-- Email EditText -->
 
     <EditText
         android:id="@+id/nameEditText"
@@ -34,6 +35,8 @@
         android:layout_marginTop="48dp"
         android:hint="Name"
         android:textColor="#D3E2F2"
+        android:textColorHint="#D3E2F2"
+        android:backgroundTint="#D3E2F2"
         android:textSize="34sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -47,12 +50,13 @@
         android:layout_marginTop="30dp"
         android:hint="Email"
         android:textColor="#D3E2F2"
+        android:textColorHint="#D3E2F2"
+        android:backgroundTint="#D3E2F2"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/nameEditText" />
 
-    <!-- Phone Number EditText -->
     <EditText
         android:id="@+id/phoneEditText"
         android:layout_width="0dp"
@@ -60,12 +64,13 @@
         android:layout_marginTop="30dp"
         android:hint="Phone Number"
         android:textColor="#D3E2F2"
+        android:textColorHint="#D3E2F2"
+        android:backgroundTint="#D3E2F2"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/emailEditText" />
 
-    <!-- Bio EditText -->
     <EditText
         android:id="@+id/bioEditText"
         android:layout_width="0dp"
@@ -73,6 +78,8 @@
         android:layout_marginTop="30dp"
         android:hint="Bio"
         android:textColor="#D3E2F2"
+        android:textColorHint="#D3E2F2"
+        android:backgroundTint="#D3E2F2"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

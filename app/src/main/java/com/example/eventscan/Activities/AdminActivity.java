@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventscan.Database.DatabaseHelper;
+import com.example.eventscan.Fragments.AddEvent;
 import com.example.eventscan.Fragments.AttendeeFragment;
 import com.example.eventscan.Fragments.EventFragment;
 import com.example.eventscan.Fragments.qrCodeTestFrag;
@@ -52,7 +53,7 @@ public class AdminActivity extends AppCompatActivity {
     private void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container_view, fragment);
-        transaction.addToBackStack(null); // Optional: Add to back stack to enable back navigation
+        transaction.addToBackStack(null);
         transaction.commit();
     }
 }
