@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventscan.Fragments.AddEvent;
 import com.example.eventscan.Fragments.ProfileFragment;
@@ -21,7 +22,8 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
         final Button buttonOrganizerProfile = findViewById(R.id.buttonOrganizerProfile);
         final Button buttonSendNoti = findViewById(R.id.buttonSendEventNoti);
         final Button buttonViewEvents = findViewById(R.id.buttonViewEvents);
-        buttonAddEvent = findViewById(R.id.buttonAddEvent);
+        Button buttonAddEvent = findViewById(R.id.buttonAddEvent);
+        buttonAddEvent.setOnClickListener(this);
 
         buttonViewEvents.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,7 +48,10 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         if(v.getId()==R.id.buttonAddEvent){
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, new AddEvent()).commit();
+            AddEvent eventFragment = new AddEvent();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container_view, eventFragment);
+            transaction.commit();
         }
 
     }
