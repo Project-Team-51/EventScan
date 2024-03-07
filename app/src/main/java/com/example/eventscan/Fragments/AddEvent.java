@@ -49,7 +49,7 @@ public class AddEvent extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.add_event, container, false);
-
+        event = new Event();
         EditText eventName = view.findViewById(R.id.add_edit_event_Name);
         EditText eventDesc = view.findViewById(R.id.addEventDescription);
         String name = eventName.getText().toString();
