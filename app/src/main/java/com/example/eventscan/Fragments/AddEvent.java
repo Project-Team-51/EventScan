@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -20,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -33,8 +35,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Random;
 
 public class AddEvent extends DialogFragment {
+
+    private Event event;
 
     public AddEvent() {
         // Required empty public constructor
@@ -45,6 +50,12 @@ public class AddEvent extends DialogFragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.add_event, container, false);
 
+        EditText eventName = view.findViewById(R.id.add_edit_event_Name);
+        EditText eventDesc = view.findViewById(R.id.addEventDescription);
+        String name = eventName.getText().toString();
+        String description = eventDesc.getText().toString();
+        event.setDesc(description);
+        event.setName(name);
         return view;
     }
 
@@ -54,8 +65,7 @@ public class AddEvent extends DialogFragment {
 
         Button returnToEventsButton = view.findViewById(R.id.return_to_event);
         Button generateQRCodeButton = view.findViewById(R.id.generate_QRCode);
-
-
+        Button confirmEvent = view.findViewById(R.id.confirmEvent);
 
         returnToEventsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,8 +79,9 @@ public class AddEvent extends DialogFragment {
             @Override
             public void onClick(View v) {
                 // Generate QR code bitmap
-                String eventInfo = "placeholdereventID:123";
-                Bitmap qrCodeBitmap = generateQRCode(eventInfo);
+                String eventID = getRandomNumberString();
+
+                Bitmap qrCodeBitmap = generateQRCode(eventID);
 
                 // Inflate the dialog layout
                 View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
@@ -100,10 +111,10 @@ public class AddEvent extends DialogFragment {
         });
     }
 
-    private Bitmap generateQRCode(String eventInfo) {
+    private Bitmap generateQRCode(String eventID) {
         try {
             MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
-            BitMatrix bitMatrix = multiFormatWriter.encode(eventInfo, BarcodeFormat.QR_CODE, 500, 500);
+            BitMatrix bitMatrix = multiFormatWriter.encode(eventID, BarcodeFormat.QR_CODE, 500, 500);
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
             return barcodeEncoder.createBitmap(bitMatrix);
         } catch (WriterException e) {
@@ -132,6 +143,16 @@ public class AddEvent extends DialogFragment {
         });
 
         dialog.show();
+    }
+
+    public static String getRandomNumberString() {
+        // It will generate 6 digit random Number.
+        // from 0 to 999999
+        Random rnd = new Random();
+        int number = rnd.nextInt(999999);
+
+        // this will convert any number sequence into 6 character.
+        return String.format("%06d", number);
     }
 
     private void saveQRCodeToCameraRoll(Bitmap qrCodeBitmap) {
