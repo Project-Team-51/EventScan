@@ -26,6 +26,11 @@
             android:exported="true">
         </activity>
         <activity
+            android:name=".Activities.OrganizerViewAllEvents"
+            android:label="Organizer View All Events"
+            android:exported="true">
+        </activity>
+        <activity
             android:name=".Activities.OrganizerEventsView"
             android:label="Organizer Home Page"
             android:exported="true">
