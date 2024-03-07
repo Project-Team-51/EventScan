@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventscan.Database.DatabaseHelper;
+import com.example.eventscan.Fragments.AddEvent;
 import com.example.eventscan.Fragments.AttendeeFragment;
 import com.example.eventscan.Fragments.EventFragment;
 import com.example.eventscan.Fragments.qrCodeTestFrag;
@@ -26,7 +27,8 @@ public class AdminActivity extends AppCompatActivity {
             transaction.replace(R.id.fragment_container_view, eventFragment);
             transaction.commit();
 
-            AddEvent addevent = new AddEvent();
+//            AddEvent addevent = new AddEvent();
+
         }
     }
 }
