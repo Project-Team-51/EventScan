@@ -4,9 +4,12 @@ import static android.content.ContentValues.TAG;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -18,8 +21,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.example.eventscan.Entities.Attendee;
+import com.example.eventscan.Helpers.ImageUploader;
 import com.example.eventscan.R;
+import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.firebase.firestore.FirebaseFirestore;
+import android.provider.Settings.Secure;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 
 public class ProfileFragment extends Fragment {
@@ -32,6 +41,8 @@ public class ProfileFragment extends Fragment {
     EditText bioInput;
     Button saveProfileBtn;
     ActivityResultLauncher<Intent> imagePickLauncher;
+    Uri selectedImageUri;
+
 
 
 
@@ -39,6 +50,22 @@ public class ProfileFragment extends Fragment {
         // Required empty public constructor
     }
 
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        imagePickLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if(result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if(data!=null && data.getData()!=null) {
+                            selectedImageUri = data.getData();
+                            ImageUploader.setProfilePic(getContext(), selectedImageUri, profilePic);
+
+                        }
+                    }
+                });
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,7 +90,7 @@ public class ProfileFragment extends Fragment {
                 String email = emailInput.getText().toString();
                 String bio = bioInput.getText().toString();
 
-                String deviceID = "exampleDeviceID"; // Replace with actual value
+                String deviceID = Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
                 String profilePictureID = "exampleProfilePictureID";
 
                 // Create a new Attendee object with the input values
@@ -75,8 +102,22 @@ public class ProfileFragment extends Fragment {
         });
 
 
+        profilePic.setOnClickListener((v)->{
+            ImagePicker.with(this).cropSquare().compress(512).maxResultSize(512, 512).createIntent(new Function1<Intent, Unit>() {
+                @Override
+                public Unit invoke(Intent intent) {
+                    imagePickLauncher.launch(intent);
+                    return null;
+                }
+            });
+        });
+
+
         return view;
     }
+
+
+
 
     private void saveAttendeeProfile(Attendee attendee) {
         // Replace "attendees" with the appropriate Firestore collection name
