@@ -20,36 +20,48 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 public class LoginActivity extends AppCompatActivity {
     private FirebaseFirestore db;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.login_activity);
+
+        // firestore initialization
         db = FirebaseFirestore.getInstance();
 
+        // UI components
         EditText username = findViewById(R.id.editTextUsername);
         EditText password = findViewById(R.id.editTextPassword);
         Button buttonLogin = findViewById(R.id.buttonLogin);
         TextView result = findViewById(R.id.loginResult);
 
+        // login button click listener
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
+                // Get entered username and password
                 String user = username.getText().toString();
-                String pass = password.getText().toString(); // access firestore, compare user and passowrds with the inputted details
+                String pass = password.getText().toString();
+
+                // Access Firestore, compare user and passwords with inputted details
                 db.collection("admin")
                         .whereEqualTo("user", user)
                         .whereEqualTo("pass", pass)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) { // if comparison complete and firestore data retrieved,  either start the admin activity or display invalid credentials
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                // If comparison is complete and Firestore data is retrieved
                                 if (task.isSuccessful()) {
                                     if (task.getResult() != null && !task.getResult().isEmpty()) {
+                                        // Start the admin activity
                                         Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
                                         startActivity(intent);
                                     } else {
+                                        // Display invalid credentials
                                         result.setText("Invalid Login");
                                     }
                                 } else {
+                                    // Display error message
                                     result.setText("Error");
                                 }
                             }
@@ -58,5 +70,6 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 }
+
 
 
