@@ -13,9 +13,32 @@
         android:layout_height="67dp"
         android:layout_alignParentBottom="true"
         android:background="#191E30"
-        android:padding="19dp">
+        android:padding="5dp">
 
 
+        <ImageButton
+            android:id="@+id/buttonProfile"
+            android:layout_width="59dp"
+            android:layout_height="59dp"
+            android:layout_marginRight="30dp"
+            android:layout_alignParentRight="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Button 2"
+            android:onClick="onButtonClick"
+            android:scaleType="centerInside"
+            android:src="@drawable/profile" />
+
+        <ImageButton
+            android:id="@+id/buttonEvents"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="30dp"
+            android:scaleType="centerInside"
+            android:background="?android:attr/selectableItemBackground"
+            android:contentDescription="Button 1"
+            android:onClick="onButtonClick"
+            android:src="@drawable/events" />
     </RelativeLayout>
 
     <androidx.fragment.app.FragmentContainerView
