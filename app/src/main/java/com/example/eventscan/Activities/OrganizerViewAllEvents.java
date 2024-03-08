@@ -2,24 +2,12 @@ package com.example.eventscan.Activities;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import android.widget.TextView;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-
-import com.example.eventscan.Entities.Administrator;
 import com.example.eventscan.Entities.Event;
-
-import com.example.eventscan.Entities.User;
-
 import com.example.eventscan.Fragments.OrganizerViewAttendee;
 import com.example.eventscan.Helpers.EventArrayAdapter;
 import com.example.eventscan.R;
@@ -29,37 +17,30 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
 
-import java.util.List;
-
-public class OrganizerViewAllEvents extends Fragment implements View.OnClickListener {
+public class OrganizerViewAllEvents extends AppCompatActivity implements View.OnClickListener  {
     private ListView allEventsListView;
     private ArrayList<Event> allEvents;
     private EventArrayAdapter allEventsAdapter;
-
     private FirebaseFirestore db;
     private CollectionReference eventsCollection;
 
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.organizer_view_all, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.organizer_view_all);
 
         allEvents = new ArrayList<>();
-
-        allEventsAdapter = new EventArrayAdapter(getActivity(), R.layout.event_list_content, allEvents);
-
-        allEventsListView = view.findViewById(R.id.allEvents);
-
+        allEventsAdapter = new EventArrayAdapter(this, R.layout.event_list_content, allEvents);
+        allEventsListView = findViewById(R.id.allEvents);
         allEventsListView.setAdapter(allEventsAdapter);
 
-        // initialize firestore
+        // Initialize Firestore
         db = FirebaseFirestore.getInstance();
         eventsCollection = db.collection("events");
 
-        // update events in real time
+        // Update events in real-time
         eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
@@ -67,13 +48,13 @@ public class OrganizerViewAllEvents extends Fragment implements View.OnClickList
                     Log.e("Firestore", error.toString());
                     return;
                 }
-                if (querySnapshots != null) { // if there is an update then..
+                if (querySnapshots != null) {
                     allEvents.clear();
-                    for (QueryDocumentSnapshot doc : querySnapshots) { // turn every stored "Event" into an event class, add to adapters
+                    for (QueryDocumentSnapshot doc : querySnapshots) {
                         Event event = doc.toObject(Event.class);
                         allEventsAdapter.add(event);
                     }
-                    allEventsAdapter.notifyDataSetChanged(); // update listviews
+                    allEventsAdapter.notifyDataSetChanged();
                 }
             }
         });
@@ -89,22 +70,17 @@ public class OrganizerViewAllEvents extends Fragment implements View.OnClickList
                 args.putString("eventId", selectedEvent.getEventID());
                 fragment.setArguments(args);
 
-                getParentFragmentManager().beginTransaction()
+                getSupportFragmentManager().beginTransaction()
                         .replace(R.id.fragment_container_view, fragment)
                         .addToBackStack(null)
                         .commit();
             }
+
         });
-
-        // Other code
-
-        return view;
     }
 
     @Override
     public void onClick(View v) {
-
+        // Handle clicks if necessary
     }
 }
-
-
