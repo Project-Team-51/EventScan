@@ -2,7 +2,7 @@ package com.example.eventscan.Entities;
 
 import java.util.ArrayList;
 
-/**
+/*
  * The Attendee class represents a user attending an event and extends the User class.
  * It contains information about the attendee's name, phone number, email, biography,
  * device ID, and profile picture ID. It provides methods to retrieve and modify this information.

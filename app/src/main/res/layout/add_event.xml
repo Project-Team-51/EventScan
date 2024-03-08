@@ -72,7 +72,8 @@
         android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="30dp"
-        android:layout_marginTop="440dp"
+        android:layout_below="@id/bubbleContainer"
+        android:layout_marginTop="-240dp"
         android:backgroundTint="#414E6E"
         android:text="Return" />
 
@@ -81,8 +82,9 @@
         android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
+        android:layout_below="@id/bubbleContainer"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="440dp"
+        android:layout_marginTop="-240dp"
         android:layout_marginRight="30dp"
         android:backgroundTint="#414E6E"
         android:text="Upload Poster" />
@@ -90,8 +92,9 @@
     <Button
         android:id="@+id/generate_QRCode"
         android:layout_width="160dp"
+        android:layout_below="@id/bubbleContainer"
         android:layout_height="wrap_content"
-        android:layout_marginTop="490dp"
+        android:layout_marginTop="-290dp"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="30dp"
         android:backgroundTint="#414E6E"
@@ -101,7 +104,8 @@
         android:id="@+id/confirmEvent"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="490dp"
+        android:layout_marginTop="-290dp"
+        android:layout_below="@id/bubbleContainer"
         android:layout_alignParentRight="true"
         android:layout_marginRight="30dp"
         android:backgroundTint="#414E6E"

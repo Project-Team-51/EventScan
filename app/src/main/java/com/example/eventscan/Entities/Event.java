@@ -6,7 +6,10 @@ import android.net.Uri;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-
+/*
+ * The event class that holds all the necessary information for an event. Provides
+ * sufficient setters and getters for interfacing with the class.
+ */
 public class Event implements Serializable {
     private Location location;
     private String desc;

@@ -18,6 +18,10 @@ import com.example.eventscan.Entities.User;
 import com.example.eventscan.R;
 
 import java.util.Objects;
+/*
+ * A simple dialogfragment that displays some basic info about the User Profile thats passed into it, and gives
+ * the user the ability to delete the profile from the app.
+ */
 
 
 public class DeleteProfile extends DialogFragment {

@@ -8,7 +8,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.eventscan.R;
 import com.google.firebase.FirebaseApp;
-
+/*
+ * The activity that serves as the first activity the user sees. Gives the user 3 buttons, one for each user type,
+ * and choosing one will take you to that user types main activity. In the future, we will consolidate all 3 main
+ * activities into one main activity.
+ */
 public class UserSelection extends AppCompatActivity {
 
     /**

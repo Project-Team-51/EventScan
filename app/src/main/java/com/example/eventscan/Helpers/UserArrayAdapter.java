@@ -15,6 +15,10 @@ import com.example.eventscan.Entities.User;
 import com.example.eventscan.R;
 
 import java.util.ArrayList;
+/*
+Just a simple subclass that extends ArrayAdapter, retrieves the needed info from the User class, and
+displays it. For use in the ListView of All users, or the users in an event.
+ */
 
 public class UserArrayAdapter extends ArrayAdapter<User> {
 

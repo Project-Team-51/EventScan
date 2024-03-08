@@ -20,7 +20,10 @@ import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 
 import java.util.Objects;
-
+/*
+ * A simple dialogfragment that displays some basic info about the Event that is passed into it, and gives
+ * the user the ability to delete the profile from the app.
+ */
 public class DeleteEvent extends DialogFragment {
 
 
@@ -85,7 +88,6 @@ public class DeleteEvent extends DialogFragment {
 
         Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
-
         return dialog;
     }
 
@@ -99,6 +101,3 @@ public class DeleteEvent extends DialogFragment {
         this.deleteEventListener = listener;
     }
 }
-
-
-

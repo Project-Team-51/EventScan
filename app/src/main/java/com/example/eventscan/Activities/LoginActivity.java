@@ -17,7 +17,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-
+/*
+ * This activity handles the logging in of an admin. Prompts the user to enter a user and password, and checks the inputted
+ * text to the admin credentials stored in Firestore. Has error handling for incorrect credentials and a failure to connect to firestore.
+ * Sign up button is unused, and will likely be removed in a future build.
+ */
 public class LoginActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
@@ -34,9 +38,9 @@ public class LoginActivity extends AppCompatActivity {
 
         // firestore initialization
         db = FirebaseFirestore.getInstance();
-        //use only when you want to make some events DatabaseHelper dbh = new DatabaseHelper();
-        //DO NOT TURN ON THIS SHIT IS BROKEN dbh.addSampleEvents();
-        //use only when you want to make some events dbh.addSampleUsers();
+        //use only when you want to make some users DatabaseHelper dbh = new DatabaseHelper();
+        //DO NOT TURN ON THIS IS BROKEN dbh.addSampleEvents();
+        //use only when you want to make some users dbh.addSampleUsers();
 
 
         // UI components
