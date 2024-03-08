@@ -16,6 +16,7 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.UseCase;
 
+import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -60,7 +61,8 @@ public class QRAnalyzer{
                                 // this QR code most likely fits our encoding scheme
                                 String eventID = QrCodec.decodeQRString(Objects.requireNonNull(bcode.getRawValue()));
                                 Log.d("QR SCAN", "This should now go to sign up for event "+eventID);
-                                createSignInDialog(eventID);
+                                Attendee dummyAttendee = new Attendee("James", "123456", "abc@gmail", "hello :)", "deviceID", "profilePictureID");
+                                createSignInDialog(eventID, dummyAttendee);
                             }
                         }
                     }
@@ -68,7 +70,7 @@ public class QRAnalyzer{
         }
     }
 
-    private void createSignInDialog(String eventID){
+    private void createSignInDialog(String eventID, Attendee selfAttendee){
         Dialog eventSignIn = new Dialog(context);
         eventSignIn.setContentView(R.layout.fragment_event_sign_in);
         eventSignIn.setCancelable(true);
@@ -88,12 +90,16 @@ public class QRAnalyzer{
                             ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText(event.getDesc());
                             Log.d("QR SCAN","completed, successful");
                             //TODO set the poster
-                            //TODO set the onclick of the button to sign you up
+
+                            // set the onclick of the button to sign you up
+                            ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setOnClickListener(v -> {
+                                event.addAttendee(selfAttendee);
+                            });
                         } else {
                             Log.e("QR SCAN", "Event "+eventID+" not found in firebase");
                             Log.e("QR_SCAN", task.getException().toString());
                             ((TextView) eventSignIn.findViewById(R.id.sign_in_event_name)).setText("Event "+eventID);
-                            ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText("Not found");
+                            ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText("Not found\n(you may be offline)");
                             ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setVisibility(GONE);
                         }
                     }
