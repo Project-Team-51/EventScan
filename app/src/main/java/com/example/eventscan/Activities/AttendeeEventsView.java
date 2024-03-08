@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.eventscan.Fragments.ProfileFragment;
+import com.example.eventscan.Fragments.QrScannerFragment;
 import com.example.eventscan.R;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -19,6 +20,7 @@ import java.util.Map;
 public class AttendeeEventsView extends AppCompatActivity implements View.OnClickListener {
 
     Button buttonAttendeeProfile;
+    Button buttonQRScanner;
     Button buttonEventsView;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +30,10 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
         buttonEventsView = findViewById(R.id.buttonViewEvents);
 
         buttonAttendeeProfile.setOnClickListener(this);
+        buttonQRScanner = findViewById(R.id.buttonQRScanner);
+        buttonQRScanner.setOnClickListener(v -> {
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new QrScannerFragment()).commit();
+        });
         buttonEventsView.setOnClickListener(this);
 
 

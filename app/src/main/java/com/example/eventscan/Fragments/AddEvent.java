@@ -29,6 +29,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.eventscan.Activities.UserSelection;
 import com.example.eventscan.Entities.Event;
+import com.example.eventscan.Helpers.QrCodec;
 import com.example.eventscan.Entities.Organizer;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -113,7 +114,7 @@ public class AddEvent extends DialogFragment {
             public void onClick(View v) {
                 // Generate QR code bitmap
 
-                Bitmap qrCodeBitmap = generateQRCode(event.getEventID());
+                Bitmap qrCodeBitmap = generateQRCode(QrCodec.encodeQRString(event.getEventID()));
 
                 // Inflate the dialog layout
                 View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);

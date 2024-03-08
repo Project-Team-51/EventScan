@@ -58,15 +58,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="168dp"
-        tools:layout_editor_absoluteY="223dp" />
+        tools:layout_editor_absoluteY="223dp" >
+
+    </FrameLayout>
 
     <Button
         android:id="@+id/buttonViewEvents"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="38dp"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="20dp"
-        android:layout_marginEnd="47dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="20dp"
         android:layout_toStartOf="@+id/buttonAttendeeProfile"
         android:backgroundTint="#414E6E"
@@ -74,12 +76,23 @@
         android:textColor="#D3E2F2" />
 
     <Button
+        android:id="@+id/buttonQRScanner"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="#414E6E"
+        android:layout_toStartOf="@+id/buttonViewEvents"
+        android:text="QR Scan" />
+
+    <Button
         android:id="@+id/buttonAttendeeProfile"
         android:layout_width="wrap_content"
         android:layout_height="38dp"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
-        android:layout_marginEnd="65dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
         android:backgroundTint="#414E6E"
         android:text="@string/profile"
