@@ -24,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
 
+import com.example.eventscan.Helpers.QRAnalyzer;
 import com.example.eventscan.R;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -33,10 +34,12 @@ public class QrScannerFragment extends Fragment {
     //https://developer.android.com/media/camera/camerax/preview
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
     private PreviewView previewView;
+    private QRAnalyzer analyzer;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        analyzer = new QRAnalyzer();
         cameraProviderFuture = ProcessCameraProvider.getInstance(this.requireContext());
         View view = getLayoutInflater().inflate(R.layout.scan_qr_layout, container, false);
         previewView = view.findViewById(R.id.CameraPreview);
@@ -57,7 +60,7 @@ public class QrScannerFragment extends Fragment {
                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                 .build();
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
-        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, preview);
+        Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, preview, analyzer.getUseCase());
     }
 
     private static void checkCameraPermissions(Context context){
