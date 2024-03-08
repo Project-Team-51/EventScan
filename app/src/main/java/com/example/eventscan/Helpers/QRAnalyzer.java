@@ -1,7 +1,13 @@
 package com.example.eventscan.Helpers;
 
+import static android.view.View.GONE;
+
+import android.app.Dialog;
+import android.content.Context;
 import android.media.Image;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
@@ -10,8 +16,13 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.UseCase;
 
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.example.eventscan.Entities.Event;
+import com.example.eventscan.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
@@ -26,11 +37,15 @@ public class QRAnalyzer{
     //https://developers.google.com/ml-kit/vision/barcode-scanning/android#java
 
     BarcodeScanner scanner;
-    public QRAnalyzer(){
+    Context context;
+    FirebaseFirestore db;
+    public QRAnalyzer(Context context){
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                         .setBarcodeFormats(Barcode.FORMAT_QR_CODE).build();
         scanner = BarcodeScanning.getClient(options);
+        this.context = context;
+        db = FirebaseFirestore.getInstance();
     }
 
 
@@ -45,11 +60,46 @@ public class QRAnalyzer{
                                 // this QR code most likely fits our encoding scheme
                                 String eventID = QrCodec.decodeQRString(Objects.requireNonNull(bcode.getRawValue()));
                                 Log.d("QR SCAN", "This should now go to sign up for event "+eventID);
+                                createSignInDialog(eventID);
                             }
                         }
                     }
             );
         }
+    }
+
+    private void createSignInDialog(String eventID){
+        Dialog eventSignIn = new Dialog(context);
+        eventSignIn.setContentView(R.layout.fragment_event_sign_in);
+        eventSignIn.setCancelable(true);
+        // get the data loaded in
+        CollectionReference eventCollection = db.collection("events");
+        //https://firebase.google.com/docs/firestore/query-data/get-data#java_4
+        eventCollection.document(eventID).get()
+
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            Event event = document.toObject(Event.class);
+                            assert event != null;
+                            ((TextView) eventSignIn.findViewById(R.id.sign_in_event_name)).setText(event.getName());
+                            ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText(event.getDesc());
+                            Log.d("QR SCAN","completed, successful");
+                            //TODO set the poster
+                            //TODO set the onclick of the button to sign you up
+                        } else {
+                            Log.e("QR SCAN", "Event "+eventID+" not found in firebase");
+                            Log.e("QR_SCAN", task.getException().toString());
+                            ((TextView) eventSignIn.findViewById(R.id.sign_in_event_name)).setText("Event "+eventID);
+                            ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText("Not found");
+                            ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setVisibility(GONE);
+                        }
+                    }
+                });
+
+        eventSignIn.show();
     }
 
     public UseCase getUseCase(){
