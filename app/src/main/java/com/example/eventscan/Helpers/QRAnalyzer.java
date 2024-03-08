@@ -19,6 +19,7 @@ import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 
 public class QRAnalyzer{
@@ -39,8 +40,12 @@ public class QRAnalyzer{
             InputImage image = InputImage.fromMediaImage(mediaImage, imageProxy.getImageInfo().getRotationDegrees());
             Task<List<Barcode>> result = scanner.process(image).addOnSuccessListener(
                     barcodes -> {
-                        for(Barcode b: barcodes){
-                            Log.d("Barcode found", b.getRawValue());
+                        for(Barcode bcode: barcodes){
+                            if(QrCodec.verifyQRStringDecodable(Objects.requireNonNull(bcode.getRawValue()))){
+                                // this QR code most likely fits our encoding scheme
+                                String eventID = QrCodec.decodeQRString(Objects.requireNonNull(bcode.getRawValue()));
+                                Log.d("QR SCAN", "This should now go to sign up for event "+eventID);
+                            }
                         }
                     }
             );
