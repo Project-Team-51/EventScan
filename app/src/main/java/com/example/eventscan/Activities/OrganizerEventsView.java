@@ -11,13 +11,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,8 +28,14 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventscan.Entities.Event;
+
 import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.Fragments.QrScannerFragment;
+
+import com.example.eventscan.Fragments.AddEvent;
+import com.example.eventscan.Fragments.ProfileFragment;
+import com.example.eventscan.Helpers.EventArrayAdapter;
+
 import com.example.eventscan.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
@@ -36,7 +45,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-
 
 public class OrganizerEventsView extends AppCompatActivity implements View.OnClickListener {
 
@@ -124,6 +132,8 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
         buttonAddEvent.setOnClickListener(this);
 
         // cite but implement correctly
+
+
         buttonViewEvents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -187,6 +197,7 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
                     .replace(R.id.fragment_container_view, eventFragment)
                     .commit();
 
+
         } else if(v.getId()==R.id.buttonOrganizerProfile){
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.container, new ProfileFragment())
@@ -217,8 +228,9 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
             });
 
         }
-
     }
+
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
