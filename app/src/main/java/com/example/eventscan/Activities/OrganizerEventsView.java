@@ -1,7 +1,9 @@
 package com.example.eventscan.Activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.Button;
 
@@ -48,12 +50,27 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View v) {
         if(v.getId()==R.id.buttonAddEvent){
+            String deviceID = getDeviceId(OrganizerEventsView.this);
             AddEvent eventFragment = new AddEvent();
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container_view, eventFragment);
-            transaction.commit();
+
+            // Pass the device ID to the fragment using a Bundle
+            Bundle bundle = new Bundle();
+            bundle.putString("DEVICE_ID", deviceID);
+            eventFragment.setArguments(bundle);
+
+            // Begin a fragment transaction
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container_view, eventFragment)
+                    .commit();
+
         }
 
+    }
+
+    public static String getDeviceId(Context context) {
+        // Retrieve the device ID using Settings.Secure class
+        return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
     }
 
 }
