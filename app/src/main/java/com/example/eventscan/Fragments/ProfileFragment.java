@@ -40,7 +40,9 @@ import android.provider.Settings.Secure;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
-
+/**
+ * A simple {@link Fragment} subclass for managing user profiles.
+ */
 public class ProfileFragment extends Fragment {
 
     private FirebaseFirestore db;
@@ -58,7 +60,10 @@ public class ProfileFragment extends Fragment {
     private static final int defaultProfileIcon = R.drawable.profile_icon;
 
 
-
+    /**
+     * Called when the fragment is being created.
+     * Initializes the image pick launcher for selecting profile pictures.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +81,10 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    /**
+     * Inflates the layout for this fragment and initializes UI components.
+     * Loads user profile information from Firestore and sets listeners for button clicks.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -89,7 +98,7 @@ public class ProfileFragment extends Fragment {
         usernameInput = view.findViewById(R.id.nameEditText);
         phoneInput = view.findViewById(R.id.phoneEditText);
         emailInput = view.findViewById(R.id.emailEditText);
-        bioInput = view.findViewById(R.id.bioEditText);
+        bioInput = view.findViewById(R.id.homepageEditText);
         saveProfileBtn = view.findViewById(R.id.saveButton);
         backButton = view.findViewById(R.id.backButton);
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
@@ -110,10 +119,10 @@ public class ProfileFragment extends Fragment {
 
                 String profilePictureID = "exampleProfilePictureID";
 
-                // Create a new Attendee object with the input values
+                // Creates a new Attendee object with the input values
                 Attendee attendee = new Attendee(username, phone, email, bio, deviceID, profilePictureID);
 
-                // Save the attendee's profile to Firestore
+                // Saves the attendee's profile to Firestore
                 saveAttendeeProfile(attendee);
             }
         });
@@ -131,7 +140,7 @@ public class ProfileFragment extends Fragment {
         deleteProfilePicBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Call a method to delete the profile picture
+                // Calls a method to delete the profile picture
                 deleteProfilePicture();
             }
         });
@@ -149,7 +158,12 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
-
+    /**
+     * Saves the attendee's profile information to Firestore.
+     * If a profile picture is selected, uploads it to Firebase Storage.
+     *
+     * @param attendee The Attendee object containing profile information.
+     */
     private void saveAttendeeProfile(Attendee attendee) {
         db.collection("attendees")
                 .document(deviceID) // Use deviceID as a document ID
@@ -170,10 +184,18 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    /**
+     * Checks if a profile picture is uploaded.
+     *
+     * @return True if a profile picture is uploaded, false otherwise.
+     */
     private boolean isProfilePictureUploaded() {
         return selectedImageUri != null;
     }
 
+    /**
+     * Deletes the profile picture from Firebase Storage and updates the UI.
+     */
     private void deleteProfilePicture() {
         // Delete the profile picture from Firebase Storage
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
@@ -200,6 +222,9 @@ public class ProfileFragment extends Fragment {
         });
     }
 
+    /**
+     * Loads the user's profile information from Firestore and updates the UI.
+     */
     private void loadProfileInfo() {
         db.collection("attendees")
                 .document(deviceID)
@@ -215,6 +240,11 @@ public class ProfileFragment extends Fragment {
                 });
     }
 
+    /**
+     * Updates the UI with the provided Attendee's profile information.
+     *
+     * @param attendee The Attendee object containing the profile information to display.
+     */
     private void updateUIWithProfileInfo(Attendee attendee) {
         // Update UI elements with profile information
         if (attendee != null) {
