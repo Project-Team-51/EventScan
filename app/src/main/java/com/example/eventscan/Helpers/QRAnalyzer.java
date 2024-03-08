@@ -33,7 +33,10 @@ import com.google.mlkit.vision.common.InputImage;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
-
+/*
+This class handles the opening of the camera, as well as scanning the QR Code and retrieving the relevant information
+from it. Will be consolidated with QR Codec in the future.
+ */
 public class QRAnalyzer{
     //https://developers.google.com/ml-kit/vision/barcode-scanning/android#java
 

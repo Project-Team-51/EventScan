@@ -37,6 +37,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+/*
+ * The activity that an Organizer first see's when they open the app.  Allows them to see all events, and their own.
+ * Utilizes very similar code to the EventFragment. This will be consolidated into the EventFragment in a future build, as this is unneeded as a standalone activity.
+ */
 
 public class OrganizerEventsView extends AppCompatActivity implements View.OnClickListener {
 

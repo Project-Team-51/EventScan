@@ -51,7 +51,10 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
-
+/*
+ * A dialog fragment that allows us to add a new event. The organizer who makes the event is designated the event owner,
+ * and the new event is pushed to the Firestore where every users all events list will promptly update and add it.
+ */
 public class AddEvent extends DialogFragment {
 
     private Event event;
