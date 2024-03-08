@@ -20,8 +20,16 @@ public class Event implements Serializable {
   
     // empty constructor so it works with firestore
     public Event() {};
-  
 
+    /**
+     * Constructs a new Event object with the specified parameters.
+     *
+     * @param eventName The name of the event.
+     * @param desc The description of the event.
+     * @param organizer The organizer of the event.
+     * @param poster The URL of the poster for the event.
+     * @param eventID The unique ID of the event.
+     */
     public Event(String eventName, String desc, Organizer organizer, String poster, String eventID) {
         this.name = eventName;
         this.desc = desc;
@@ -31,7 +39,7 @@ public class Event implements Serializable {
         this.eventID = eventID;
     }
 
-
+    // getters and setters for all parameters below
     public Location getLocation() {
         return location;
     }
@@ -80,7 +88,6 @@ public class Event implements Serializable {
     public void setOrganizer(Organizer organizer) {
         this.organizer = organizer;
     }
-
 
     public String getPoster() {
         return poster;

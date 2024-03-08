@@ -23,14 +23,28 @@ import java.util.Objects;
 
 public class DeleteEvent extends DialogFragment {
 
+
+    /**
+     * Default constructor for the DeleteEvent DialogFragment.
+     */
     public DeleteEvent() {
         // Required empty public constructor
     }
+
+    /**
+     * Interface for handling event deletion.
+     */
     public interface DeleteEventListener {
         void onDeleteEvent(Event event);
     }
     private DeleteEventListener deleteEventListener;
 
+    /**
+     * Called to create the dialog view.
+     *
+     * @param savedInstanceState A Bundle containing the activity's previously saved state.
+     * @return A Dialog representing the event deletion dialog.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -74,6 +88,13 @@ public class DeleteEvent extends DialogFragment {
 
         return dialog;
     }
+
+    /**
+     * Sets the event listener for event deletion.
+     *
+     * @param listener The listener to be set for event deletion.
+     */
+
     public void setDeleteEventListener(DeleteEventListener listener) {
         this.deleteEventListener = listener;
     }

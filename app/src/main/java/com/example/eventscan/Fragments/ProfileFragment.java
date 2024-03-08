@@ -40,9 +40,6 @@ import android.provider.Settings.Secure;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
-/**
- * A simple {@link Fragment} subclass for managing user profiles.
- */
 public class ProfileFragment extends Fragment {
 
     private FirebaseFirestore db;

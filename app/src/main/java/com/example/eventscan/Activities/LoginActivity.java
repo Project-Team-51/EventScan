@@ -21,6 +21,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 public class LoginActivity extends AppCompatActivity {
     private FirebaseFirestore db;
 
+    /**
+     * Called when the activity is created. Initializes Firebase Firestore and sets up
+     * the UI components for user login.
+     *
+     * @param savedInstanceState A Bundle containing the saved state of the activity.
+     */
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);

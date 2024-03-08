@@ -40,6 +40,16 @@ import java.util.ArrayList;
 
 public class OrganizerEventsView extends AppCompatActivity implements View.OnClickListener {
 
+    private ListView ownedEventsListView;
+    private ListView inEventsListView;
+    private ArrayList<Event> ownedEvents;
+    private ArrayList<Event> inEvents;
+    private EventArrayAdapter ownedEventsAdapter;
+    private EventArrayAdapter inEventsAdapter;
+
+    private FirebaseFirestore db;
+    private CollectionReference eventsCollection;
+
     Button buttonOrganizerProfile;
     Button buttonSendNoti;
     Button buttonViewEvents;
@@ -52,6 +62,50 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.organizer_events_view);
+
+        ownedEvents = new ArrayList<>();
+        inEvents = new ArrayList<>();
+
+        ownedEventsAdapter = new EventArrayAdapter(OrganizerEventsView.this, R.layout.event_list_content, ownedEvents);
+        inEventsAdapter = new EventArrayAdapter(OrganizerEventsView.this, R.layout.event_list_content, inEvents);
+
+        ownedEventsListView = findViewById(R.id.ownedEvents);
+        inEventsListView = findViewById(R.id.inEvents);
+
+        ownedEventsListView.setAdapter(ownedEventsAdapter);
+        inEventsListView.setAdapter(inEventsAdapter);
+
+        // initialize firestore
+        db = FirebaseFirestore.getInstance();
+        eventsCollection = db.collection("events");
+
+        // update events in real time
+        eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (querySnapshots != null) { // if there is an update then..
+                    ownedEvents.clear();
+                    inEvents.clear();
+                    for (QueryDocumentSnapshot doc : querySnapshots) { // turn every stored "Event" into an event class, add to adapters
+                        Event event = doc.toObject(Event.class);
+                        // event.getOrganizer().getDeviceID()
+                        if (event.getOrganizer().getDeviceID().equals(getDeviceId(OrganizerEventsView.this))){
+                            ownedEventsAdapter.add(event);
+                            ownedEventsAdapter.notifyDataSetChanged();
+                        } else {
+                            inEventsAdapter.add(event);
+                            // update listviews
+                            inEventsAdapter.notifyDataSetChanged();
+                        }
+                    }
+
+                }
+            }
+        });
 
         // XML
         yourEventsText = findViewById(R.id.yourEventsText);
@@ -110,6 +164,12 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
 
     }
 
+    /**
+     * Handles button clicks. Opens the corresponding fragment or initiates
+     * the organizer's profile view when the respective button is clicked.
+     *
+     * @param v The clicked View.
+     */
     @Override
     public void onClick(View v) {
         if(v.getId()==R.id.buttonAddEvent){
@@ -170,6 +230,12 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
         bubbleContainer2.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * Retrieves the device ID using Settings.Secure class.
+     *
+     * @param context The context of the application.
+     * @return The device ID as a String.
+     */
     public static String getDeviceId(Context context) {
         // Retrieve the device ID using Settings.Secure class
         return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);

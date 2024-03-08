@@ -17,6 +17,15 @@ import com.example.eventscan.R;
 import java.util.ArrayList;
 
 public class UserArrayAdapter extends ArrayAdapter<User> {
+
+    /**
+     * Constructs a new UserArrayAdapter.
+     *
+     * @param context The context in which the adapter is being used.
+     * @param resource The resource ID for a layout file containing a TextView to use when
+     *                 instantiating views.
+     * @param users The list of User objects to represent in the ListView.
+     */
     public UserArrayAdapter(Context context, int resource, ArrayList<User> users) {
         super(context, resource, users);
     }

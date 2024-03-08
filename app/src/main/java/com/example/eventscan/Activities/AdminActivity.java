@@ -15,6 +15,7 @@ import com.example.eventscan.Fragments.EventFragment;
 import com.example.eventscan.Fragments.qrCodeTestFrag;
 import com.example.eventscan.R;
 
+
 public class AdminActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,7 @@ public class AdminActivity extends AppCompatActivity {
         ImageButton buttonEvents = findViewById(R.id.buttonEvents);
         ImageButton buttonProfile = findViewById(R.id.buttonProfile);
 
+        // Load EventFragment when the Events button is clicked
         buttonEvents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -40,6 +42,7 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+        // Load AttendeeFragment when the Profile button is clicked
         buttonProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,6 +53,10 @@ public class AdminActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Load the specified fragment into the fragment container view.
+     * @param fragment The fragment to be loaded.
+     */
     private void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container_view, fragment);

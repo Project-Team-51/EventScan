@@ -10,6 +10,12 @@ import com.example.eventscan.R;
 import com.google.firebase.FirebaseApp;
 
 public class UserSelection extends AppCompatActivity {
+
+    /**
+     * Called when the activity is created.
+     *
+     * @param savedInstanceState A Bundle containing the saved state of the activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

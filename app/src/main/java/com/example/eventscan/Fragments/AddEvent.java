@@ -85,6 +85,15 @@ public class AddEvent extends DialogFragment {
         return view;
     }
 
+    /**
+     * Called immediately after onCreateView(LayoutInflater, ViewGroup, Bundle)
+     * has returned, but before any saved state has been restored in to the view.
+     * It is called after onCreateView(LayoutInflater, ViewGroup, Bundle) and before
+     * onViewStateRestored(Bundle).
+     *
+     * @param view               The view returned by onCreateView(LayoutInflater, ViewGroup, Bundle).
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -187,6 +196,13 @@ public class AddEvent extends DialogFragment {
         });
     }
 
+    /**
+     * Generates a QR code bitmap based on the provided event ID.
+     *
+     * @param eventID The ID of the event to be encoded into the QR code.
+     * @return The generated QR code bitmap.
+     * @throws RuntimeException if an error occurs during the encoding process.
+     */
     private Bitmap generateQRCode(String eventID) {
         try {
             MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
@@ -198,6 +214,12 @@ public class AddEvent extends DialogFragment {
         }
     }
 
+    /**
+     * Displays a dialog containing the provided QR code bitmap.
+     * Allows the user to save the QR code to the device's camera roll.
+     *
+     * @param qrCodeBitmap The QR code bitmap to be displayed.
+     */
     private void showQRCodeDialog(Bitmap qrCodeBitmap) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
@@ -221,6 +243,11 @@ public class AddEvent extends DialogFragment {
         dialog.show();
     }
 
+    /**
+     * Generates a random 6-digit number as a string.
+     *
+     * @return A randomly generated 6-digit number as a string.
+     */
     public static String getRandomNumberString() {
         // It will generate 6 digit random Number.
         // from 0 to 999999
@@ -231,6 +258,11 @@ public class AddEvent extends DialogFragment {
         return String.format("%06d", number);
     }
 
+    /**
+     * Saves the provided QR code bitmap to the device's camera roll.
+     *
+     * @param qrCodeBitmap The QR code bitmap to be saved.
+     */
     private void saveQRCodeToCameraRoll(Bitmap qrCodeBitmap) {
         // Get the current timestamp to generate a unique file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());

@@ -30,23 +30,22 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 
-/**
- * The AttendeeEventsView class displays events and announcements to the attendee.
- * It extends AppCompatActivity and implements the View.OnClickListener interface.
- * This activity provides buttons to navigate to the attendee's profile
- * using the {@link ProfileFragment} and view upcoming events.
- */
 public class AttendeeEventsView extends AppCompatActivity implements View.OnClickListener {
 
-    Button buttonAttendeeProfile;
-    Button buttonQRScanner;
-    Button buttonEventsView;
+    // UI Components
+    private Button buttonAttendeeProfile;
+    private Button buttonQRScanner;
+    private Button buttonEventsView;
     private ListView eventsListView;
     private ListView announcementsListView;
+
+    // Data
     private ArrayList<Event> upcomingEvents;
     private ArrayList<Event> eventAnnouncements;
     private EventArrayAdapter upcomingEventsAdapter;
     private EventArrayAdapter announcementsAdapter;
+
+    // Firebase
     private FirebaseFirestore db;
     private CollectionReference eventsCollection;
 
@@ -88,6 +87,7 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
         db = FirebaseFirestore.getInstance();
         eventsCollection = db.collection("events"); // Initialize eventsCollection here
 
+        // Set up Firestore snapshot listener
         eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
@@ -109,6 +109,7 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
             }
         });
 
+        // Set item click listener for events list view
         eventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

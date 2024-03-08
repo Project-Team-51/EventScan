@@ -87,6 +87,12 @@ public class OrganizerViewAllEvents extends Fragment implements View.OnClickList
         return view;
     }
 
+    /**
+     * Handles button clicks. This method is not implemented in this class.
+     *
+     * @param v The clicked View.
+     */
+
     @Override
     public void onClick(View v) {
 
