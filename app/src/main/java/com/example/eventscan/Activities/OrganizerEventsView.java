@@ -1,19 +1,42 @@
 package com.example.eventscan.Activities;
 
+import com.example.eventscan.Fragments.AddEvent;
+import com.example.eventscan.Activities.OrganizerViewAllEvents;
+import com.example.eventscan.Helpers.EventArrayAdapter;
+
+import android.content.Context;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.provider.Settings;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.eventscan.Fragments.AddEvent;
+import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Fragments.ProfileFragment;
+import com.example.eventscan.Fragments.QrScannerFragment;
 import com.example.eventscan.R;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+
 
 public class OrganizerEventsView extends AppCompatActivity implements View.OnClickListener {
 
@@ -22,9 +45,19 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
     Button buttonViewEvents;
     Button buttonAddEvent;
 
+    TextView yourEventsText;
+    RelativeLayout bubbleContainer;
+    TextView atEventsText;
+    RelativeLayout bubbleContainer2;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.organizer_events_view);
+
+        // XML
+        yourEventsText = findViewById(R.id.yourEventsText);
+        bubbleContainer = findViewById(R.id.bubbleContainer);
+        atEventsText = findViewById(R.id.atEventsText);
+        bubbleContainer2 = findViewById(R.id.bubbleContainer2);
 
         buttonOrganizerProfile = findViewById(R.id.buttonOrganizerProfile);
         buttonSendNoti = findViewById(R.id.buttonSendEventNoti);
@@ -36,11 +69,37 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
         buttonViewEvents.setOnClickListener(this);
         buttonAddEvent.setOnClickListener(this);
 
+        // cite but implement correctly
         buttonViewEvents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Set the content view to organizer_view_all.xml
-                Intent intent = new Intent(OrganizerEventsView.this, OrganizerViewAllEvents.class);
+                // Create an instance of the OrganizerViewAllEvents fragment
+                OrganizerViewAllEvents organizerViewAllEventsFragment = new OrganizerViewAllEvents();
+
+                // Begin a fragment transaction
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+                // Replace the current fragment with the new fragment
+                transaction.replace(R.id.fragment_container_view, organizerViewAllEventsFragment);
+
+                // Add the transaction to the back stack (optional)
+                transaction.addToBackStack(null);
+
+                // Commit the transaction
+                transaction.commit();
+
+                yourEventsText.setVisibility(View.GONE);
+                bubbleContainer.setVisibility(View.GONE);
+                atEventsText.setVisibility(View.GONE);
+                bubbleContainer2.setVisibility(View.GONE);
+            }
+        });
+
+
+        buttonOrganizerProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(OrganizerEventsView.this, OrganizerProfile.class);
                 startActivity(intent);
             }
         });
@@ -99,6 +158,16 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
 
         }
 
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        // Show XML elements when the back button is pressed
+        yourEventsText.setVisibility(View.VISIBLE);
+        bubbleContainer.setVisibility(View.VISIBLE);
+        atEventsText.setVisibility(View.VISIBLE);
+        bubbleContainer2.setVisibility(View.VISIBLE);
     }
 
     public static String getDeviceId(Context context) {

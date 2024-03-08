@@ -1,8 +1,11 @@
 package com.example.eventscan.Entities;
 
-public class Organizer extends User {
+import java.util.ArrayList;
 
+public class Organizer extends User {
+    //public ArrayList<Event> ownedEvents;
     // empty constructor so it works with firestore
+
     public Organizer(){};
 
 
