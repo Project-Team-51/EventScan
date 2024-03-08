@@ -29,6 +29,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+
+/**
+ * The AttendeeEventsView class displays events and announcements to the attendee.
+ * It extends AppCompatActivity and implements the View.OnClickListener interface.
+ * This activity provides buttons to navigate to the attendee's profile
+ * using the {@link ProfileFragment} and view upcoming events.
+ */
 public class AttendeeEventsView extends AppCompatActivity implements View.OnClickListener {
 
     Button buttonAttendeeProfile;
@@ -43,6 +50,12 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
     private FirebaseFirestore db;
     private CollectionReference eventsCollection;
 
+    /**
+     * Called when the activity is created. Initializes UI components, adapters,
+     * and sets up Firebase Firestore listeners for events and announcements.
+     *
+     * @param savedInstanceState A Bundle containing the saved state of the activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -104,7 +117,12 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
         });
     }
 
-
+    /**
+     * Handles button clicks. Opens the corresponding fragment or initiates
+     * the attendee profile view when the Attendee Profile button is clicked.
+     *
+     * @param v The clicked View.
+     */
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.buttonAttendeeProfile) {
@@ -117,18 +135,17 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
             buttonAttendeeProfile.setVisibility(View.GONE);
             buttonQRScanner.setVisibility(View.GONE);
 
-            // Add a FragmentTransaction listener to handle button visibility
             getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
                 @Override
                 public void onBackStackChanged() {
-                    // Check if the back stack is empty
+                    // Checks if the back stack is empty
                     if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-                        // Fragment is removed from the back stack, make buttons visible
+                        // Fragment is removed from the back stack, makes buttons visible
                         buttonEventsView.setVisibility(View.VISIBLE);
                         buttonAttendeeProfile.setVisibility(View.VISIBLE);
                         buttonQRScanner.setVisibility(View.VISIBLE);
 
-                        // Remove the listener to avoid multiple callbacks
+                        // Removes the listener to avoid multiple callbacks
                         getSupportFragmentManager().removeOnBackStackChangedListener(this);
                     }
                 }
