@@ -72,17 +72,16 @@ public class QRAnalyzer{
      */
     private void analyze(@NonNull ImageProxy imageProxy) {
         @OptIn(markerClass = ExperimentalGetImage.class) Image mediaImage = imageProxy.getImage();
-        if (mediaImage != null) {
+        if(mediaImage != null) {
             InputImage image = InputImage.fromMediaImage(mediaImage, imageProxy.getImageInfo().getRotationDegrees());
             Task<List<Barcode>> result = scanner.process(image).addOnSuccessListener(
                     barcodes -> {
-                        for (Barcode bcode : barcodes) {
-                            if (QrCodec.verifyQRStringDecodable(Objects.requireNonNull(bcode.getRawValue()))) {
+                        for(Barcode bcode: barcodes){
+                            if(QrCodec.verifyQRStringDecodable(Objects.requireNonNull(bcode.getRawValue()))){
                                 // this QR code most likely fits our encoding scheme
                                 String eventID = QrCodec.decodeQRString(Objects.requireNonNull(bcode.getRawValue()));
-                                Log.d("QR SCAN", "This should now go to sign up for event " + eventID);
-                                Attendee dummyAttendee = new Attendee("James", "123456", "abc@gmail", "hello :)", "deviceID", "profilePictureID");
-                                createSignInDialog(eventID, dummyAttendee);
+                                Log.d("QR SCAN", "This should now go to sign up for event "+eventID);
+                                createSignInDialog(eventID);
                             }
                         }
                     }
@@ -94,21 +93,8 @@ public class QRAnalyzer{
      * Creates a sign-in dialog for the event.
      *
      * @param eventID       The ID of the event.
-     * @param selfAttendee  The attendee signing in.
      */
-    private void createSignInDialog(String eventID, Attendee selfAttendee){
-
-                                Log.d("QR SCAN", "This should now go to sign up for event "+eventID);
-                                createSignInDialog(eventID);
-                            }
-                        }
-                    }
-            );
-        }
-    }
-
     private void createSignInDialog(String eventID){
-
         Dialog eventSignIn = new Dialog(context);
         eventSignIn.setContentView(R.layout.fragment_event_sign_in);
         eventSignIn.setCancelable(true);
