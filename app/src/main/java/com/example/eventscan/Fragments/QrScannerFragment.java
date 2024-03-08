@@ -28,6 +28,7 @@ import com.example.eventscan.Helpers.QRAnalyzer;
 import com.example.eventscan.R;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class QrScannerFragment extends Fragment {
@@ -39,7 +40,7 @@ public class QrScannerFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        analyzer = new QRAnalyzer();
+        analyzer = new QRAnalyzer(getContext());
         cameraProviderFuture = ProcessCameraProvider.getInstance(this.requireContext());
         View view = getLayoutInflater().inflate(R.layout.scan_qr_layout, container, false);
         previewView = view.findViewById(R.id.CameraPreview);
