@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:background="@drawable/background_gradient"
     tools:context=".Activities.AdminActivity">
     <TextView
         android:id="@+id/yourEventsText"
@@ -31,4 +31,8 @@
             android:divider="@android:color/darker_gray"
             android:dividerHeight="1dp"/>
     </RelativeLayout>
+    <FrameLayout
+        android:id="@+id/fragment_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 </RelativeLayout>

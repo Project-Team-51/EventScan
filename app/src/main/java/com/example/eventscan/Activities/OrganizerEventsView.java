@@ -19,6 +19,8 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.OnBackPressedDispatcher;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -77,28 +79,10 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
         buttonViewEvents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Create an instance of the OrganizerViewAllEvents fragment
-                OrganizerViewAllEvents organizerViewAllEventsFragment = new OrganizerViewAllEvents();
-
-                // Begin a fragment transaction
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-                // Replace the current fragment with the new fragment
-                transaction.replace(R.id.fragment_container_view, organizerViewAllEventsFragment);
-
-                // Add the transaction to the back stack (optional)
-                transaction.addToBackStack(null);
-
-                // Commit the transaction
-                transaction.commit();
-
-                yourEventsText.setVisibility(View.GONE);
-                bubbleContainer.setVisibility(View.GONE);
-                atEventsText.setVisibility(View.GONE);
-                bubbleContainer2.setVisibility(View.GONE);
+                Intent intent = new Intent(OrganizerEventsView.this, OrganizerViewAllEvents.class);
+                startActivity(intent);
             }
         });
-
 
         buttonOrganizerProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,7 +91,6 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
                 startActivity(intent);
             }
         });
-
 
         buttonAddEvent.setOnClickListener(this);
         buttonOrganizerProfile.setOnClickListener(this);
@@ -162,16 +145,6 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
 
         }
 
-    }
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        // Show XML elements when the back button is pressed
-        yourEventsText.setVisibility(View.VISIBLE);
-        bubbleContainer.setVisibility(View.VISIBLE);
-        atEventsText.setVisibility(View.VISIBLE);
-        bubbleContainer2.setVisibility(View.VISIBLE);
     }
 
     public static String getDeviceId(Context context) {
