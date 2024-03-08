@@ -5,7 +5,10 @@ import android.location.Location;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-
+/*
+ * The user superclass that the three other user types descend from. Stores info all users may need, as well as
+ * providing setters and getters for interfacing with the class.
+ */
 public class User implements Serializable {
     private String name;
     private String phoneNum;
