@@ -144,7 +144,6 @@ public class ProfileFragment extends Fragment {
 
 
     private void saveAttendeeProfile(Attendee attendee) {
-        // Replace "attendees" with the appropriate Firestore collection name
         db.collection("attendees")
                 .document(deviceID) // Use deviceID as a document ID
                 .set(attendee)
