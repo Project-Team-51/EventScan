@@ -15,6 +15,8 @@ import com.example.eventscan.Fragments.EventFragment;
 import com.example.eventscan.Fragments.qrCodeTestFrag;
 import com.example.eventscan.R;
 
+
+
 /*
  * The main activity that an Admin sees. Calls fragments instead of other activities. The navigation
  * bar at the bottom allows access to the EventFragment or the AttendeeFragment. By default, it shows
@@ -22,6 +24,7 @@ import com.example.eventscan.R;
  * activities will be refactored into fragments that are called from this activity depending on buttons pressed
  * and user permissions.
  */
+
 
 public class AdminActivity extends AppCompatActivity {
     @Override
@@ -39,6 +42,7 @@ public class AdminActivity extends AppCompatActivity {
         ImageButton buttonEvents = findViewById(R.id.buttonEvents);
         ImageButton buttonProfile = findViewById(R.id.buttonProfile);
 
+        // Load EventFragment when the Events button is clicked
         buttonEvents.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,6 +52,7 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+        // Load AttendeeFragment when the Profile button is clicked
         buttonProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,6 +63,10 @@ public class AdminActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Load the specified fragment into the fragment container view.
+     * @param fragment The fragment to be loaded.
+     */
     private void loadFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container_view, fragment);

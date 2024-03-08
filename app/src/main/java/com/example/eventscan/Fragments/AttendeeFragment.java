@@ -38,6 +38,14 @@ public class AttendeeFragment extends Fragment implements DeleteProfile.DeletePr
     private FirebaseFirestore db;
     private CollectionReference usersCollection;
 
+    /**
+     * Called to have the fragment instantiate its user interface view.
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate views.
+     * @param container          This is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState This fragment is being re-constructed from a previous saved state.
+     * @return Return the View for the fragment's UI.
+     */
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.attendee_list_content, container, false);
 
@@ -77,10 +85,21 @@ public class AttendeeFragment extends Fragment implements DeleteProfile.DeletePr
         });
         return view;
     }
+
+    /**
+     * Callback method to handle profile deletion.
+     *
+     * @param user The user whose profile is to be deleted.
+     */
     public void onDeleteProfile(User user) {
         deleteProfile(user);
     }
 
+    /**
+     * Opens the DeleteProfile fragment to confirm profile deletion.
+     *
+     * @param selectedUser The selected user whose profile deletion is to be confirmed.
+     */
     private void openDeleteProfileFragment(User selectedUser) {
         DeleteProfile deleteProfileFragment = new DeleteProfile();
         deleteProfileFragment.setDeleteProfileListener(this);
@@ -94,6 +113,11 @@ public class AttendeeFragment extends Fragment implements DeleteProfile.DeletePr
         deleteProfileFragment.show(getParentFragmentManager(), "DeleteProfileFragment");
     }
 
+    /**
+     * Deletes the user profile.
+     *
+     * @param user The user whose profile is to be deleted.
+     */
     private void deleteProfile(User user) {
         // removes user from both the adapter and the firestore.
         userAdapter.remove(user);

@@ -14,6 +14,12 @@ import com.google.firebase.FirebaseApp;
  * activities into one main activity.
  */
 public class UserSelection extends AppCompatActivity {
+
+    /**
+     * Called when the activity is created.
+     *
+     * @param savedInstanceState A Bundle containing the saved state of the activity.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

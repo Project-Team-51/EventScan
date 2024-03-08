@@ -55,6 +55,11 @@ public class QrScannerFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Binds the camera preview to the provided camera provider.
+     *
+     * @param cameraProvider The ProcessCameraProvider instance used to bind the camera preview.
+     */
     private void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
         Preview preview = new Preview.Builder().build();
         CameraSelector cameraSelector = new CameraSelector.Builder()
@@ -63,6 +68,12 @@ public class QrScannerFragment extends Fragment {
         preview.setSurfaceProvider(previewView.getSurfaceProvider());
         Camera camera = cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, preview, analyzer.getUseCase());
     }
+
+    /**
+     * Checks for camera permissions and requests them if not granted.
+     *
+     * @param context The context from which permissions are checked and requested.
+     */
 
     private static void checkCameraPermissions(Context context){
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
