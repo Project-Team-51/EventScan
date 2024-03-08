@@ -95,8 +95,7 @@ public class AttendeeFragment extends Fragment implements DeleteProfile.DeletePr
     }
 
     private void deleteProfile(User user) {
-        // Implement the logic to delete the user profile
-        // For example, you can remove the user from the adapter and update the UI.
+        // removes user from both the adapter and the firestore.
         userAdapter.remove(user);
         userAdapter.notifyDataSetChanged();
         db.collection("users").document(user.getDeviceID()).delete();
