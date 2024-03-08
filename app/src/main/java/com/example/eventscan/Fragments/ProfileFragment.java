@@ -4,12 +4,15 @@ import static android.content.ContentValues.TAG;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -24,6 +27,8 @@ import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Helpers.ImageUploader;
 import com.example.eventscan.R;
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -43,9 +48,11 @@ public class ProfileFragment extends Fragment {
     EditText emailInput;
     EditText bioInput;
     Button saveProfileBtn;
+    Button deleteProfilePicBtn;
     ActivityResultLauncher<Intent> imagePickLauncher;
     Uri selectedImageUri;
     public String deviceID;
+    private static final int defaultProfileIcon = R.drawable.profile_icon;
 
 
 
@@ -112,6 +119,16 @@ public class ProfileFragment extends Fragment {
         });
 
 
+        deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
+        deleteProfilePicBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Call a method to delete the profile picture
+                deleteProfilePicture();
+            }
+        });
+
+
         return view;
     }
 
@@ -135,6 +152,30 @@ public class ProfileFragment extends Fragment {
             profilePicRef.putFile(selectedImageUri);
 
         }
+    }
+
+    private void deleteProfilePicture() {
+        // Delete the profile picture from Firebase Storage
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference profilePicRef = storageRef.child("profile_pics").child(deviceID);
+
+        profilePicRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                // File deleted successfully
+                // Update the UI or perform any other necessary actions
+                Drawable drawableDefaultProfileIcon = ContextCompat.getDrawable(requireContext(), defaultProfileIcon);
+                profilePic.setImageDrawable(drawableDefaultProfileIcon);
+                selectedImageUri = null; // Clear the selected image URI
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Error occurred while deleting the file
+                Log.e(TAG, "Error deleting profile picture", e);
+                // You can display an error message to the user if needed
+            }
+        });
     }
 
 }
