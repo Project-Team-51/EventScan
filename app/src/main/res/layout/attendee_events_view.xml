@@ -1,101 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient"
     tools:context=".Activities.AttendeeEventsView">
+
     <TextView
         android:id="@+id/upcomingEventsText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
         android:textColor="#D3E2F2"
         android:text="Upcoming Events"
-        android:textSize="30sp" />
-    <RelativeLayout
+        android:textSize="30sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_marginTop="25dp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bubbleContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="75dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/background_rounded"
+        app:layout_constraintTop_toBottomOf="@+id/upcomingEventsText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintDimensionRatio="H,16:9"
+        android:layout_marginTop="25dp"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginBottom="400dp"
-        android:background="@drawable/background_rounded">
+        android:layout_marginBottom="400dp">
+
         <ListView
-            android:id="@+id/allEvents"
+            android:id="@+id/upcomingEvents"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp"/>
-    </RelativeLayout>
+            android:dividerHeight="1dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintDimensionRatio="H,16:9" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <TextView
         android:id="@+id/EventAnnouncements"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="350dp"
         android:textColor="#D3E2F2"
         android:text="Event Announcements"
-        android:textSize="30sp" />
-    <RelativeLayout
+        android:textSize="30sp"
+        app:layout_constraintTop_toBottomOf="@+id/bubbleContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        android:layout_marginTop="25dp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bubbleContainer2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="400dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/background_rounded"
+        app:layout_constraintTop_toBottomOf="@+id/EventAnnouncements"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintDimensionRatio="H,16:9"
+        android:layout_marginTop="25dp"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginBottom="100dp"
-        android:background="@drawable/background_rounded">
+        android:layout_marginBottom="100dp">
+
         <ListView
-            android:id="@+id/inEvents"
+            android:id="@+id/announcements"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:divider="@android:color/darker_gray"
-            android:dividerHeight="1dp"/>
-    </RelativeLayout>
+            android:dividerHeight="1dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="H,16:9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/buttonViewEvents"
+        android:layout_width="0dp"
+        android:layout_height="38dp"
+        android:text="@string/viewEvents"
+        android:textColor="#D3E2F2"
+        android:backgroundTint="#414E6E"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/buttonQRScanner"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="20dp" />
+
+    <Button
+        android:id="@+id/buttonQRScanner"
+        android:layout_width="0dp"
+        android:layout_height="38dp"
+        android:text="QR Scan"
+        android:backgroundTint="#414E6E"
+        app:layout_constraintStart_toEndOf="@+id/buttonViewEvents"
+        app:layout_constraintEnd_toStartOf="@+id/buttonAttendeeProfile"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="20dp" />
+
+    <Button
+        android:id="@+id/buttonAttendeeProfile"
+        android:layout_width="0dp"
+        android:layout_height="38dp"
+        android:text="@string/profile"
+        android:textColor="#D3E2F2"
+        android:backgroundTint="#414E6E"
+        app:layout_constraintStart_toEndOf="@+id/buttonQRScanner"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp" />
+
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="168dp"
-        tools:layout_editor_absoluteY="223dp" >
+        android:layout_above="@+id/buttonViewEvents"
+        android:layout_below="@+id/upcomingEventsText"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="-16dp" />
 
-    </FrameLayout>
-
-    <Button
-        android:id="@+id/buttonViewEvents"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="20dp"
-        android:layout_toStartOf="@+id/buttonAttendeeProfile"
-        android:backgroundTint="#414E6E"
-        android:text="@string/viewEvents"
-        android:textColor="#D3E2F2" />
-
-    <Button
-        android:id="@+id/buttonQRScanner"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="20dp"
-        android:backgroundTint="#414E6E"
-        android:layout_toStartOf="@+id/buttonViewEvents"
-        android:text="QR Scan" />
-
-    <Button
-        android:id="@+id/buttonAttendeeProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="38dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
-        android:backgroundTint="#414E6E"
-        android:text="@string/profile"
-        android:textColor="#D3E2F2" />
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
