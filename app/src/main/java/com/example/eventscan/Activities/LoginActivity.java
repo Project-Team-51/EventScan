@@ -28,9 +28,9 @@ public class LoginActivity extends AppCompatActivity {
 
         // firestore initialization
         db = FirebaseFirestore.getInstance();
-        DatabaseHelper dbh = new DatabaseHelper();
-        dbh.addSampleEvents();
-        dbh.addSampleUsers();
+        //use only when you want to make some events DatabaseHelper dbh = new DatabaseHelper();
+        //DO NOT TURN ON THIS SHIT IS BROKEN dbh.addSampleEvents();
+        //use only when you want to make some events dbh.addSampleUsers();
 
 
         // UI components
