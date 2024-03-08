@@ -12,7 +12,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class DatabaseHelper {
-    private Uri posterBitmap;
+    private String posterUriString;
     private FirebaseFirestore db;
 
     // Constructor initializes Firestore instance
@@ -30,13 +30,13 @@ public class DatabaseHelper {
         String eventID12 = eventID1.toString();
 
         // Creating and adding sample events
-        Event event1 = new Event("Sample Event1", "sample desc1", placeholderOrganizer, posterBitmap, eventID12);
+        Event event1 = new Event("Sample Event1", "sample desc1", placeholderOrganizer, posterUriString, eventID12);
         event1.setName("Event 1");
 
         Integer eventID2 = (int) Math.floor(Math.random() * 90000) + 10000;
         String eventID22 = eventID2.toString();
 
-        Event event2 = new Event("Sample Event2", "sample desc2", placeholderOrganizer, posterBitmap, eventID22);
+        Event event2 = new Event("Sample Event2", "sample desc2", placeholderOrganizer, posterUriString, eventID22);
         event2.setName("Event 2");
 
         db.collection("events").document(event1.getEventID()).set(event1);
