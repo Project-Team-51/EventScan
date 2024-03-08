@@ -257,6 +257,7 @@ public class ProfileFragment extends Fragment {
             emailInput.setText(attendee.getEmail());
             bioInput.setText(attendee.getBio());
 
+
             // Load profile picture using Glide or Picasso (or any image loading library)
             if (attendee.getProfilePictureID() != null) {
                 StorageReference profilePicRef = FirebaseStorage.getInstance()
@@ -276,6 +277,8 @@ public class ProfileFragment extends Fragment {
 
 
                             profilePic.setBackgroundResource(R.drawable.circular_background);
+
+                            deleteProfilePicBtn.setVisibility(View.VISIBLE);
                         })
                         .addOnFailureListener(e -> {
                             Log.e(TAG, "Error loading profile picture", e);
