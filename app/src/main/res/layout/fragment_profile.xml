@@ -97,7 +97,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/backButton"
-        app:layout_constraintTop_toBottomOf="@+id/bioEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/bioEditText"
+        app:layout_constraintVertical_bias="0.85" />
 
     <Button
         android:id="@+id/backButton"
@@ -109,6 +110,19 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/saveButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bioEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/bioEditText"
+        app:layout_constraintVertical_bias="0.85" />
+
+    <Button
+        android:id="@+id/deleteProfilePicButton"
+        android:layout_width="174dp"
+        android:layout_height="52dp"
+        android:backgroundTint="#414E6E"
+        android:text="Remove Profile Picture"
+        android:textColor="#D3E2F2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/phoneEditText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
