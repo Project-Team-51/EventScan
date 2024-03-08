@@ -23,6 +23,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Helpers.ImageUploader;
 import com.example.eventscan.R;
@@ -93,6 +95,8 @@ public class ProfileFragment extends Fragment {
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
 
         deleteProfilePicBtn.setVisibility(isProfilePictureUploaded() ? View.VISIBLE : View.GONE);
+
+        loadProfileInfo();
 
         saveProfileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -194,6 +198,57 @@ public class ProfileFragment extends Fragment {
                 // You can display an error message to the user if needed
             }
         });
+    }
+
+    private void loadProfileInfo() {
+        db.collection("attendees")
+                .document(deviceID)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Attendee attendee = documentSnapshot.toObject(Attendee.class);
+                        updateUIWithProfileInfo(attendee);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error retrieving profile information", e);
+                });
+    }
+
+    private void updateUIWithProfileInfo(Attendee attendee) {
+        // Update UI elements with profile information
+        if (attendee != null) {
+            // Assuming that you have getters in the Attendee class
+            usernameInput.setText(attendee.getName());
+            phoneInput.setText(attendee.getPhoneNum());
+            emailInput.setText(attendee.getEmail());
+            bioInput.setText(attendee.getBio());
+
+            // Load profile picture using Glide or Picasso (or any image loading library)
+            if (attendee.getProfilePictureID() != null) {
+                StorageReference profilePicRef = FirebaseStorage.getInstance()
+                        .getReference()
+                        .child("profile_pics")
+                        .child(deviceID);
+
+                profilePicRef.getDownloadUrl()
+                        .addOnSuccessListener(uri -> {
+                            // Load the profile picture using an image loading library
+                            Glide.with(this)
+                                    .load(uri)
+                                    .apply(RequestOptions.circleCropTransform())
+                                    .placeholder(R.drawable.profile_icon) // Placeholder image while loading
+                                    .error(R.drawable.profile_icon) // Image to display in case of error
+                                    .into(profilePic);
+
+
+                            profilePic.setBackgroundResource(R.drawable.circular_background);
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e(TAG, "Error loading profile picture", e);
+                        });
+            }
+        }
     }
 
 }
