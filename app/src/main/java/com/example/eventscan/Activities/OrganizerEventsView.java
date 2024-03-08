@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventscan.Fragments.AddEvent;
@@ -77,6 +78,24 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
             buttonSendNoti.setVisibility(View.GONE);
             buttonViewEvents.setVisibility(View.GONE);
             buttonAddEvent.setVisibility(View.GONE);
+
+            // Add a FragmentTransaction listener to handle button visibility
+            getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+                @Override
+                public void onBackStackChanged() {
+                    // Check if the back stack is empty
+                    if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+                        // Fragment is removed from the back stack, make buttons visible
+                        buttonOrganizerProfile.setVisibility(View.VISIBLE);
+                        buttonSendNoti.setVisibility(View.VISIBLE);
+                        buttonViewEvents.setVisibility(View.VISIBLE);
+                        buttonAddEvent.setVisibility(View.VISIBLE);
+
+                        // Remove the listener to avoid multiple callbacks
+                        getSupportFragmentManager().removeOnBackStackChangedListener(this);
+                    }
+                }
+            });
 
         }
 

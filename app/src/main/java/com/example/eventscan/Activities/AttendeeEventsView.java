@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.R;
@@ -44,6 +45,23 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
 
             buttonEventsView.setVisibility(View.GONE);
             buttonAttendeeProfile.setVisibility(View.GONE);
+
+            // Add a FragmentTransaction listener to handle button visibility
+            getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+                @Override
+                public void onBackStackChanged() {
+                    // Check if the back stack is empty
+                    if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
+                        // Fragment is removed from the back stack, make buttons visible
+                        buttonEventsView.setVisibility(View.VISIBLE);
+                        buttonAttendeeProfile.setVisibility(View.VISIBLE);
+
+                        // Remove the listener to avoid multiple callbacks
+                        getSupportFragmentManager().removeOnBackStackChangedListener(this);
+                    }
+                }
+            });
+
         }
     }
 
