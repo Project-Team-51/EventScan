@@ -78,17 +78,17 @@
         app:layout_constraintTop_toBottomOf="@+id/emailEditText" />
 
     <EditText
-        android:id="@+id/bioEditText"
+        android:id="@+id/homepageEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="30dp"
-        android:hint="Bio"
+        android:layout_marginEnd="20dp"
+        android:backgroundTint="#D3E2F2"
+        android:hint="Homepage"
         android:textColor="#D3E2F2"
         android:textColorHint="#D3E2F2"
-        android:backgroundTint="#D3E2F2"
-        android:textSize="24sp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/phoneEditText" />
@@ -105,7 +105,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/backButton"
-        app:layout_constraintTop_toBottomOf="@+id/bioEditText"
+        app:layout_constraintTop_toBottomOf="@+id/homepageEditText"
         app:layout_constraintVertical_bias="0.85" />
 
     <Button
@@ -118,7 +118,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/saveButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bioEditText"
+        app:layout_constraintTop_toBottomOf="@+id/homepageEditText"
         app:layout_constraintVertical_bias="0.85" />
 
     <Button

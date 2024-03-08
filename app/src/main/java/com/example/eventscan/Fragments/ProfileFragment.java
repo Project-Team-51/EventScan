@@ -89,7 +89,7 @@ public class ProfileFragment extends Fragment {
         usernameInput = view.findViewById(R.id.nameEditText);
         phoneInput = view.findViewById(R.id.phoneEditText);
         emailInput = view.findViewById(R.id.emailEditText);
-        bioInput = view.findViewById(R.id.bioEditText);
+        bioInput = view.findViewById(R.id.homepageEditText);
         saveProfileBtn = view.findViewById(R.id.saveButton);
         backButton = view.findViewById(R.id.backButton);
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
