@@ -5,6 +5,7 @@ import static android.view.View.GONE;
 import android.app.Dialog;
 import android.content.Context;
 import android.media.Image;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
@@ -43,6 +44,8 @@ public class QRAnalyzer{
     BarcodeScanner scanner;
     Context context;
     FirebaseFirestore db;
+    Attendee selfAttendee = null;
+    boolean attendeeFetchCompleted; // this will be removed later, just for forcing synchronous code
     public QRAnalyzer(Context context){
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
@@ -50,6 +53,16 @@ public class QRAnalyzer{
         scanner = BarcodeScanning.getClient(options);
         this.context = context;
         db = FirebaseFirestore.getInstance();
+
+        // TODO replace this with a databaseHelper style static method call
+        String deviceID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+        db.collection("attendees").document(deviceID).get().addOnSuccessListener(documentSnapshot -> {
+            selfAttendee = documentSnapshot.toObject(Attendee.class);
+            attendeeFetchCompleted = true;
+        }).addOnFailureListener(e -> {
+            Log.e("QR SCAN", "couldn't fetch selfAttendee: "+e.toString());
+            attendeeFetchCompleted = true;
+        });
     }
 
 
@@ -64,8 +77,7 @@ public class QRAnalyzer{
                                 // this QR code most likely fits our encoding scheme
                                 String eventID = QrCodec.decodeQRString(Objects.requireNonNull(bcode.getRawValue()));
                                 Log.d("QR SCAN", "This should now go to sign up for event "+eventID);
-                                Attendee dummyAttendee = new Attendee("James", "123456", "abc@gmail", "hello :)", "deviceID", "profilePictureID");
-                                createSignInDialog(eventID, dummyAttendee);
+                                createSignInDialog(eventID);
                             }
                         }
                     }
@@ -73,12 +85,13 @@ public class QRAnalyzer{
         }
     }
 
-    private void createSignInDialog(String eventID, Attendee selfAttendee){
+    private void createSignInDialog(String eventID){
         Dialog eventSignIn = new Dialog(context);
         eventSignIn.setContentView(R.layout.fragment_event_sign_in);
         eventSignIn.setCancelable(true);
         // get the data loaded in
         CollectionReference eventCollection = db.collection("events");
+
         //https://firebase.google.com/docs/firestore/query-data/get-data#java_4
         eventCollection.document(eventID).get()
 
@@ -99,6 +112,17 @@ public class QRAnalyzer{
                                 ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setText("You've Already signed up");
                             } else {
                                 ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setOnClickListener(v -> {
+                                    // make sure the selfAttendee has been returned, quick and dirty code, this will be changed
+                                    while(!attendeeFetchCompleted){
+                                        try {
+                                            Thread.sleep(20);
+                                        } catch (InterruptedException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }
+                                    if(selfAttendee == null){
+                                        throw new RuntimeException("Attendee fetch failed :( This will be gracefully handled in the future");
+                                    }
                                     event.addAttendee(selfAttendee);
                                     // ↓ absolutely egregious, we need to change this as soon as possible
                                     db.collection("events").document(eventID).set(event);
