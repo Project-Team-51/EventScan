@@ -1,6 +1,7 @@
 package com.example.eventscan.Fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,12 +12,14 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventscan.Entities.Attendee;
+import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class OrganizerViewAttendee extends Fragment {
 
@@ -46,18 +49,12 @@ public class OrganizerViewAttendee extends Fragment {
             String eventId = args.getString("eventId");
             if (eventId != null) {
                 // Query database to retrieve attendees for the specified event ID
-                CollectionReference attendeesRef = db.collection("events").document(eventId).collection("attendees");
-                attendeesRef.get().addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        attendeesList.clear();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Attendee attendee = document.toObject(Attendee.class);
-                            attendeesList.add(attendee.getName());
-                        }
-                        attendeesAdapter.notifyDataSetChanged(); // Update list view
-                    } else {
-                        Toast.makeText(requireContext(), "Failed to retrieve attendees", Toast.LENGTH_SHORT).show();
+                db.collection("events").document(eventId).get().addOnSuccessListener(documentSnapshot -> {
+                    Event e = documentSnapshot.toObject(Event.class);
+                    for(Attendee attendee : e.getAttendees()){
+                        attendeesList.add(attendee.getName());
                     }
+                    attendeesAdapter.notifyDataSetChanged();
                 });
             }
         }
