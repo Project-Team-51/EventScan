@@ -94,6 +94,8 @@ public class QRAnalyzer{
                             // set the onclick of the button to sign you up
                             ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setOnClickListener(v -> {
                                 event.addAttendee(selfAttendee);
+                                // ↓ absolutely egregious, we need to change this as soon as possible
+                                db.collection("events").document(eventID).set(event);
                             });
                         } else {
                             Log.e("QR SCAN", "Event "+eventID+" not found in firebase");
