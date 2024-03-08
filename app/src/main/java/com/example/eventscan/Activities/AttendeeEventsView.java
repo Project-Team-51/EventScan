@@ -115,6 +115,7 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
 
             buttonEventsView.setVisibility(View.GONE);
             buttonAttendeeProfile.setVisibility(View.GONE);
+            buttonQRScanner.setVisibility(View.GONE);
 
             // Add a FragmentTransaction listener to handle button visibility
             getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
@@ -125,6 +126,7 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
                         // Fragment is removed from the back stack, make buttons visible
                         buttonEventsView.setVisibility(View.VISIBLE);
                         buttonAttendeeProfile.setVisibility(View.VISIBLE);
+                        buttonQRScanner.setVisibility(View.VISIBLE);
 
                         // Remove the listener to avoid multiple callbacks
                         getSupportFragmentManager().removeOnBackStackChangedListener(this);

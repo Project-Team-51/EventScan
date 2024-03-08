@@ -67,6 +67,7 @@ public class ProfileFragment extends Fragment {
                         if(data!=null && data.getData()!=null) {
                             selectedImageUri = data.getData();
                             ImageUploader.setProfilePic(getContext(), selectedImageUri, profilePic);
+                            deleteProfilePicBtn.setVisibility(View.VISIBLE);
 
                         }
                     }
@@ -90,6 +91,8 @@ public class ProfileFragment extends Fragment {
         saveProfileBtn = view.findViewById(R.id.saveButton);
         backButton = view.findViewById(R.id.backButton);
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
+
+        deleteProfilePicBtn.setVisibility(isProfilePictureUploaded() ? View.VISIBLE : View.GONE);
 
         saveProfileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,6 +166,10 @@ public class ProfileFragment extends Fragment {
         }
     }
 
+    private boolean isProfilePictureUploaded() {
+        return selectedImageUri != null;
+    }
+
     private void deleteProfilePicture() {
         // Delete the profile picture from Firebase Storage
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
@@ -176,6 +183,8 @@ public class ProfileFragment extends Fragment {
                 Drawable drawableDefaultProfileIcon = ContextCompat.getDrawable(requireContext(), defaultProfileIcon);
                 profilePic.setImageDrawable(drawableDefaultProfileIcon);
                 selectedImageUri = null; // Clear the selected image URI
+
+                deleteProfilePicBtn.setVisibility(View.GONE);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
