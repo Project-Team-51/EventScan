@@ -19,6 +19,8 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.OnBackPressedDispatcher;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -92,9 +94,9 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
                 bubbleContainer.setVisibility(View.GONE);
                 atEventsText.setVisibility(View.GONE);
                 bubbleContainer2.setVisibility(View.GONE);
+
             }
         });
-
 
         buttonOrganizerProfile.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,7 +105,6 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
                 startActivity(intent);
             }
         });
-
 
         buttonAddEvent.setOnClickListener(this);
         buttonOrganizerProfile.setOnClickListener(this);
@@ -164,10 +165,10 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
         super.onBackPressed();
 
         // Show XML elements when the back button is pressed
-        yourEventsText.setVisibility(View.VISIBLE);
-        bubbleContainer.setVisibility(View.VISIBLE);
-        atEventsText.setVisibility(View.VISIBLE);
-        bubbleContainer2.setVisibility(View.VISIBLE);
+        yourEventsText.setVisibility(View.GONE);
+        bubbleContainer.setVisibility(View.GONE);
+        atEventsText.setVisibility(View.GONE);
+        bubbleContainer2.setVisibility(View.GONE);
     }
 
     public static String getDeviceId(Context context) {

@@ -20,6 +20,7 @@ import com.example.eventscan.Entities.Event;
 
 import com.example.eventscan.Entities.User;
 
+import com.example.eventscan.Fragments.OrganizerViewAttendee;
 import com.example.eventscan.Helpers.EventArrayAdapter;
 import com.example.eventscan.R;
 import com.google.firebase.firestore.CollectionReference;
@@ -80,9 +81,22 @@ public class OrganizerViewAllEvents extends Fragment implements View.OnClickList
         allEventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Event selectedBook = allEvents.get(position);
+                Event selectedEvent = allEvents.get(position);
+
+                // Navigate to OrganizerViewAttendee fragment passing event ID as argument
+                OrganizerViewAttendee fragment = new OrganizerViewAttendee();
+                Bundle args = new Bundle();
+                args.putString("eventId", selectedEvent.getEventID());
+                fragment.setArguments(args);
+
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container_view, fragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
+
+        // Other code
 
         return view;
     }
