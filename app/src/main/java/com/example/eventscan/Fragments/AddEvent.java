@@ -34,6 +34,8 @@ import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -47,6 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
+import java.util.UUID;
 
 public class AddEvent extends DialogFragment {
 
@@ -152,6 +155,15 @@ public class AddEvent extends DialogFragment {
                 event.setPoster(posterUri);
                 organizer = new Organizer(deviceID);
                 event.setOrganizer(organizer);
+
+                // Poster
+                // Generate a unique filename for the poster image
+                String uniqueId = UUID.randomUUID().toString(); // Generate a random UUID
+                String posterFileName = "poster_" + eventName + "_" + uniqueId + ".jpg";
+
+                StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+                StorageReference posterRef = storageRef.child("poster_pictures").child(eventID);
+                posterRef.putFile(posterUri);
 
                 Event event = new Event(eventName, eventDesc, organizer, posterUri, eventID);
                 // Call the addEvent function with the retrieved information
