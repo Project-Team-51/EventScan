@@ -10,7 +10,11 @@ import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Entities.Organizer;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-
+/*
+ * Testing class for adding sample events and users to the Firestore. As of writing,
+ * it has been completely broken by the addition of URI to store event posters.
+ * Do not use.
+ */
 public class DatabaseHelper {
     private String posterUriString;
     private FirebaseFirestore db;

@@ -1,5 +1,9 @@
 package com.example.eventscan.Helpers;
 
+/*
+Helper class that parses the string encoded to and decoded from a QR Code.
+ */
+
 public class QrCodec {
     public static String encodeQRString(String toEncode){
         return "EventScan_event"+toEncode;

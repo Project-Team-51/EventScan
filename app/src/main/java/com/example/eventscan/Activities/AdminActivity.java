@@ -15,6 +15,14 @@ import com.example.eventscan.Fragments.EventFragment;
 import com.example.eventscan.Fragments.qrCodeTestFrag;
 import com.example.eventscan.R;
 
+/*
+ * The main activity that an Admin sees. Calls fragments instead of other activities. The navigation
+ * bar at the bottom allows access to the EventFragment or the AttendeeFragment. By default, it shows
+ * the EventFragment. This activity will become the overall MainActivity in the near future, and most
+ * activities will be refactored into fragments that are called from this activity depending on buttons pressed
+ * and user permissions.
+ */
+
 public class AdminActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {

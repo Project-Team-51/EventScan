@@ -20,7 +20,10 @@ import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 
 import java.util.Objects;
-
+/*
+ * A simple dialogfragment that displays some basic info about the Event that is passed into it, and gives
+ * the user the ability to delete the profile from the app.
+ */
 public class DeleteEvent extends DialogFragment {
 
     public DeleteEvent() {

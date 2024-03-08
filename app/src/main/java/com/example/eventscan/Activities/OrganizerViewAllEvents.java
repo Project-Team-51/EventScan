@@ -18,8 +18,14 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
+import java.util.List;
 
+/*
+ * The activity that an Organizer see's when they click on the navigation button to see all events. Allows them to see all events.
+ * Utilizes very similar code to the EventFragment. This will be consolidated into the EventFragment in a future build, as this is unneeded as a standalone activity.
+ */
 public class OrganizerViewAllEvents extends AppCompatActivity implements View.OnClickListener  {
+
     private ListView allEventsListView;
     private ArrayList<Event> allEvents;
     private EventArrayAdapter allEventsAdapter;

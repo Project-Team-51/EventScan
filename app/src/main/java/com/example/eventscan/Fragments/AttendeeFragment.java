@@ -24,7 +24,12 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-
+/*
+ * Displays all users in a ListView. Currently only supports the Admin, but can be reworked
+ * to fit the Organizer class as well, when clicking on one of their events. Clicking on a list item
+ * gives you the option to delete the profile from the app, deleting the user linked to their deviceID
+ * on firestore.
+ */
 public class AttendeeFragment extends Fragment implements DeleteProfile.DeleteProfileListener{
 
     private ArrayList<User> allUser;
@@ -90,8 +95,7 @@ public class AttendeeFragment extends Fragment implements DeleteProfile.DeletePr
     }
 
     private void deleteProfile(User user) {
-        // Implement the logic to delete the user profile
-        // For example, you can remove the user from the adapter and update the UI.
+        // removes user from both the adapter and the firestore.
         userAdapter.remove(user);
         userAdapter.notifyDataSetChanged();
         db.collection("users").document(user.getDeviceID()).delete();
