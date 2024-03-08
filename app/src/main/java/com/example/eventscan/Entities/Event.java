@@ -2,6 +2,7 @@ package com.example.eventscan.Entities;
 
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ public class Event implements Serializable {
     private String name;
     public ArrayList<Attendee> attendees;
     private Organizer organizer;
-    private Bitmap poster;
+    private Uri poster;
     private String eventID;
 
   
@@ -21,7 +22,7 @@ public class Event implements Serializable {
     public Event() {};
   
 
-    public Event(String eventName, String desc, Organizer organizer, Bitmap poster, String eventID) {
+    public Event(String eventName, String desc, Organizer organizer, Uri poster, String eventID) {
         this.name = eventName;
         this.desc = desc;
         this.attendees = new ArrayList<>();
@@ -35,7 +36,9 @@ public class Event implements Serializable {
     public Location getLocation() {
         return location;
     }
-
+    public void setEventID(String eventID) {
+        this.eventID = eventID;
+    }
     public void setLocation(Location location) {
         this.location = location;
     }
@@ -80,11 +83,11 @@ public class Event implements Serializable {
     }
 
 
-    public Bitmap getPoster() {
+    public Uri getPoster() {
         return poster;
     }
 
-    public void setPoster(Bitmap poster) {
+    public void setPoster(Uri poster) {
         this.poster = poster;
     }
 }

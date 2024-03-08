@@ -3,11 +3,13 @@ package com.example.eventscan.Fragments;
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
 import android.app.FragmentManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,8 +27,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.eventscan.Activities.UserSelection;
 import com.example.eventscan.Entities.Event;
+import com.example.eventscan.Entities.Organizer;
 import com.example.eventscan.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -44,8 +51,12 @@ import java.util.Random;
 public class AddEvent extends DialogFragment {
 
     private Event event;
+    private Organizer organizer;
     private ImageView imageView;
     private Uri posterUri;
+    private String eventID;
+    private FirebaseFirestore db;
+    private String deviceID;
 
     public AddEvent() {
         // Required empty public constructor
@@ -54,34 +65,31 @@ public class AddEvent extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.add_event, container, false);
+        if (getArguments() != null) {
+            deviceID = getArguments().getString("DEVICE_ID");
+        }
         event = new Event();
+        View view = inflater.inflate(R.layout.add_event, container, false);
         EditText eventName = view.findViewById(R.id.add_edit_event_Name);
         EditText eventDesc = view.findViewById(R.id.addEventDescription);
         String name = eventName.getText().toString();
         String description = eventDesc.getText().toString();
-        event.setDesc(description);
-        event.setName(name);
+        eventID = getRandomNumberString();
+
+        event.setEventID(eventID);
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        db = FirebaseFirestore.getInstance();
         Button returnToEventsButton = view.findViewById(R.id.return_to_event);
         Button generateQRCodeButton = view.findViewById(R.id.generate_QRCode);
-        Button confirmEvent = view.findViewById(R.id.confirmEvent);
+        Button confirmEventButton = view.findViewById(R.id.confirmEvent);
         Button uploadPoster = view.findViewById(R.id.upload_poster);
         imageView = view.findViewById(R.id.posterView);
 
-        returnToEventsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss(); // Close the dialog when the button is clicked
-                // You can perform other actions here if needed
-            }
-        });
         uploadPoster.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -89,14 +97,20 @@ public class AddEvent extends DialogFragment {
                 pickImageLauncher.launch("image/*");
             }
         });
+        returnToEventsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss(); // Close the dialog when the button is clicked
+                // You can perform other actions here if needed
+            }
+        });
 
         generateQRCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Generate QR code bitmap
-                String eventID = getRandomNumberString();
 
-                Bitmap qrCodeBitmap = generateQRCode(eventID);
+                Bitmap qrCodeBitmap = generateQRCode(event.getEventID());
 
                 // Inflate the dialog layout
                 View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
@@ -122,6 +136,41 @@ public class AddEvent extends DialogFragment {
                         dialog.dismiss(); // Dismiss the dialog after saving
                     }
                 });
+            }
+        });
+        confirmEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Retrieve event name and description
+                EditText eventNameEditText = view.findViewById(R.id.add_edit_event_Name);
+                EditText eventDescEditText = view.findViewById(R.id.addEventDescription);
+                String eventName = eventNameEditText.getText().toString();
+                String eventDesc = eventDescEditText.getText().toString();
+
+                event.setDesc(eventDesc);
+                event.setName(eventName);
+                event.setPoster(posterUri);
+                organizer = new Organizer(deviceID);
+                event.setOrganizer(organizer);
+
+                Event event = new Event(eventName, eventDesc, organizer, posterUri, eventID);
+                // Call the addEvent function with the retrieved information
+                db.collection("events").document(event.getEventID()).set(event)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "Event successfully added to Firestore");
+                                getActivity().finish();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error adding event to Firestore", e);
+
+                            }
+                        });
+
             }
         });
     }
@@ -174,24 +223,20 @@ public class AddEvent extends DialogFragment {
         // Get the current timestamp to generate a unique file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
 
-        // Define the file name
+        //  file name
         String imageFileName = "QRCode_" + timeStamp + ".jpg";
 
-        // Get the directory for storing images in the external storage
         File storageDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 
-        // Create a new file in the storage directory
         File imageFile = new File(storageDirectory, imageFileName);
 
         // Try to save the bitmap to the file
         try {
-            // Create an output stream to write the bitmap to the file
             FileOutputStream outputStream = new FileOutputStream(imageFile);
 
             // Compress the bitmap and write it to the output stream as a JPEG file
             qrCodeBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
 
-            // Close the output stream
             outputStream.flush();
             outputStream.close();
 
@@ -214,6 +259,8 @@ public class AddEvent extends DialogFragment {
         }
     }
 
+
+
     private final ActivityResultLauncher<String> pickImageLauncher = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
             new ActivityResultCallback<Uri>() {
@@ -223,6 +270,7 @@ public class AddEvent extends DialogFragment {
                         posterUri = result;
                         imageView.setImageURI(result);
                     }
+
                 }
             });
 

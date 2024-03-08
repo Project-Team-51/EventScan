@@ -3,6 +3,7 @@ package com.example.eventscan.Database;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.media.Image;
+import android.net.Uri;
 
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
@@ -11,7 +12,7 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class DatabaseHelper {
-    private Bitmap posterBitmap;
+    private Uri posterBitmap;
     private FirebaseFirestore db;
 
     // Constructor initializes Firestore instance
