@@ -234,12 +234,10 @@ public class AddEvent extends DialogFragment {
         try {
             FileOutputStream outputStream = new FileOutputStream(imageFile);
 
-            // Compress the bitmap and write it to the output stream as a JPEG file
             qrCodeBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
 
             outputStream.flush();
             outputStream.close();
-
             // Notify the MediaScanner about the new image so that it appears in the gallery app
             MediaScannerConnection.scanFile(
                     getActivity(),
@@ -258,8 +256,6 @@ public class AddEvent extends DialogFragment {
             Toast.makeText(getActivity(), "Failed to save QR code", Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
     private final ActivityResultLauncher<String> pickImageLauncher = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
