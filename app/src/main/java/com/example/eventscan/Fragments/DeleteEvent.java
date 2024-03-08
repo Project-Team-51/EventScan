@@ -74,13 +74,9 @@ public class DeleteEvent extends DialogFragment {
 
         Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
-
         return dialog;
     }
     public void setDeleteEventListener(DeleteEventListener listener) {
         this.deleteEventListener = listener;
     }
 }
-
-
-
