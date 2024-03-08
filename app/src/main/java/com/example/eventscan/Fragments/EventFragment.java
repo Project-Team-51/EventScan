@@ -12,17 +12,23 @@ import android.widget.ListView;
 
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventscan.Entities.Administrator;
+import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 
 import com.example.eventscan.Entities.User;
 
 import com.example.eventscan.Helpers.EventArrayAdapter;
+import com.example.eventscan.Helpers.UserArrayAdapter;
 import com.example.eventscan.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -101,6 +107,9 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         return view;
     }
 
+
+
+
     private void openDeleteEventFragment(Event selectedEvent) {
         DeleteEvent deleteEventFragment = new DeleteEvent();
         deleteEventFragment.setDeleteEventListener(this);
@@ -121,4 +130,40 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         ownedEventsAdapter.notifyDataSetChanged();
         db.collection("events").document(event.getEventID()).delete();
     }
+
+    private void fetchUsersForEvent(String eventId) {
+        // Assuming you have a CollectionReference for users
+        CollectionReference eventsCollection = db.collection("events");
+
+        // Query users collection for users associated with the given event ID
+        eventsCollection.document(eventId)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        DocumentSnapshot document = task.getResult();
+                        if(task.isSuccessful()) {
+                            Event event = document.toObject(Event.class);
+                            // arraylist of type attendee
+                            ArrayList<Attendee> attendeesList = event.getAttendees();
+                        } else {
+                            Log.d("NAMEPOP", "Error getting documents: ", task.getException());
+                        }
+
+                    }
+                });
+
+        }
+    // changed
+    private void displayAttendees(ArrayList<User> attendeesList) {
+        // Create an adapter for the list of attendees
+        UserArrayAdapter attendeeAdapter = new UserArrayAdapter(getActivity(), R.layout.attendee_list_content, attendeesList);
+
+        // Assuming you have a ListView in your layout with the id 'attendeesListView'
+        ListView attendeesListView = getView().findViewById(R.id.allUserList);
+
+        // Set the adapter to the ListView
+        attendeesListView.setAdapter(attendeeAdapter);
+    }
+
 }

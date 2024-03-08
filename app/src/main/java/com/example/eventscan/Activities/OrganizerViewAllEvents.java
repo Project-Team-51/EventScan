@@ -73,6 +73,7 @@ public class OrganizerViewAllEvents extends AppCompatActivity implements View.On
                 // Navigate to OrganizerViewAttendee fragment passing event ID as argument
                 OrganizerViewAttendee fragment = new OrganizerViewAttendee();
                 Bundle args = new Bundle();
+                //changed
                 args.putString("eventId", selectedEvent.getEventID());
                 fragment.setArguments(args);
 

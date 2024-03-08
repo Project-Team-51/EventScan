@@ -26,6 +26,7 @@ public class OrganizerViewAttendee extends Fragment {
     private ArrayAdapter<String> attendeesAdapter;
 
     @Override
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
