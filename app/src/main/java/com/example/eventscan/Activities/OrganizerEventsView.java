@@ -16,15 +16,23 @@ import com.example.eventscan.R;
 
 public class OrganizerEventsView extends AppCompatActivity implements View.OnClickListener {
 
+    Button buttonOrganizerProfile;
+    Button buttonSendNoti;
+    Button buttonViewEvents;
     Button buttonAddEvent;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.organizer_events_view);
 
-        final Button buttonOrganizerProfile = findViewById(R.id.buttonOrganizerProfile);
-        final Button buttonSendNoti = findViewById(R.id.buttonSendEventNoti);
-        final Button buttonViewEvents = findViewById(R.id.buttonViewEvents);
-        Button buttonAddEvent = findViewById(R.id.buttonAddEvent);
+        buttonOrganizerProfile = findViewById(R.id.buttonOrganizerProfile);
+        buttonSendNoti = findViewById(R.id.buttonSendEventNoti);
+        buttonViewEvents = findViewById(R.id.buttonViewEvents);
+        buttonAddEvent = findViewById(R.id.buttonAddEvent);
+
+        buttonOrganizerProfile.setOnClickListener(this);
+        buttonSendNoti.setOnClickListener(this);
+        buttonViewEvents.setOnClickListener(this);
         buttonAddEvent.setOnClickListener(this);
 
         buttonViewEvents.setOnClickListener(new View.OnClickListener() {
@@ -35,15 +43,10 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
                 startActivity(intent);
             }
         });
-        buttonOrganizerProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(OrganizerEventsView.this, OrganizerProfile.class);
-                startActivity(intent);
-            }
-        });
+
 
         buttonAddEvent.setOnClickListener(this);
+        buttonOrganizerProfile.setOnClickListener(this);
 
     }
 
@@ -63,6 +66,17 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
                     .beginTransaction()
                     .replace(R.id.fragment_container_view, eventFragment)
                     .commit();
+
+        } else if(v.getId()==R.id.buttonOrganizerProfile){
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, new ProfileFragment())
+                    .addToBackStack(null)
+                    .commit();
+
+            buttonOrganizerProfile.setVisibility(View.GONE);
+            buttonSendNoti.setVisibility(View.GONE);
+            buttonViewEvents.setVisibility(View.GONE);
+            buttonAddEvent.setVisibility(View.GONE);
 
         }
 
