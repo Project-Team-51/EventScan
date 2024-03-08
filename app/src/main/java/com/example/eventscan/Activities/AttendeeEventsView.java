@@ -30,7 +30,10 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
     @Override
     public void onClick(View v) {
         if(v.getId()==R.id.buttonAttendeeProfile){
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ProfileFragment()).commit();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.container, new ProfileFragment())
+                    .addToBackStack(null)
+                    .commit();
         }
     }
 
