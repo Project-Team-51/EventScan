@@ -19,10 +19,12 @@ Just a simple subclass that extends ArrayAdapter, retrieves the needed info from
 For use in the ListView of all events, or events attending.
  */
 
+
+
 public class EventArrayAdapter extends ArrayAdapter<Event> {
     // The class responsible for displaying the list and the list's objects //
     //  -- Pretty simple, just has the View method to show individual list objects, and within View-
-    // retrieves the necessary information about the book object, and pcik -- //
+    // retrieves the necessary information about the event object//
     // seems to be bug free //
 
     public EventArrayAdapter(Context context, int resource, ArrayList<Event> events) {

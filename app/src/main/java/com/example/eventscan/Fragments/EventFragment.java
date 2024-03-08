@@ -107,9 +107,11 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         return view;
     }
 
-
-
-
+    /**
+     * Opens the DeleteEvent fragment for the selected event.
+     *
+     * @param selectedEvent The event to be deleted.
+     */
     private void openDeleteEventFragment(Event selectedEvent) {
         DeleteEvent deleteEventFragment = new DeleteEvent();
         deleteEventFragment.setDeleteEventListener(this);
@@ -121,9 +123,20 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         deleteEventFragment.show(getParentFragmentManager(), "DeleteEventFragment");
     }
 
+    /**
+     * Handles the deletion of an event.
+     *
+     * @param event The event to be deleted.
+     */
     public void onDeleteEvent(Event event) {
         deleteEvent(event);
     }
+
+    /**
+     * Deletes the specified event from the list and Firestore.
+     *
+     * @param event The event to be deleted.
+     */
 
     public void deleteEvent(Event event) {
         ownedEventsAdapter.remove(event);

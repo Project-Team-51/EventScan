@@ -15,9 +15,11 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
+
 /*
 Deprecated and unused class left for reference purposes. Was used to generate a sample QR code and display it on the screen.
  */
+
 public class qrCodeTestFrag extends Fragment {
 
     @Override

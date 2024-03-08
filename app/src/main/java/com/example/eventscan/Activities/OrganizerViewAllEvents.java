@@ -86,6 +86,12 @@ public class OrganizerViewAllEvents extends AppCompatActivity implements View.On
         });
     }
 
+    /**
+     * Handles button clicks. This method is not implemented in this class.
+     *
+     * @param v The clicked View.
+     */
+
     @Override
     public void onClick(View v) {
         // Handle clicks if necessary

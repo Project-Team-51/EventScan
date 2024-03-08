@@ -65,7 +65,11 @@ public class QRAnalyzer{
         });
     }
 
-
+    /**
+     * Analyzes the QR code obtained from the camera feed.
+     *
+     * @param imageProxy The image proxy containing the captured image.
+     */
     private void analyze(@NonNull ImageProxy imageProxy) {
         @OptIn(markerClass = ExperimentalGetImage.class) Image mediaImage = imageProxy.getImage();
         if(mediaImage != null) {
@@ -85,6 +89,11 @@ public class QRAnalyzer{
         }
     }
 
+    /**
+     * Creates a sign-in dialog for the event.
+     *
+     * @param eventID       The ID of the event.
+     */
     private void createSignInDialog(String eventID){
         Dialog eventSignIn = new Dialog(context);
         eventSignIn.setContentView(R.layout.fragment_event_sign_in);
@@ -142,6 +151,11 @@ public class QRAnalyzer{
         eventSignIn.show();
     }
 
+    /**
+     * Retrieves the image analysis use case.
+     *
+     * @return The image analysis use case.
+     */
     public UseCase getUseCase(){
         //https://beakutis.medium.com/using-googles-mlkit-and-camerax-for-lightweight-barcode-scanning-bb2038164cdc
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().build();

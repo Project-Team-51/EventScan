@@ -23,17 +23,31 @@ import java.util.Objects;
  * the user the ability to delete the profile from the app.
  */
 
+
 public class DeleteProfile extends DialogFragment {
+
+    /**
+     * Default constructor for the DeleteProfile DialogFragment.
+     */
     public DeleteProfile() {
         // Required empty public constructor
     }
 
+    /**
+     * Interface for handling profile deletion.
+     */
     public interface DeleteProfileListener {
         void onDeleteProfile(User user);
     }
 
     private DeleteProfileListener deleteProfileListener;
 
+    /**
+     * Called to create the dialog view.
+     *
+     * @param savedInstanceState A Bundle containing the activity's previously saved state.
+     * @return A Dialog representing the profile deletion dialog.
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
@@ -73,6 +87,13 @@ public class DeleteProfile extends DialogFragment {
 
         return dialog;
     }
+
+    /**
+     * Sets the profile listener for profile deletion.
+     *
+     * @param listener The listener to be set for profile deletion.
+     */
+
     public void setDeleteProfileListener(DeleteProfileListener listener) {
         this.deleteProfileListener = listener;
     }
