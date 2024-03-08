@@ -13,7 +13,7 @@ public class Event implements Serializable {
     private String name;
     public ArrayList<Attendee> attendees;
     private Organizer organizer;
-    private Uri poster;
+    private String poster;
     private String eventID;
 
   
@@ -22,7 +22,7 @@ public class Event implements Serializable {
     public Event() {};
   
 
-    public Event(String eventName, String desc, Organizer organizer, Uri poster, String eventID) {
+    public Event(String eventName, String desc, Organizer organizer, String poster, String eventID) {
         this.name = eventName;
         this.desc = desc;
         this.attendees = new ArrayList<>();
@@ -30,7 +30,6 @@ public class Event implements Serializable {
         this.poster = poster;
         this.eventID = eventID;
     }
-
 
 
     public Location getLocation() {
@@ -83,11 +82,11 @@ public class Event implements Serializable {
     }
 
 
-    public Uri getPoster() {
+    public String getPoster() {
         return poster;
     }
 
-    public void setPoster(Uri poster) {
+    public void setPoster(String poster) {
         this.poster = poster;
     }
 }

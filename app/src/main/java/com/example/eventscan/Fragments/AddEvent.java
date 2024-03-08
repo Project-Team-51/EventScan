@@ -58,6 +58,7 @@ public class AddEvent extends DialogFragment {
     private Organizer organizer;
     private ImageView imageView;
     private Uri posterUri;
+    private String posterUriString;
     private String eventID;
     private FirebaseFirestore db;
     private String deviceID;
@@ -153,20 +154,18 @@ public class AddEvent extends DialogFragment {
 
                 event.setDesc(eventDesc);
                 event.setName(eventName);
-                event.setPoster(posterUri);
+                event.setPoster(posterUriString);
                 organizer = new Organizer(deviceID);
                 event.setOrganizer(organizer);
 
                 // Poster
-                // Generate a unique filename for the poster image
-                String uniqueId = UUID.randomUUID().toString(); // Generate a random UUID
-                String posterFileName = "poster_" + eventName + "_" + uniqueId + ".jpg";
+                // Generate a unique filename for the poster imag
 
                 StorageReference storageRef = FirebaseStorage.getInstance().getReference();
                 StorageReference posterRef = storageRef.child("poster_pictures").child(eventID);
                 posterRef.putFile(posterUri);
 
-                Event event = new Event(eventName, eventDesc, organizer, posterUri, eventID);
+                Event event = new Event(eventName, eventDesc, organizer, posterUriString, eventID);
                 // Call the addEvent function with the retrieved information
                 db.collection("events").document(event.getEventID()).set(event)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -282,6 +281,7 @@ public class AddEvent extends DialogFragment {
                     if (result != null) {
                         posterUri = result;
                         imageView.setImageURI(result);
+                        posterUriString = posterUri.toString();
                     }
 
                 }
