@@ -4,11 +4,14 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 
+import com.example.eventscan.Database.EventDatabaseRepresentation;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-/*
+/**
  * The event class that holds all the necessary information for an event. Provides
  * sufficient setters and getters for interfacing with the class.
+ * <b>If you change this don't forget to change Database/EventDatabaseRepresentation</b>
  */
 public class Event implements Serializable {
     private Location location;
@@ -98,6 +101,10 @@ public class Event implements Serializable {
 
     public void setPoster(String poster) {
         this.poster = poster;
+    }
+
+    public EventDatabaseRepresentation convertToDatabaseRepresentation(){
+        return new EventDatabaseRepresentation(this);
     }
 }
 
