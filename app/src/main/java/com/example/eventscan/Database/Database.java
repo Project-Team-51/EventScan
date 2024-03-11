@@ -18,13 +18,13 @@ import java.util.ArrayList;
  * call the getter functions as early as possible,
  * use foo.getResult() to resolve them, do this as late as possible
  */
-public class DatabaseManager {
+public class Database {
     // References
     // Bing Copilot (Bing Chat), 2024-MR-08, "how can I turn a FirebaseFirestore document search into a future in java android" -> "I have a document containing the data needed to build an object, I want the future to return a built object"
     // gave me information on how to use Task.continueWith(new Continuation...)
     // implementation written by us though
-    private static final String attendeeCollectionPath = "attendees"; // easier to change here if we refactor the DB later
-    private static final String eventsCollectionPath = "events";
+    private static final String attendeeCollectionPath = "prod/attendees"; // easier to change here if we refactor the DB later
+    private static final String eventsCollectionPath = "prod/events";
 
     /**
      * Get an object that may contain an Attendee in the future.
@@ -94,7 +94,7 @@ public class DatabaseManager {
                             ArrayList<Task<Attendee>> attendeeTasks = new ArrayList<>(); // tasks for resolving each attendee
                             if(fetchAttendees) {
                                 for (int i = 0; i < databaseEvent.getAttendeeIDs().size(); i++) {
-                                    attendeeTasks.add(DatabaseManager.getAttendee(databaseEvent.getAttendeeIDs().get(i)));
+                                    attendeeTasks.add(Database.getAttendee(databaseEvent.getAttendeeIDs().get(i)));
                                 }
                             }
                             Task<Organizer> organizerTask = null;
