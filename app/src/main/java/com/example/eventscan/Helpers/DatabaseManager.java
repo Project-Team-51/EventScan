@@ -29,9 +29,18 @@ public class DatabaseManager {
     private ExecutorService executorService = Executors.newFixedThreadPool(3);
 
     public static class attendees {
+        private static final String attendeeCollectionPath = "attendees"; // easier to change here if we refactor the DB later
+
+        /**
+         * Get an object that may contain an Attendee in the future.
+         * Call this as early as possible, then call foo.get() later to get the request's output
+         * give as much space as possible between calling this and calling .get() so that the request can process
+         * @param AttendeeID the ID of the attendee to fetch
+         * @return a Task\<Attendee\> object, will contain an attendee or an error once the request finishes
+         */
         public static Task<Attendee> getAttendee(String AttendeeID){
             return FirebaseFirestore.getInstance()
-                    .collection("attendees")
+                    .collection(attendeeCollectionPath)
                     .document(AttendeeID).get()
                     .continueWith(new Continuation<DocumentSnapshot, Attendee>() {
                         @Override
@@ -46,15 +55,23 @@ public class DatabaseManager {
                         }
                     });
         }
+
+        /**
+         * Upload/update an attendee on the database
+         * @param attendee the attendee to add/update
+         * @return a task object, check it to see if the action was successful
+         */
         public static Task<Void> setAttendee(Attendee attendee){
             return FirebaseFirestore.getInstance()
-                    .collection("attendees")
+                    .collection(attendeeCollectionPath)
                     .document(attendee.getDeviceID())
                     .set(attendee);
         }
     }
 
     public static class events {
+        private static final String eventsCollectionPath = "events";
+
 
     }
 
