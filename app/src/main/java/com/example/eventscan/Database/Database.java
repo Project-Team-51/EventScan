@@ -250,7 +250,6 @@ public class Database {
                     });
         }
 
-
     }
 
     private static class posters{
