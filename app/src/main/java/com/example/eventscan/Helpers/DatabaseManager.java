@@ -17,10 +17,12 @@ import java.util.concurrent.Executors;
 
 /**
  * Helper class for easily pulling/pushing data from/to the firestore
+ * call the getter functions as early as possible,
+ * use xyz.get() to resolve them, do this as late as possible
  */
 public class DatabaseManager {
     // References
-    // Bing Copilot, 2024-MR-08, "how can I turn a FirebaseFirestore document search into a future in java android" -> "I have a document containing the data needed to build an object, I want the future to return a built object"
+    // Bing Copilot (Bing Chat), 2024-MR-08, "how can I turn a FirebaseFirestore document search into a future in java android" -> "I have a document containing the data needed to build an object, I want the future to return a built object"
     // gave me information on how to use Task.continueWith(new Continuation...)
     // implementation written by us though
 
@@ -43,6 +45,12 @@ public class DatabaseManager {
                             }
                         }
                     });
+        }
+        public static Task<Void> setAttendee(Attendee attendee){
+            return FirebaseFirestore.getInstance()
+                    .collection("attendees")
+                    .document(attendee.getDeviceID())
+                    .set(attendee);
         }
     }
 
