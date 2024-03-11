@@ -8,13 +8,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
-//references
-//https://jc1175.medium.com/a-crash-course-in-java-futures-cebae805cebb
-//https://www.baeldung.com/java-future
-
 /**
  * Helper class for easily pulling/pushing data from/to the firestore
  * call the getter functions as early as possible,
@@ -25,8 +18,6 @@ public class DatabaseManager {
     // Bing Copilot (Bing Chat), 2024-MR-08, "how can I turn a FirebaseFirestore document search into a future in java android" -> "I have a document containing the data needed to build an object, I want the future to return a built object"
     // gave me information on how to use Task.continueWith(new Continuation...)
     // implementation written by us though
-
-    private ExecutorService executorService = Executors.newFixedThreadPool(3);
 
     public static class attendees {
         private static final String attendeeCollectionPath = "attendees"; // easier to change here if we refactor the DB later
