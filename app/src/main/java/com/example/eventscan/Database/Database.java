@@ -23,6 +23,12 @@ public class Database {
     // Bing Copilot (Bing Chat), 2024-MR-08, "how can I turn a FirebaseFirestore document search into a future in java android" -> "I have a document containing the data needed to build an object, I want the future to return a built object"
     // gave me information on how to use Task.continueWith(new Continuation...)
     // implementation written by us though
+
+    /*
+    TODO find out if database calls block the main thread, if so, look into Executors
+     https://www.baeldung.com/java-future (they can be used with ContinueWith and ContinueWithTask)
+     */
+
     private static final String attendeeCollectionPath = "prod/attendees"; // easier to change here if we refactor the DB later
     private static final String eventsCollectionPath = "prod/events";
 
@@ -188,19 +194,50 @@ public class Database {
         }
 
         /**
-         * create an event on the database
+         * create an event on the database, with a guarantee that it has a unique ID
          * <p>
-         * <b>Overwrites whatever is currently there, be careful</b>
+         * <b>The returned task will contain an event with an potentially updated ID, be sure to double check it if necessary</b>
          * <p>
          * consider using setEvent or a specific setter/adder to update an already existing event
          * @param event event to create
-         * @return a task that will be resolved when the database write is completed or fails
+         * @return a task that will be resolved when the database write is completed or failed,
+         * it will contain an Event object with a potentially updated ID
          */
-        public static Task<Void> create(Event event){
+        @NonNull
+        public static Task<Event> create(Event event){
+            //https://stackoverflow.com/questions/53332471/checking-if-a-document-exists-in-a-firestore-collection
+
+            // 2024-MR-11, ChatGPT, OpenAI, prompt: "what's the difference between ContinueWith and ContinueWithTask?"
+            // provided information that continueWithTask is for asynchronous work after a task's completion
             return FirebaseFirestore.getInstance()
                     .collection(eventsCollectionPath)
                     .document(event.getEventID())
-                    .set(event);
+                    .get()
+                    .continueWithTask(task -> {
+                        if(task.isSuccessful()){
+                            if(!task.getResult().exists()){
+                                // nothing exists with this ID, we're good :)
+                                return FirebaseFirestore.getInstance()
+                                        .document(event.getEventID())
+                                        .set(event.convertToDatabaseRepresentation())
+                                        .continueWith(task1 -> {
+                                            return event;
+                                        });
+                            } else {
+                                // already exists :( regenerate ID and try again
+                                // TODO move the regeneration to somewhere it makes more sense and also make it better
+                                String randomID = String.valueOf((int) (Math.random()*10000));
+                                event.setEventID(randomID);
+                                return create(event); // recurse with new ID
+                            }
+                        } else {
+                            Exception taskException = task.getException();
+                            if(taskException != null){
+                                throw taskException;
+                            }
+                            throw new Exception("Unknown Error Occurred");
+                        }
+                    });
         }
 
     }
