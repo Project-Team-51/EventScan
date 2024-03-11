@@ -8,6 +8,7 @@ import com.example.eventscan.Entities.Organizer;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -153,6 +154,51 @@ public class DatabaseManager {
         return getEvent(eventID, true, true, true);
     }
 
+
+    /**
+     * Add an attendee to an event if they aren't already on it
+     * @param eventDatabaseRepresentation the event to add to
+     * @param attendee the attendee to be added
+     * @return a task that will be resolved when the adding finishes
+     */
+    @NonNull
+    public static Task<Void> addAttendeeToEvent(@NonNull EventDatabaseRepresentation eventDatabaseRepresentation, @NonNull Attendee attendee) {
+        //https://firebase.google.com/docs/firestore/manage-data/add-data#update_elements_in_an_array
+        return FirebaseFirestore.getInstance()
+                .collection(eventsCollectionPath)
+                .document(eventDatabaseRepresentation.getEventID())
+                .update("attendees", FieldValue.arrayUnion(attendee));
+    }
+    /**
+     * Add an attendee to an event if they aren't already on it
+     * @param event the event to add to
+     * @param attendee the attendee to be added
+     * @return a task that will be resolved when the adding finishes
+     */
+    @NonNull
+    public static Task<Void> addAttendeeToEvent(@NonNull Event event, @NonNull Attendee attendee) {
+        EventDatabaseRepresentation eventDatabaseRepresentation = event.convertToDatabaseRepresentation();
+        return FirebaseFirestore.getInstance()
+                .collection(eventsCollectionPath)
+                .document(eventDatabaseRepresentation.getEventID())
+                .update("attendees", FieldValue.arrayUnion(attendee));
+    }
+
+    /**
+     * create/update an event on the database
+     * <p>
+     * <b>Overwrites whatever is currently there, be careful</b>
+     * <p>
+     * consider using other setters/adders if you need to change only one or two things, or to avoid clobbering
+     * @param event event to create/overwrite
+     * @return a task that will be resolved when the database write is completed or fails
+     */
+    public static Task<Void> setEvent(Event event){
+        return FirebaseFirestore.getInstance()
+                .collection(eventsCollectionPath)
+                .document(event.getEventID())
+                .set(event);
+    }
 
     // admins and users?
 
