@@ -9,9 +9,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
- * Helper class for easily pulling/pushing data from/to the firestore
+ * Helper class for easily pulling/pushing data from/to the database
  * call the getter functions as early as possible,
- * use xyz.get() to resolve them, do this as late as possible
+ * use foo.getResult() to resolve them, do this as late as possible
  */
 public class DatabaseManager {
     // References
@@ -24,8 +24,8 @@ public class DatabaseManager {
 
         /**
          * Get an object that may contain an Attendee in the future.
-         * Call this as early as possible, then call foo.get() later to get the request's output
-         * give as much space as possible between calling this and calling .get() so that the request can process
+         * Call this as early as possible, then call foo.getResult() later to get the request's output
+         * give as much space as possible between calling this and calling .getResult() so that the request can process
          * @param AttendeeID the ID of the attendee to fetch
          * @return a Task\<Attendee\> object, will contain an attendee or an error once the request finishes
          */
