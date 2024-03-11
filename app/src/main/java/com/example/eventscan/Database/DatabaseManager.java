@@ -62,7 +62,6 @@ public class DatabaseManager {
                 .set(attendee);
     }
 
-
     /**
      * get an Event object from the database
      * @param eventID ID of the event
@@ -74,6 +73,7 @@ public class DatabaseManager {
      *                    this can save some query time if you know you don't need it
      * @return a Task\<Event\> object, call getResult() on it to get the Event or an error
      */
+    @NonNull
     public static Task<Event> getEvent(String eventID, boolean fetchAttendees, boolean fetchOrganizer, boolean fetchPoster){
         return FirebaseFirestore.getInstance().
                 collection(eventsCollectionPath).
@@ -84,19 +84,16 @@ public class DatabaseManager {
                         if(task.isSuccessful()) {
                             EventDatabaseRepresentation databaseEvent = task.getResult()
                                     .toObject(EventDatabaseRepresentation.class);
-                            //now build the Event object from it
+                            // build the Event object from the EventDatabaseRepresentation object
                             // 1. queue up the async stuff
                             //  1.1 get the attendees
-                            if (databaseEvent == null) {
-                                // mostly for resolving warnings, exit early if we get a null response
+                            if (databaseEvent == null) {// mostly for resolving IDE warnings: exit early if we get a null response
                                 throw new Exception("event " + eventID + " is null, this should not be possible");
                             }
                             ArrayList<Task<Attendee>> attendeeTasks = new ArrayList<>(); // tasks for resolving each attendee
                             if(fetchAttendees) {
                                 for (int i = 0; i < databaseEvent.getAttendeeIDs().size(); i++) {
-                                    attendeeTasks.add(DatabaseManager.getAttendee(
-                                            databaseEvent.getAttendeeIDs().get(i)
-                                    ));
+                                    attendeeTasks.add(DatabaseManager.getAttendee(databaseEvent.getAttendeeIDs().get(i)));
                                 }
                             }
                             Task<Organizer> organizerTask = null;
@@ -124,10 +121,11 @@ public class DatabaseManager {
                                     attendeesResolved.add(null);
                                 }
                             }
+
                             Organizer eventOrganizer = null;
                             if (fetchOrganizer) {
                                 eventOrganizer = organizerTask.getResult();
-                            } // else it stays null, we're good :)
+                            } // else eventOrganizer stays null, we're good :)
 
                             // TODO poster stuff
 
@@ -138,15 +136,13 @@ public class DatabaseManager {
                                     eventOrganizer,
                                     null, // poster
                                     databaseEvent.getEventID()
-
                             );
-
                         } else {
                             throw new Exception("Could not fetch Event"+eventID+" | "+task.getException().toString());
                         }
                     }
                 });
-        }
+    }
 
 
 
