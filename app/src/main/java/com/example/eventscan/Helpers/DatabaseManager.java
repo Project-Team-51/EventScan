@@ -20,7 +20,7 @@ import java.util.concurrent.Executors;
  */
 public class DatabaseManager {
     // References
-    // Bing Copilot, 2024-03-08, "how can I turn a FirebaseFirestore document search into a future in java android" -> "I have a document containing the data needed to build an object, I want the future to return a built object"
+    // Bing Copilot, 2024-MR-08, "how can I turn a FirebaseFirestore document search into a future in java android" -> "I have a document containing the data needed to build an object, I want the future to return a built object"
     // gave me information on how to use Task.continueWith(new Continuation...)
     // implementation written by us though
 
@@ -35,8 +35,9 @@ public class DatabaseManager {
                         @Override
                         public Attendee then(@NonNull Task<DocumentSnapshot> task) throws Exception {
                             if(task.isSuccessful()){
-                                // we can build the Attendee object here with the result TODO vvvv
-                                return new Attendee();
+                                // we can build the Attendee object here with the result
+                                // may need to customize if you're copy pasting
+                                return task.getResult().toObject(Attendee.class);
                             } else {
                                 throw new Exception("Could not fetch Attendee "+AttendeeID+" | "+task.getException());
                             }
