@@ -143,7 +143,15 @@ public class DatabaseManager {
                     }
                 });
     }
-
+    /**
+     * get an Event object from the database
+     * @param eventID ID of the event
+     * @return a Task\<Event\> object, call getResult() on it to get the Event or an error
+     */
+    @NonNull
+    public static Task<Event> getEvent(String eventID){
+        return getEvent(eventID, true, true, true);
+    }
 
 
     // admins and users?
