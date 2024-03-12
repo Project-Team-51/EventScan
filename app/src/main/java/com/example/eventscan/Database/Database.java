@@ -198,10 +198,10 @@ public class Database {
          * <p>
          * <b>The returned task will contain an event with an potentially updated ID, be sure to double check it if necessary</b>
          * <p>
-         * consider using setEvent or a specific setter/adder to update an already existing event
+         * use setEvent or a specific setter/adder to update an already existing event
          * @param event event to create
          * @return a task that will be resolved when the database write is completed or failed,
-         * it will contain an Event object with a potentially updated ID
+         * it will contain the Event object you passed in with a potentially updated ID
          */
         @NonNull
         public static Task<Event> create(Event event){
