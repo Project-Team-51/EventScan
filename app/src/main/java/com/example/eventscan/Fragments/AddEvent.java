@@ -167,7 +167,8 @@ public class AddEvent extends DialogFragment {
                 event.setDesc(eventDesc);
                 event.setName(eventName);
                 event.setPoster(posterUriString);
-                organizer = new Organizer(deviceID);
+                organizer = new Organizer();
+                organizer.setDeviceID(deviceID);
                 event.setOrganizer(organizer);
 
                 // Poster

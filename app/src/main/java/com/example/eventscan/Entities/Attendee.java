@@ -21,26 +21,8 @@ public class Attendee extends User {
      */
     public Attendee() {
     }
-
-    /**
-     * Parameterized constructor for the Attendee class.
-     *
-     * @param name             The name of the attendee.
-     * @param phoneNum         The phone number of the attendee.
-     * @param email            The email address of the attendee.
-     * @param bio              The biography of the attendee.
-     * @param deviceID         The unique device ID of the attendee.
-     * @param profilePictureID The unique ID of the attendee's profile picture.
-     */
-    public Attendee(String name, String phoneNum, String email, String bio, String deviceID, String profilePictureID) {
-        super(name, phoneNum, email, bio, deviceID, profilePictureID);
-        this.name = name;
-        this.phoneNum = phoneNum;
-        this.email = email;
-        this.bio = bio;
-        this.deviceID = deviceID;
-        this.profilePictureID = profilePictureID;
-
+    public String type() {
+        return "attendee";
     }
 
     ArrayList<Attendee> attendeeDataList;

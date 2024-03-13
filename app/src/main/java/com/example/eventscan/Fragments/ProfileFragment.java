@@ -123,7 +123,15 @@ public class ProfileFragment extends Fragment {
                 String profilePictureID = "exampleProfilePictureID";
 
                 // Creates a new Attendee object with the input values
-                Attendee attendee = new Attendee(username, phone, email, bio, deviceID, profilePictureID);
+                Attendee attendee = new Attendee();
+
+                // Set attributes using setter methods
+                attendee.setName(username);
+                attendee.setPhoneNum(phone);
+                attendee.setEmail(email);
+                attendee.setBio(bio);
+                attendee.setDeviceID(deviceID);
+                attendee.setProfilePictureID(profilePictureID);
 
                 // Saves the attendee's profile to Firestore
                 saveAttendeeProfile(attendee);

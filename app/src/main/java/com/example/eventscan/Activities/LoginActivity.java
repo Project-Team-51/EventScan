@@ -10,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.eventscan.Database.DatabaseHelper;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -68,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     if (task.getResult() != null && !task.getResult().isEmpty()) {
                                         // Start the admin activity
-                                        Intent intent = new Intent(LoginActivity.this, AdminActivity.class);
+                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                         startActivity(intent);
                                     } else {
                                         // Display invalid credentials
