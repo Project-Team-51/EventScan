@@ -27,27 +27,6 @@
             android:label="Login Activity"
             android:exported="true">
         </activity>
-
-        <activity
-            android:name=".Activities.OrganizerEventsView"
-            android:label="Organizer Home Page"
-            android:exported="true">
-        </activity>
-        <activity
-            android:name=".Activities.OrganizerViewAllEvents"
-            android:label="AdminActivity"
-            android:exported="true">
-        </activity>
-        <activity
-            android:name=".Activities.OrganizerProfile"
-            android:label="Organizer Profile"
-            android:exported="true">
-        </activity>
-        <activity
-            android:name=".Activities.AttendeeEventsView"
-            android:label="Attendee Home Page"
-            android:exported="true">
-        </activity>
         <activity
             android:name=".Activities.MainActivity"
             android:label="AdminActivity"

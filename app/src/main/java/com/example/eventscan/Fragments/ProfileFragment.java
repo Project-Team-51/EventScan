@@ -55,7 +55,6 @@ public class ProfileFragment extends Fragment {
     EditText emailInput;
     EditText bioInput;
     Button saveProfileBtn;
-    Button backButton;
     Button deleteProfilePicBtn;
     ActivityResultLauncher<Intent> imagePickLauncher;
     Uri selectedImageUri;
@@ -103,7 +102,6 @@ public class ProfileFragment extends Fragment {
         emailInput = view.findViewById(R.id.emailEditText);
         bioInput = view.findViewById(R.id.homepageEditText);
         saveProfileBtn = view.findViewById(R.id.saveButton);
-        backButton = view.findViewById(R.id.backButton);
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
 
         deleteProfilePicBtn.setVisibility(isProfilePictureUploaded() ? View.VISIBLE : View.GONE);
@@ -155,16 +153,6 @@ public class ProfileFragment extends Fragment {
                 deleteProfilePicture();
             }
         });
-
-
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Handle back button click by popping the fragment from the back stack
-                requireActivity().getSupportFragmentManager().popBackStack();
-            }
-        });
-
 
         return view;
     }

@@ -27,6 +27,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.eventscan.Activities.MainActivity;
 import com.example.eventscan.Activities.UserSelection;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Helpers.QrCodec;
@@ -65,7 +66,13 @@ public class AddEvent extends DialogFragment {
     private String eventID;
     private FirebaseFirestore db;
     private String deviceID;
-
+    public interface OnEventAddedListener {
+        void onEventAdded();
+    }
+    public void setEventAddedListener(OnEventAddedListener listener) {
+        this.eventAddedListener = listener;
+    }
+    private OnEventAddedListener eventAddedListener;
     public AddEvent() {
         // Required empty public constructor
     }
@@ -87,7 +94,14 @@ public class AddEvent extends DialogFragment {
         event.setEventID(eventID);
         return view;
     }
-
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        if (context instanceof MainActivity) {
+            MainActivity mainActivity = (MainActivity) context;
+            setEventAddedListener(mainActivity);
+        }
+    }
     /**
      * Called immediately after onCreateView(LayoutInflater, ViewGroup, Bundle)
      * has returned, but before any saved state has been restored in to the view.
@@ -101,11 +115,11 @@ public class AddEvent extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         db = FirebaseFirestore.getInstance();
-        Button returnToEventsButton = view.findViewById(R.id.return_to_event);
         Button generateQRCodeButton = view.findViewById(R.id.generate_QRCode);
         Button confirmEventButton = view.findViewById(R.id.confirmEvent);
         Button uploadPoster = view.findViewById(R.id.upload_poster);
         imageView = view.findViewById(R.id.posterView);
+
 
         uploadPoster.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,13 +128,7 @@ public class AddEvent extends DialogFragment {
                 pickImageLauncher.launch("image/*");
             }
         });
-        returnToEventsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss(); // Close the dialog when the button is clicked
-                // You can perform other actions here if needed
-            }
-        });
+
 
         generateQRCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,7 +193,10 @@ public class AddEvent extends DialogFragment {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Log.d(TAG, "Event successfully added to Firestore");
-                                getActivity().finish();
+                                // Notify the listener that the event is added
+                                if (eventAddedListener != null) {
+                                    eventAddedListener.onEventAdded();
+                                }
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {

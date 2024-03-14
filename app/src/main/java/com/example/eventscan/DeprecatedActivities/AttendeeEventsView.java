@@ -1,4 +1,4 @@
-package com.example.eventscan.Activities;
+package com.example.eventscan.DeprecatedActivities;
 
 import com.example.eventscan.Helpers.EventArrayAdapter;
 
@@ -29,6 +29,9 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
+/*
+ * OFFICIALLY DEPRECATED. USE ONLY FOR REFERENCE WHEN BUILDING NEW FRAGMENTS.
+ */
 
 public class AttendeeEventsView extends AppCompatActivity implements View.OnClickListener {
 

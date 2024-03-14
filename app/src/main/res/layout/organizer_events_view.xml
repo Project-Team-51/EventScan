@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient"
-    tools:context=".Activities.OrganizerEventsView">
+    tools:context=".DeprecatedActivities.OrganizerEventsView">
     <TextView
         android:id="@+id/yourEventsText"
         android:layout_width="wrap_content"

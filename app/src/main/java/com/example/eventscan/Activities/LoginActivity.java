@@ -68,6 +68,7 @@ public class LoginActivity extends AppCompatActivity {
                                     if (task.getResult() != null && !task.getResult().isEmpty()) {
                                         // Start the admin activity
                                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                        intent.putExtra("userType", "Admin");
                                         startActivity(intent);
                                     } else {
                                         // Display invalid credentials

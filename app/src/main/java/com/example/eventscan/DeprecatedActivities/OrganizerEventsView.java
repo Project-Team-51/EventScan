@@ -1,42 +1,27 @@
-package com.example.eventscan.Activities;
+package com.example.eventscan.DeprecatedActivities;
 
 import com.example.eventscan.Fragments.AddEvent;
-import com.example.eventscan.Activities.OrganizerViewAllEvents;
 import com.example.eventscan.Helpers.EventArrayAdapter;
 
-import android.content.Context;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.activity.OnBackPressedCallback;
-import androidx.activity.OnBackPressedDispatcher;
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventscan.Entities.Event;
 
 import com.example.eventscan.Fragments.ProfileFragment;
-import com.example.eventscan.Fragments.QrScannerFragment;
-
-import com.example.eventscan.Fragments.AddEvent;
-import com.example.eventscan.Fragments.ProfileFragment;
-import com.example.eventscan.Helpers.EventArrayAdapter;
 
 import com.example.eventscan.R;
 import com.google.firebase.firestore.CollectionReference;
@@ -52,6 +37,10 @@ import java.util.ArrayList;
 /*
  * The activity that an Organizer first see's when they open the app.  Allows them to see all events, and their own.
  * Utilizes very similar code to the EventFragment. This will be consolidated into the EventFragment in a future build, as this is unneeded as a standalone activity.
+ */
+
+/*
+ * OFFICIALLY DEPRECATED. USE ONLY FOR REFERENCE WHEN BUILDING NEW FRAGMENTS.
  */
 
 
@@ -151,13 +140,6 @@ public class OrganizerEventsView extends AppCompatActivity implements View.OnCli
             }
         });
 
-        buttonOrganizerProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(OrganizerEventsView.this, OrganizerProfile.class);
-                startActivity(intent);
-            }
-        });
 
         buttonAddEvent.setOnClickListener(this);
         buttonOrganizerProfile.setOnClickListener(this);

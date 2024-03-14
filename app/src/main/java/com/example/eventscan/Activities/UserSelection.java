@@ -54,6 +54,7 @@ public class UserSelection extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UserSelection.this, LoginActivity.class);
+                saveUserSelection("Admin");
                 startActivity(intent);
             }
         });
@@ -105,7 +106,8 @@ public class UserSelection extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Intent intent = new Intent(UserSelection.this, AttendeeEventsView.class);
+                            Intent intent = new Intent(UserSelection.this, MainActivity.class);
+                            intent.putExtra("userType", "Attendee");
                             startActivity(intent);
                             finish();
                         } else {
@@ -124,7 +126,8 @@ public class UserSelection extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Intent intent = new Intent(UserSelection.this, OrganizerEventsView.class);
+                            Intent intent = new Intent(UserSelection.this, MainActivity.class);
+                            intent.putExtra("userType", "Organizer");
                             startActivity(intent);
                             finish();
                         } else {
@@ -146,11 +149,17 @@ public class UserSelection extends AppCompatActivity {
     private void goToActivity(String selection) {
         if (selection != null) {
             if (selection.equals("Organizer")) {
-                Intent intent = new Intent(UserSelection.this, OrganizerEventsView.class);
+                Intent intent = new Intent(UserSelection.this, MainActivity.class);
+                intent.putExtra("userType", selection);
                 startActivity(intent);
                 finish();
             } else if (selection.equals("Attendee")) {
-                Intent intent = new Intent(UserSelection.this, AttendeeEventsView.class);
+                Intent intent = new Intent(UserSelection.this, MainActivity.class);
+                intent.putExtra("userType", selection);
+                startActivity(intent);
+                finish();
+            } else if (selection.equals("Admin")) {
+                Intent intent = new Intent(UserSelection.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
             }

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_gradient"
+    android:background="@android:color/transparent"
     tools:context=".Fragments.ProfileFragment">
 
 
@@ -97,29 +97,17 @@
 
     <Button
         android:id="@+id/saveButton"
-        android:layout_width="130dp"
-        android:layout_height="60dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:backgroundTint="#414E6E"
         android:text="Save"
         android:textColor="#D3E2F2"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/backButton"
         app:layout_constraintTop_toBottomOf="@+id/homepageEditText"
-        app:layout_constraintVertical_bias="0.85" />
+        app:layout_constraintVertical_bias="0.55" />
 
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="130dp"
-        android:layout_height="60dp"
-        android:backgroundTint="#414E6E"
-        android:text="Back"
-        android:textColor="#D3E2F2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/saveButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/homepageEditText"
-        app:layout_constraintVertical_bias="0.85" />
 
     <Button
         android:id="@+id/deleteProfilePicButton"
