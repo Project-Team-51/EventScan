@@ -21,6 +21,7 @@ public class EventDatabaseRepresentation {
     private String posterID; // TODO make this a URI instead
     private String eventID;
 
+    public EventDatabaseRepresentation(){}
     public EventDatabaseRepresentation(Event event){
         location = event.getLocation();
         desc = event.getDesc();

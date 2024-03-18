@@ -252,7 +252,7 @@ public class Database {
                         if(task.isSuccessful()){
                             if(!task.getResult().exists()){
                                 // nothing exists with this ID, we're good :)
-                                return FirebaseFirestore.getInstance()
+                                return eventsCollection
                                         .document(event.getEventID())
                                         .set(event.convertToDatabaseRepresentation())
                                         .continueWith(task1 -> {

@@ -47,13 +47,16 @@ public class DatabaseTest extends Database {
 
             Gave me information about the below exception, and what other states a test can be in
             */
-            throw new AssumptionViolatedException("Skipping test - firebase connection failed: "+setTask.getException().toString());
+            // updated with https://www.baeldung.com/junit-fail
+            fail(setTask.getException().toString());
+            //throw new AssumptionViolatedException("Skipping test - firebase connection failed: "+setTask.getException().toString());
         }
         // now get it back
         Task<Attendee> attendeeTask = DatabaseTest.attendees.get(deviceIDTest);
         DatabaseTest.waitForTask(attendeeTask);
         if(!attendeeTask.isSuccessful()){
-            throw new AssumptionViolatedException("Skipping test - firebase connection failed: "+attendeeTask.getException().toString());
+            fail(attendeeTask.getException().toString());
+            //throw new AssumptionViolatedException("Skipping test - firebase connection failed: "+attendeeTask.getException().toString());
         }
         Attendee fetchedAttendee = attendeeTask.getResult();
         assertEquals(attendee, fetchedAttendee);
@@ -80,13 +83,15 @@ public class DatabaseTest extends Database {
         Task<Event> event1ModifiedTask = DatabaseTest.events.create(event1);
         DatabaseTest.waitForTask(event1ModifiedTask);
         if(!event1ModifiedTask.isSuccessful()){
-            throw new AssumptionViolatedException("Skipping test - firebase connection failed: "+event1ModifiedTask.getException().toString());
+            fail(event1ModifiedTask.getException().toString());
+            //throw new AssumptionViolatedException("Skipping test - firebase connection failed: "+event1ModifiedTask.getException().toString());
         }
         Event event1Modified = event1ModifiedTask.getResult();
         Task<Event> returnEvent = DatabaseTest.events.get(eventIDTest);
         DatabaseTest.waitForTask(returnEvent);
         if(!returnEvent.isSuccessful()){
-            throw new AssumptionViolatedException("Skipping test - firebase connection failed: "+returnEvent.getException().toString());
+            fail("Complete: "+returnEvent.isComplete()+" | "+returnEvent.getException().toString());
+            //throw new AssumptionViolatedException("Skipping test - firebase connection failed: "+returnEvent.getException().toString());
         }
         Event returnedEvent = returnEvent.getResult();
         assertEquals(event1Modified, returnedEvent);
