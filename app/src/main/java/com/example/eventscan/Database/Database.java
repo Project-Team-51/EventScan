@@ -15,6 +15,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Helper class for easily pulling/pushing data from/to the database
@@ -150,15 +151,19 @@ public class Database {
                                 // TODO poster stuff
 
                                 // 3. build the Event object finally
-                                return new Event(
+                                Event event = new Event(
                                         databaseEvent.getName(),
                                         databaseEvent.getDesc(),
                                         eventOrganizer,
                                         null, // poster
                                         databaseEvent.getEventID()
                                 );
+                                for(Attendee attendee : attendeesResolved){
+                                    event.addAttendee(attendee);
+                                }
+                                return event;
                             } else {
-                                throw new Exception("Could not fetch Event"+eventID+" | "+task.getException().toString());
+                                throw Objects.requireNonNull(task.getException());
                             }
                         }
                     });
