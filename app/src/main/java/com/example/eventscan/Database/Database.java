@@ -1,5 +1,7 @@
 package com.example.eventscan.Database;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 
 import com.example.eventscan.Entities.Attendee;
@@ -113,10 +115,10 @@ public class Database {
                                         attendeeTasks.add(Database.attendees.get(databaseEvent.getAttendeeIDs().get(i)));
                                     }
                                 }
-                                Task<Organizer> organizerTask = null;
+                                Task<Attendee> organizerTask = null;
                                 //  1.2 get the Organizer
                                 if(fetchOrganizer) {
-                                    // TODO get the organizer
+                                    organizerTask = Database.attendees.get(databaseEvent.getOrganizerID());
                                 }
                                 //  1.3 get the Poster
                                 if(fetchPoster) {
