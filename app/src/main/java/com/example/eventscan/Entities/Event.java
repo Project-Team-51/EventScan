@@ -8,6 +8,8 @@ import com.example.eventscan.Database.EventDatabaseRepresentation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Objects;
+
 /**
  * The event class that holds all the necessary information for an event. Provides
  * sufficient setters and getters for interfacing with the class.
@@ -105,6 +107,21 @@ public class Event implements Serializable {
 
     public EventDatabaseRepresentation convertToDatabaseRepresentation(){
         return new EventDatabaseRepresentation(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        //auto-generated
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Event event = (Event) o;
+        return Objects.equals(getLocation(), event.getLocation()) && Objects.equals(getDesc(), event.getDesc()) && Objects.equals(getName(), event.getName()) && Objects.equals(getAttendees(), event.getAttendees()) && Objects.equals(getOrganizer(), event.getOrganizer()) && Objects.equals(getPoster(), event.getPoster()) && Objects.equals(getEventID(), event.getEventID());
+    }
+
+    @Override
+    public int hashCode() {
+        //auto-generated
+        return Objects.hash(getLocation(), getDesc(), getName(), getAttendees(), getOrganizer(), getPoster(), getEventID());
     }
 }
 
