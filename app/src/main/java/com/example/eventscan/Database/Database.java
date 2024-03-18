@@ -1,5 +1,7 @@
 package com.example.eventscan.Database;
 
+import android.net.Uri;
+
 import androidx.annotation.NonNull;
 
 import com.example.eventscan.Entities.Attendee;
@@ -10,6 +12,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 
@@ -31,6 +36,9 @@ public class Database {
 
     private static final String attendeeCollectionPath = "prod/attendees"; // easier to change here if we refactor the DB later
     private static final String eventsCollectionPath = "prod/events";
+    private static final String qrDirectionCollectionPath = "prod/qr_codes";
+    private static final String storageRootFolder = "prod";
+    private static final String postersStoragePath = "posters";
 
     public static class attendees{
         /**
@@ -106,10 +114,10 @@ public class Database {
                                         attendeeTasks.add(Database.attendees.get(databaseEvent.getAttendeeIDs().get(i)));
                                     }
                                 }
-                                Task<Organizer> organizerTask = null;
+                                Task<Attendee> organizerTask = null;
                                 //  1.2 get the Organizer
                                 if(fetchOrganizer) {
-                                    // TODO get the organizer
+                                    organizerTask = Database.attendees.get(databaseEvent.getOrganizerID());
                                 }
                                 //  1.3 get the Poster
                                 if(fetchPoster) {
@@ -134,7 +142,11 @@ public class Database {
 
                                 Organizer eventOrganizer = null;
                                 if (fetchOrganizer) {
-                                    eventOrganizer = organizerTask.getResult();
+                                    try {
+                                        eventOrganizer = (Organizer) organizerTask.getResult();
+                                    } catch(ClassCastException e){
+                                        throw new Exception("The organizer of this event is not an organizer");
+                                    }
                                 } // else eventOrganizer stays null, we're good :)
 
                                 // TODO poster stuff
@@ -240,8 +252,64 @@ public class Database {
                     });
         }
 
+
     }
 
-    // admins and users?
+    private static class posters{
+        static FileDownloadTask get(String posterID, Uri destinationURI){
+            return FirebaseStorage.getInstance().getReference()
+                    .child(storageRootFolder)
+                    .child(postersStoragePath)
+                    .child(posterID)
+                    .getFile(destinationURI);
+
+        }
+        static UploadTask set(String posterID, Uri posterUri){
+            return FirebaseStorage.getInstance().getReference()
+                    .child(storageRootFolder)
+                    .child(postersStoragePath)
+                    .child(posterID)
+                    .putFile(posterUri);
+        }
+    }
+
+    public static class qr_codes {
+        // set(qr_data, event) makes it so scanning a QR with that data will send you to that event
+
+        /**
+         * get a QR code's direction type and destination
+         * @param decoded_qr_data the <b>decoded</b> qr data
+         * @return a task that should resolve to a QRDatabaseRedirection object
+         */
+        public Task<QRDatabaseEventLink> get(String decoded_qr_data){
+            return FirebaseFirestore.getInstance()
+                    .collection(qrDirectionCollectionPath)
+                    .document(decoded_qr_data)
+                    .get()
+                    .continueWith(task ->{
+                        return task.getResult().toObject(QRDatabaseEventLink.class);
+                    });
+        }
+
+        /**
+         * Set a QR code's direction type and destination
+         * @param decoded_qr_data the decoded data of the QR code you are setting the link from
+         * @param directedEvent the event you are setting the link to
+         * @param linkType the type of link.
+         *                 Use QRDatabaseEventLink.DIRECT_SIGN_IN, or
+         *                     QRDatabaseEventLink.DIRECT_SEE_DETAILS when setting this
+         * @return a Task that will be resolved when the database write is complete or failed
+         */
+        public Task<Void> set(String decoded_qr_data, Event directedEvent, int linkType){
+            return FirebaseFirestore.getInstance()
+                    .collection(qrDirectionCollectionPath)
+                    .document(decoded_qr_data)
+                    .set(new QRDatabaseEventLink(
+                            linkType,
+                            directedEvent
+                    ));
+        }
+    }
+
 
 }
