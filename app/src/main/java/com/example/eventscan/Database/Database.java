@@ -51,6 +51,20 @@ public class Database {
     private static final String storageRootFolder = "prod";
     private static final String postersStoragePath = "posters";
 
+    /**
+     * Wait until a task has been completed
+     * <b>DON'T USE THIS UNLESS YOU ABSOLUTELY NEED TO, use onCompleteListeners instead if at all possible</b>
+     * @param task the task to wait for
+     */
+    public static void waitForTask(Task<?> task){
+        while(!task.isComplete()){
+            try {
+                Thread.sleep(10);
+            } catch(InterruptedException exception){
+                // do nothing
+            }
+        }
+    }
     public static class attendees{
         /**
          * Get an object that may contain an Attendee in the future.

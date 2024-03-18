@@ -34,9 +34,7 @@ public class DatabaseTest extends Database {
         attendee.setEmail("Test Email Attendee");
         attendee.setPhoneNum("012983013");
         Task<Void> setTask = DatabaseTest.attendees.set(attendee);
-        while(!setTask.isComplete()){
-            Thread.sleep(10);
-        }
+        DatabaseTest.waitForTask(setTask);
         if(!setTask.isSuccessful()){
             /* 2024-MR-18, OpenAI ChatGPT 3.5,
             "in android studio, I am writing a unit test that interfaces with firebase, how can I make the test handle an error to the firebase properly, in this case the test did not fail but did not complete, would blocked be accurate?"
@@ -51,9 +49,7 @@ public class DatabaseTest extends Database {
         }
         // now get it back
         Task<Attendee> attendeeTask = DatabaseTest.attendees.get(deviceIDTest);
-        while(!attendeeTask.isComplete()){
-            Thread.sleep(10);
-        }
+        DatabaseTest.waitForTask(attendeeTask);
         if(!attendeeTask.isSuccessful()){
             throw new AssumptionViolatedException("Skipping test - firebase connection failed: "+attendeeTask.getException().toString());
         }
