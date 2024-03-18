@@ -30,24 +30,6 @@ public class User implements Serializable {
     // empty constructor so it works with firestore
     public User() {}
 
-    /**
-     * Constructs a new User object with the specified attributes.
-     *
-     * @param name             The name of the user.
-     * @param deviceID         The device ID of the user.
-     * @param email            The email of the user.
-     * @param phoneNum         The phone number of the user.
-     * @param bio              The biography of the user.
-     * @param profilePictureID The profile picture ID of the user.
-     */
-    public User(String name, String deviceID, String email, String phoneNum, String bio, String profilePictureID) {
-            this.name = name;
-            this.deviceID = deviceID;
-            this.email = email;
-            this.phoneNum = phoneNum;
-            this.bio = bio;
-            this.profilePictureID = profilePictureID;
-        }
 
         // getters and setters for all parameters of User
         public String getName() {

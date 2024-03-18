@@ -8,11 +8,10 @@ import androidx.test.espresso.intent.matcher.IntentMatchers;
 import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.example.eventscan.Activities.AttendeeEventsView;
+import com.example.eventscan.DeprecatedActivities.AttendeeEventsView;
 import com.example.eventscan.Activities.LoginActivity;
-import com.example.eventscan.Activities.OrganizerEventsView;
+import com.example.eventscan.DeprecatedActivities.OrganizerEventsView;
 import com.example.eventscan.Activities.UserSelection;
-import com.example.eventscan.R;
 
 import org.junit.After;
 import org.junit.Before;

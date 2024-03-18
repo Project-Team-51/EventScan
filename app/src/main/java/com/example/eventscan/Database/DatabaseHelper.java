@@ -27,8 +27,7 @@ public class DatabaseHelper {
     // Adds sample events to Firestore
     public void addSampleEvents() {
         Integer orgID = (int) Math.floor(Math.random() * 90000) + 10000;
-        String ordID2 = orgID.toString();
-        Organizer placeholderOrganizer = new Organizer(ordID2);
+        Organizer placeholderOrganizer = new Organizer();
 
         Integer eventID1 = (int) Math.floor(Math.random() * 90000) + 10000;
         String eventID12 = eventID1.toString();
@@ -48,9 +47,11 @@ public class DatabaseHelper {
     }
 
     // Adds sample users (Attendee and Organizer) to Firestore
+    /*
+
+
     public void addSampleUsers() {
         // Adding a sample Attendee
-        Attendee sampleAttendee = new Attendee("John Doe", "device1", "john@example.com", "123456789", "Bio for John", "profile1");
         Integer attendeeID1 = (int) Math.floor(Math.random() * 90000) + 10000;
         String attendeeID12 = attendeeID1.toString();
         sampleAttendee.setDeviceID(attendeeID12);
@@ -62,5 +63,6 @@ public class DatabaseHelper {
         db.collection("users").document(sampleAttendee.getDeviceID()).set(sampleAttendee);
         db.collection("users").document(sampleOrganizer.getDeviceID()).set(sampleOrganizer);
     }
+         */
 }
 
