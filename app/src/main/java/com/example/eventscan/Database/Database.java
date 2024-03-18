@@ -9,6 +9,7 @@ import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Entities.Organizer;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -35,9 +36,18 @@ public class Database {
      https://www.baeldung.com/java-future (they can be used with ContinueWith and ContinueWithTask)
      */
 
-    private static final String attendeeCollectionPath = "prod/attendees"; // easier to change here if we refactor the DB later
-    private static final String eventsCollectionPath = "prod/events";
-    private static final String qrDirectionCollectionPath = "prod/qr_codes";
+    private static final CollectionReference attendeeCollection = FirebaseFirestore.getInstance()
+            .collection("prod")
+            .document("attendees")
+            .collection("attendees");
+    private static final CollectionReference eventsCollection = FirebaseFirestore.getInstance()
+            .collection("prod")
+            .document("events")
+            .collection("events");
+    private static final CollectionReference qrLinkCollection = FirebaseFirestore.getInstance()
+            .collection("prod")
+            .document("qr_links")
+            .collection("qr_links");
     private static final String storageRootFolder = "prod";
     private static final String postersStoragePath = "posters";
 
@@ -50,8 +60,7 @@ public class Database {
          * @return a Task\<Attendee\> object, call getResult() on it to get the Attendee or an error
          */
         public static Task<Attendee> get(String attendeeID){
-            return FirebaseFirestore.getInstance()
-                    .collection(attendeeCollectionPath)
+            return attendeeCollection
                     .document(attendeeID).get()
                     .continueWith(new Continuation<DocumentSnapshot, Attendee>() {
                         @Override
@@ -73,8 +82,7 @@ public class Database {
          * @return a task object, check it to see if the action was successful
          */
         public static Task<Void> set(Attendee attendee){
-            return FirebaseFirestore.getInstance()
-                    .collection(attendeeCollectionPath)
+            return attendeeCollection
                     .document(attendee.getDeviceID())
                     .set(attendee);
         }
@@ -94,8 +102,7 @@ public class Database {
          */
         @NonNull
         public static Task<Event> get(String eventID, boolean fetchAttendees, boolean fetchOrganizer, boolean fetchPoster){
-            return FirebaseFirestore.getInstance().
-                    collection(eventsCollectionPath).
+            return eventsCollection.
                     document(eventID).get()
                     .continueWith(new Continuation<DocumentSnapshot, Event>() {
                         @Override
@@ -190,8 +197,7 @@ public class Database {
         @NonNull
         public static Task<Void> addAttendee(@NonNull EventDatabaseRepresentation eventDatabaseRepresentation, @NonNull Attendee attendee) {
             //https://firebase.google.com/docs/firestore/manage-data/add-data#update_elements_in_an_array
-            return FirebaseFirestore.getInstance()
-                    .collection(eventsCollectionPath)
+            return eventsCollection
                     .document(eventDatabaseRepresentation.getEventID())
                     .update("attendees", FieldValue.arrayUnion(attendee));
         }
@@ -204,8 +210,7 @@ public class Database {
         @NonNull
         public static Task<Void> addAttendee(@NonNull Event event, @NonNull Attendee attendee) {
             EventDatabaseRepresentation eventDatabaseRepresentation = event.convertToDatabaseRepresentation();
-            return FirebaseFirestore.getInstance()
-                    .collection(eventsCollectionPath)
+            return eventsCollection
                     .document(eventDatabaseRepresentation.getEventID())
                     .update("attendees", FieldValue.arrayUnion(attendee));
         }
@@ -226,8 +231,7 @@ public class Database {
 
             // 2024-MR-11, ChatGPT, OpenAI, prompt: "what's the difference between ContinueWith and ContinueWithTask?"
             // provided information that continueWithTask is for asynchronous work after a task's completion
-            return FirebaseFirestore.getInstance()
-                    .collection(eventsCollectionPath)
+            return eventsCollection
                     .document(event.getEventID())
                     .get()
                     .continueWithTask(task -> {
@@ -286,8 +290,7 @@ public class Database {
          * @return a task that should resolve to a QRDatabaseRedirection object
          */
         public Task<QRDatabaseEventLink> get(String decoded_qr_data){
-            return FirebaseFirestore.getInstance()
-                    .collection(qrDirectionCollectionPath)
+            return qrLinkCollection
                     .document(decoded_qr_data)
                     .get()
                     .continueWith(task ->{
@@ -305,8 +308,7 @@ public class Database {
          * @return a Task that will be resolved when the database write is complete or failed
          */
         public Task<Void> set(String decoded_qr_data, Event directedEvent, int linkType){
-            return FirebaseFirestore.getInstance()
-                    .collection(qrDirectionCollectionPath)
+            return qrLinkCollection
                     .document(decoded_qr_data)
                     .set(new QRDatabaseEventLink(
                             linkType,
