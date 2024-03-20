@@ -19,6 +19,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Helper class for easily pulling/pushing data from/to the database
@@ -96,7 +97,12 @@ public class Database {
                             if(task.isSuccessful()){
                                 // we can build the Attendee object here with the result
                                 // may need to customize if you're copy pasting
-                                return task.getResult().toObject(Attendee.class);
+                                AttendeeDatabaseRepresentation foundAttendee = task.getResult()
+                                        .toObject(AttendeeDatabaseRepresentation.class);
+                                if(foundAttendee == null){
+                                    throw new Exception("Fetched attendee was null");
+                                }
+                                return foundAttendee.toAttendee();
                             } else {
                                 throw new Exception("Could not fetch Attendee "+attendeeID+" | "+task.getException());
                             }
@@ -112,7 +118,7 @@ public class Database {
         public Task<Void> set(Attendee attendee){
             return attendeeCollection
                     .document(attendee.getDeviceID())
-                    .set(attendee);
+                    .set(new AttendeeDatabaseRepresentation(attendee));
         }
     }
 
@@ -158,7 +164,8 @@ public class Database {
                 // organizer gets added
                 tasks.add(owner.attendees.get(eventDatabaseRepresentation.getOrganizerID())
                         .addOnCompleteListener(task1 -> {
-                            event.setOrganizer((Organizer) task1.getResult());
+                            Attendee attendee = task1.getResult();
+                            event.setOrganizer((Organizer) attendee);
                         }));
                 // TODO fetch poster
                 return Tasks.whenAllComplete(tasks).continueWith(task1 -> {

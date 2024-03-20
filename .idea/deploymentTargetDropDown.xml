@@ -2,21 +2,20 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="DatabaseTest">
+        <State />
+      </entry>
       <entry key="app">
-        <State>
-          <runningDeviceTargetSelectedWithDropDown>
-            <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
-              <deviceKey>
-                <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="C:\Users\berna\.android\avd\Pixel_7_API_34.avd" />
-                </Key>
-              </deviceKey>
-            </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-03-14T18:45:18.994673500Z" />
-        </State>
+        <State />
+      </entry>
+      <entry key="attendee_save_and_recover()">
+        <State />
+      </entry>
+      <entry key="event_save_and_recover()">
+        <State />
+      </entry>
+      <entry key="organizer_save_and_recover()">
+        <State />
       </entry>
     </value>
   </component>

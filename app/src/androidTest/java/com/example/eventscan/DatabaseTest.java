@@ -63,6 +63,32 @@ public class DatabaseTest extends Database {
         assertEquals(fetchedAttendee,attendee);
     }
     @Test
+    public void organizer_save_and_recover() throws ExecutionException, InterruptedException {
+        Database db = DatabaseTest.getInstance();
+        String deviceIDTest = "98765";
+        Organizer organizer = new Organizer();
+        organizer.setName("Test Name Organizer");
+        organizer.setBio("Test Bio Organizer");
+        organizer.setDeviceID(deviceIDTest);
+        organizer.setEmail("Test Email Organizer");
+        organizer.setPhoneNum("1902380");
+        Task<Void> setTask = db.attendees.set(organizer);
+        Tasks.await(setTask);
+        if(!setTask.isSuccessful()){
+            fail(setTask.getException().toString());
+        }
+        // now get it back
+        Task<Attendee> attendeeTask = db.attendees.get(deviceIDTest);
+        Tasks.await(attendeeTask);
+        if(!attendeeTask.isSuccessful()){
+            fail(attendeeTask.getException().toString());
+        }
+        Organizer fetchedOrganizer = (Organizer) attendeeTask.getResult();
+        assertEquals(organizer, fetchedOrganizer);
+        assertEquals(fetchedOrganizer,organizer);
+
+    }
+    @Test
     public void event_save_and_recover() throws ExecutionException, InterruptedException {
         Database db = DatabaseTest.getInstance();
         String eventIDTest = "129038712039";
