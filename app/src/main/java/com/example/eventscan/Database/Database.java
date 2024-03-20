@@ -9,6 +9,7 @@ import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Entities.Organizer;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -18,7 +19,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * Helper class for easily pulling/pushing data from/to the database
@@ -35,45 +35,59 @@ public class Database {
     TODO find out if database calls block the main thread, if so, look into Executors
      https://www.baeldung.com/java-future (they can be used with ContinueWith and ContinueWithTask)
      */
+    protected CollectionReference attendeeCollection;
+    protected CollectionReference eventsCollection;
+    protected CollectionReference qrLinkCollection;
+    private final String storageRootFolder = "prod";
+    private final String postersStoragePath = "posters";
 
-    private static final CollectionReference attendeeCollection = FirebaseFirestore.getInstance()
-            .collection("prod")
-            .document("attendees")
-            .collection("attendees");
-    private static final CollectionReference eventsCollection = FirebaseFirestore.getInstance()
-            .collection("prod")
-            .document("events")
-            .collection("events");
-    private static final CollectionReference qrLinkCollection = FirebaseFirestore.getInstance()
-            .collection("prod")
-            .document("qr_links")
-            .collection("qr_links");
-    private static final String storageRootFolder = "prod";
-    private static final String postersStoragePath = "posters";
+    public AttendeeOperations attendees;
+    public EventOperations events;
+    public QRCodeOperations qr_codes;
+
+
+    private static final Database instance = new Database();
+
+    protected Database(){
+        attendeeCollection = FirebaseFirestore.getInstance()
+                .collection("prod")
+                .document("attendees")
+                .collection("attendees");
+        eventsCollection = FirebaseFirestore.getInstance()
+                .collection("prod")
+                .document("events")
+                .collection("events");
+        qrLinkCollection = FirebaseFirestore.getInstance()
+                .collection("prod")
+                .document("qr_links")
+                .collection("qr_links");
+        setupChildren();
+    }
 
     /**
-     * Wait until a task has been completed
-     * <br><b>DON'T USE THIS UNLESS YOU ABSOLUTELY NEED TO, use onCompleteListeners instead if at all possible</b>
-     * @param task the task to wait for
+     * Sets up self.attendees, self.events, etc...
      */
-    public static void waitForTask(Task<?> task){
-        while(!task.isComplete()){
-            try {
-                Thread.sleep(10);
-            } catch(InterruptedException exception){
-                // do nothing
-            }
-        }
+    private void setupChildren(){
+        this.attendees = new AttendeeOperations(this);
+        this.events = new EventOperations(this);
     }
-    public static class attendees{
+    public static Database getInstance(){
+        return instance;
+    }
+
+    public class AttendeeOperations{
+        private Database owner;
+        private AttendeeOperations(Database owner){
+            this.owner = owner;
+        }
         /**
          * Get an object that may contain an Attendee in the future.
          * Call this as early as possible, then call foo.getResult() later to get the request's output
          * give as much space as possible between calling this and calling .getResult() so that the request can process
          * @param attendeeID the ID of the attendee to fetch
-         * @return a Task\<Attendee\> object, call getResult() on it to get the Attendee or an error
+         * @return a Task object, will contain an Attendee when done, or an error
          */
-        public static Task<Attendee> get(String attendeeID){
+        public Task<Attendee> get(String attendeeID){
             return attendeeCollection
                     .document(attendeeID).get()
                     .continueWith(new Continuation<DocumentSnapshot, Attendee>() {
@@ -95,14 +109,18 @@ public class Database {
          * @param attendee the attendee to add/update
          * @return a task object, check it to see if the action was successful
          */
-        public static Task<Void> set(Attendee attendee){
+        public Task<Void> set(Attendee attendee){
             return attendeeCollection
                     .document(attendee.getDeviceID())
                     .set(attendee);
         }
     }
 
-    public static class events {
+    public class EventOperations {
+        private Database owner;
+        private EventOperations(Database owner){
+            this.owner = owner;
+        }
         /**
          * get an Event object from the database
          * @param eventID ID of the event
@@ -112,84 +130,41 @@ public class Database {
          *                       this can save some query time if you know you don't need it
          * @param fetchPoster if set to false, the Event's poster will be null
          *                    this can save some query time if you know you don't need it
-         * @return a Task\<Event\> object, call getResult() on it to get the Event or an error
+         * @return a Task\<Event\> object that will resolve to an Event later (or an error)
          */
         @NonNull
-        public static Task<Event> get(String eventID, boolean fetchAttendees, boolean fetchOrganizer, boolean fetchPoster){
-            return eventsCollection.
-                    document(eventID).get()
-                    .continueWith(new Continuation<DocumentSnapshot, Event>() {
-                        @Override
-                        public Event then(@NonNull Task<DocumentSnapshot> task) throws Exception {
-                            if(task.isSuccessful()) {
-                                EventDatabaseRepresentation databaseEvent = task.getResult()
-                                        .toObject(EventDatabaseRepresentation.class);
-                                // build the Event object from the EventDatabaseRepresentation object
-                                // 1. queue up the async stuff
-                                //  1.1 get the attendees
-                                if (databaseEvent == null) {// mostly for resolving IDE warnings: exit early if we get a null response
-                                    throw new Exception("event " + eventID + " is null, this should not be possible");
-                                }
-                                ArrayList<Task<Attendee>> attendeeTasks = new ArrayList<>(); // tasks for resolving each attendee
-                                if(fetchAttendees) {
-                                    for (int i = 0; i < databaseEvent.getAttendeeIDs().size(); i++) {
-                                        attendeeTasks.add(Database.attendees.get(databaseEvent.getAttendeeIDs().get(i)));
-                                    }
-                                }
-                                Task<Attendee> organizerTask = null;
-                                //  1.2 get the Organizer
-                                if(fetchOrganizer) {
-                                    organizerTask = Database.attendees.get(databaseEvent.getOrganizerID());
-                                }
-                                //  1.3 get the Poster
-                                if(fetchPoster) {
-                                    // TODO get other things like poster here
-                                }
-                                // 2. await the results of the tasks
-                                ArrayList<Attendee> attendeesResolved = new ArrayList<>();
-                                if(fetchAttendees) {
-                                    for (Task<Attendee> attendeeTask : attendeeTasks) {
-                                        if (attendeeTask.isSuccessful()) {
-                                            attendeesResolved.add(attendeeTask.getResult());
-                                        } else {
-                                            throw new Exception("Attendee fetch failure: "+attendeeTask.getException());
-                                        }
-                                    }
-                                } else {
-                                    // fill it with nulls
-                                    for (int i=0; i<databaseEvent.getAttendeeIDs().size(); i++){
-                                        attendeesResolved.add(null);
-                                    }
-                                }
+        public Task<Event> get(String eventID, boolean fetchAttendees, boolean fetchOrganizer, boolean fetchPoster){
+            // 2024-MR-20 OpenAI ChatGPT
+            // I am writing java android and have a function that returns a firebase Task<Event> where event is a custom class. There is an EventDatabaseRepresentation stored in firebase, which contains a list of attendee IDs, the function needs to return a task that will fetch all of the attendees and only resolve when all of the sub-tasks are done, how is this possible?
+            // -> provived information about tasks.whenAllComplete()
+            // -> how could I extend this if I needed to fetch other event details from the firestore, for example if the event has an organizer ID whose organizer needs to be fetched, you don't have to write the whole code just the structure
+            // -> provided general structure of a task list where each task has an onCompleteListener, you add all tasks to a list, return Tasks.onComplete(list)
+            // implementation written by me
+            return eventsCollection.document(eventID).get().continueWithTask(task -> {
+                if(!task.isSuccessful()){
+                    return Tasks.forException(task.getException());
+                }
+                ArrayList<Task<?>> tasks = new ArrayList<>();
+                Event event = new Event();
+                EventDatabaseRepresentation eventDatabaseRepresentation = task.getResult().toObject(EventDatabaseRepresentation.class);
+                // attendees get added
+                for(String attendeeID:eventDatabaseRepresentation.getAttendeeIDs()){
+                    tasks.add(owner.attendees.get(attendeeID).addOnCompleteListener(task1 -> {
+                                event.addAttendee(task1.getResult());
+                            })
 
-                                Organizer eventOrganizer = null;
-                                if (fetchOrganizer) {
-                                    try {
-                                        eventOrganizer = (Organizer) organizerTask.getResult();
-                                    } catch(ClassCastException e){
-                                        throw new Exception("The organizer of this event is not an organizer");
-                                    }
-                                } // else eventOrganizer stays null, we're good :)
-
-                                // TODO poster stuff
-
-                                // 3. build the Event object finally
-                                Event event = new Event(
-                                        databaseEvent.getName(),
-                                        databaseEvent.getDesc(),
-                                        eventOrganizer,
-                                        null, // poster
-                                        databaseEvent.getEventID()
-                                );
-                                for(Attendee attendee : attendeesResolved){
-                                    event.addAttendee(attendee);
-                                }
-                                return event;
-                            } else {
-                                throw Objects.requireNonNull(task.getException());
-                            }
-                        }
-                    });
+                    );
+                }
+                // organizer gets added
+                tasks.add(owner.attendees.get(eventDatabaseRepresentation.getOrganizerID())
+                        .addOnCompleteListener(task1 -> {
+                            event.setOrganizer((Organizer) task1.getResult());
+                        }));
+                // TODO fetch poster
+                return Tasks.whenAllComplete(tasks).continueWith(task1 -> {
+                    return event;
+                });
+            });
         }
         /**
          * get an Event object from the database
@@ -197,7 +172,7 @@ public class Database {
          * @return a Task\<Event\> object, call getResult() on it to get the Event or an error
          */
         @NonNull
-        public static Task<Event> get(String eventID){
+        public Task<Event> get(String eventID){
             return get(eventID, true, true, true);
         }
 
@@ -209,7 +184,7 @@ public class Database {
          * @return a task that will be resolved when the adding finishes
          */
         @NonNull
-        public static Task<Void> addAttendee(@NonNull EventDatabaseRepresentation eventDatabaseRepresentation, @NonNull Attendee attendee) {
+        public Task<Void> addAttendee(@NonNull EventDatabaseRepresentation eventDatabaseRepresentation, @NonNull Attendee attendee) {
             //https://firebase.google.com/docs/firestore/manage-data/add-data#update_elements_in_an_array
             return eventsCollection
                     .document(eventDatabaseRepresentation.getEventID())
@@ -222,7 +197,7 @@ public class Database {
          * @return a task that will be resolved when the adding finishes
          */
         @NonNull
-        public static Task<Void> addAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+        public Task<Void> addAttendee(@NonNull Event event, @NonNull Attendee attendee) {
             EventDatabaseRepresentation eventDatabaseRepresentation = event.convertToDatabaseRepresentation();
             return eventsCollection
                     .document(eventDatabaseRepresentation.getEventID())
@@ -240,7 +215,7 @@ public class Database {
          * it will contain the Event object you passed in with a potentially updated ID
          */
         @NonNull
-        public static Task<Event> create(Event event){
+        public Task<Event> create(Event event){
             //https://stackoverflow.com/questions/53332471/checking-if-a-document-exists-in-a-firestore-collection
 
             // 2024-MR-11, ChatGPT, OpenAI, prompt: "what's the difference between ContinueWith and ContinueWithTask?"
@@ -277,8 +252,9 @@ public class Database {
 
     }
 
-    private static class posters{
-        static FileDownloadTask get(String posterID, Uri destinationURI){
+    private class posters{
+        //TODO better references, owner class
+        FileDownloadTask get(String posterID, Uri destinationURI){
             return FirebaseStorage.getInstance().getReference()
                     .child(storageRootFolder)
                     .child(postersStoragePath)
@@ -286,7 +262,7 @@ public class Database {
                     .getFile(destinationURI);
 
         }
-        static UploadTask set(String posterID, Uri posterUri){
+        UploadTask set(String posterID, Uri posterUri){
             return FirebaseStorage.getInstance().getReference()
                     .child(storageRootFolder)
                     .child(postersStoragePath)
@@ -295,7 +271,12 @@ public class Database {
         }
     }
 
-    public static class qr_codes {
+    public class QRCodeOperations {
+        private Database owner;
+
+        private QRCodeOperations(Database owner){
+            this.owner = owner;
+        }
         // set(qr_data, event) makes it so scanning a QR with that data will send you to that event
 
         /**
