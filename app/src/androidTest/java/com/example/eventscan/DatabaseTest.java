@@ -107,6 +107,13 @@ public class DatabaseTest extends Database {
                 eventIDTest
         );
         db.attendees.set(organizer1);
+        Attendee attendee = new Attendee();
+        attendee.setName("Event added test Attendee");
+        attendee.setBio("event added test bio");
+        attendee.setDeviceID("5910293");
+        event1.addAttendee(attendee);
+        Task<Void> setAttendeeTask = db.attendees.set(attendee);
+        Tasks.await(setAttendeeTask);
         Task<Event> event1ModifiedTask = db.events.create(event1);
         Tasks.await(event1ModifiedTask);
         if(!event1ModifiedTask.isSuccessful()){
