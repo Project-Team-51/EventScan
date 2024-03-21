@@ -4,11 +4,16 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 
+import com.example.eventscan.Database.EventDatabaseRepresentation;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-/*
+import java.util.Objects;
+
+/**
  * The event class that holds all the necessary information for an event. Provides
  * sufficient setters and getters for interfacing with the class.
+ * <b>If you change this don't forget to change Database/EventDatabaseRepresentation</b>
  */
 public class Event implements Serializable {
     private Location location;
@@ -22,7 +27,9 @@ public class Event implements Serializable {
   
   
     // empty constructor so it works with firestore
-    public Event() {};
+    public Event() {
+        this.attendees = new ArrayList<>();
+    };
 
     /**
      * Constructs a new Event object with the specified parameters.
@@ -98,6 +105,24 @@ public class Event implements Serializable {
 
     public void setPoster(String poster) {
         this.poster = poster;
+    }
+
+    public EventDatabaseRepresentation convertToDatabaseRepresentation(){
+        return new EventDatabaseRepresentation(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Event event = (Event) o;
+        return Objects.equals(getLocation(), event.getLocation()) && Objects.equals(getDesc(), event.getDesc()) && Objects.equals(getName(), event.getName()) && Objects.equals(getAttendees(), event.getAttendees()) && Objects.equals(getOrganizer(), event.getOrganizer()) && Objects.equals(getPoster(), event.getPoster()) && Objects.equals(getEventID(), event.getEventID());
+    }
+
+    @Override
+    public int hashCode() {
+        //auto-generated
+        return Objects.hash(getLocation(), getDesc(), getName(), getAttendees(), getOrganizer(), getPoster(), getEventID());
     }
 }
 
