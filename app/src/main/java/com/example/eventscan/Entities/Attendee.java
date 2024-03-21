@@ -1,6 +1,7 @@
 package com.example.eventscan.Entities;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 /*
  * The Attendee class represents a user attending an event and extends the User class.
@@ -16,16 +17,19 @@ public class Attendee extends User {
     private String deviceID;
     private String profilePictureID;
 
+    protected String type;
     /**
      * Default constructor for the Attendee class.
      */
     public Attendee() {
-    }
-    public String type() {
-        return "attendee";
+        type = "attendee";
     }
 
     ArrayList<Attendee> attendeeDataList;
+
+    public String getType(){
+        return type;
+    }
 
     /**
      * Retrieves the name of the attendee.
@@ -136,4 +140,18 @@ public class Attendee extends User {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        // auto-generated
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Attendee attendee = (Attendee) o;
+        return Objects.equals(getName(), attendee.getName()) && Objects.equals(getPhoneNum(), attendee.getPhoneNum()) && Objects.equals(getEmail(), attendee.getEmail()) && Objects.equals(getBio(), attendee.getBio()) && Objects.equals(getDeviceID(), attendee.getDeviceID()) && Objects.equals(getProfilePictureID(), attendee.getProfilePictureID());
+    }
+
+    @Override
+    public int hashCode() {
+        // auto-generated
+        return Objects.hash(getName(), getPhoneNum(), getEmail(), getBio(), getDeviceID(), getProfilePictureID());
+    }
 }
