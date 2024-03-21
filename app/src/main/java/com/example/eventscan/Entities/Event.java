@@ -27,7 +27,9 @@ public class Event implements Serializable {
   
   
     // empty constructor so it works with firestore
-    public Event() {};
+    public Event() {
+        this.attendees = new ArrayList<>();
+    };
 
     /**
      * Constructs a new Event object with the specified parameters.

@@ -141,8 +141,8 @@ public class Database {
                     return Tasks.forException(task.getException());
                 }
                 ArrayList<Task<?>> tasks = new ArrayList<>();
-                Event event = new Event();
                 EventDatabaseRepresentation eventDatabaseRepresentation = task.getResult().toObject(EventDatabaseRepresentation.class);
+                Event event = eventDatabaseRepresentation.convertToBarebonesEvent();
                 // attendees get added
                 for(String attendeeID:eventDatabaseRepresentation.getAttendeeIDs()){
                     tasks.add(owner.attendees.get(attendeeID).addOnCompleteListener(task1 -> {

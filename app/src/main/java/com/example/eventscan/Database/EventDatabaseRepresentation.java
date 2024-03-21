@@ -26,6 +26,7 @@ public class EventDatabaseRepresentation {
         location = event.getLocation();
         desc = event.getDesc();
         attendeeIDs = new ArrayList<>();
+        name = event.getName();
         for(Attendee attendee: event.getAttendees()){
             attendeeIDs.add(attendee.getDeviceID());
         }
@@ -35,6 +36,19 @@ public class EventDatabaseRepresentation {
 
     }
 
+    /**
+     * converts self to a barebones event (the event contains all non-referenced data)
+     * @return
+     */
+    Event convertToBarebonesEvent(){
+        Event event = new Event();
+        event.setLocation(this.location);
+        event.setDesc(this.getDesc());
+        event.setName(this.name);
+        event.setEventID(this.eventID);
+
+        return event;
+    }
     public ArrayList<String> getAttendeeIDs() {
         return attendeeIDs;
     }

@@ -103,7 +103,7 @@ public class DatabaseTest extends Database {
                 "Test Event",
                 "Test Description",
                 organizer1,
-                "Poster? This will be changed in the future",
+                null, // TODO add to test once functionality is done
                 eventIDTest
         );
         db.attendees.set(organizer1);
@@ -114,7 +114,7 @@ public class DatabaseTest extends Database {
             //throw new AssumptionViolatedException("Skipping test - firebase connection failed: "+event1ModifiedTask.getException().toString());
         }
         Event event1Modified = event1ModifiedTask.getResult();
-        Task<Event> returnEvent = db.events.get(eventIDTest);
+        Task<Event> returnEvent = db.events.get(event1Modified.getEventID());
         Tasks.await(returnEvent);
         if(!returnEvent.isSuccessful()){
             fail("Complete: "+returnEvent.isComplete()+" | "+returnEvent.getException().toString());
