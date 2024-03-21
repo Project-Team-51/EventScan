@@ -17,16 +17,19 @@ public class Attendee extends User {
     private String deviceID;
     private String profilePictureID;
 
+    protected String type;
     /**
      * Default constructor for the Attendee class.
      */
     public Attendee() {
-    }
-    public String type() {
-        return "attendee";
+        type = "attendee";
     }
 
     ArrayList<Attendee> attendeeDataList;
+
+    public String getType(){
+        return type;
+    }
 
     /**
      * Retrieves the name of the attendee.
@@ -135,6 +138,7 @@ public class Attendee extends User {
     public void setProfilePictureID(String profilePictureID) {
         this.profilePictureID = profilePictureID;
     }
+
 
     @Override
     public boolean equals(Object o) {

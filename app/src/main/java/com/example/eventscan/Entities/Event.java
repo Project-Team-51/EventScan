@@ -111,7 +111,6 @@ public class Event implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        //auto-generated
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;

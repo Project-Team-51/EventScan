@@ -91,22 +91,12 @@ public class Database {
         public Task<Attendee> get(String attendeeID){
             return attendeeCollection
                     .document(attendeeID).get()
-                    .continueWith(new Continuation<DocumentSnapshot, Attendee>() {
-                        @Override
-                        public Attendee then(@NonNull Task<DocumentSnapshot> task) throws Exception {
-                            if(task.isSuccessful()){
-                                // we can build the Attendee object here with the result
-                                // may need to customize if you're copy pasting
-                                AttendeeDatabaseRepresentation foundAttendee = task.getResult()
-                                        .toObject(AttendeeDatabaseRepresentation.class);
-                                if(foundAttendee == null){
-                                    throw new Exception("Fetched attendee was null");
-                                }
-                                return foundAttendee.toAttendee();
-                            } else {
-                                throw new Exception("Could not fetch Attendee "+attendeeID+" | "+task.getException());
-                            }
+                    .continueWith(task -> {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        if(documentSnapshot.get("type").toString().equals("organizer")){
+                            return documentSnapshot.toObject(Organizer.class);
                         }
+                        return documentSnapshot.toObject(Attendee.class);
                     });
         }
 
@@ -118,7 +108,7 @@ public class Database {
         public Task<Void> set(Attendee attendee){
             return attendeeCollection
                     .document(attendee.getDeviceID())
-                    .set(new AttendeeDatabaseRepresentation(attendee));
+                    .set(attendee);
         }
     }
 
@@ -142,8 +132,8 @@ public class Database {
         public Task<Event> get(String eventID, boolean fetchAttendees, boolean fetchOrganizer, boolean fetchPoster){
             // 2024-MR-20 OpenAI ChatGPT
             // I am writing java android and have a function that returns a firebase Task<Event> where event is a custom class. There is an EventDatabaseRepresentation stored in firebase, which contains a list of attendee IDs, the function needs to return a task that will fetch all of the attendees and only resolve when all of the sub-tasks are done, how is this possible?
-            // -> provived information about tasks.whenAllComplete()
-            // -> how could I extend this if I needed to fetch other event details from the firestore, for example if the event has an organizer ID whose organizer needs to be fetched, you don't have to write the whole code just the structure
+            // -> provided information about tasks.whenAllComplete()
+            // how could I extend this if I needed to fetch other event details from the firestore, for example if the event has an organizer ID whose organizer needs to be fetched, you don't have to write the whole code just the structure
             // -> provided general structure of a task list where each task has an onCompleteListener, you add all tasks to a list, return Tasks.onComplete(list)
             // implementation written by me
             return eventsCollection.document(eventID).get().continueWithTask(task -> {

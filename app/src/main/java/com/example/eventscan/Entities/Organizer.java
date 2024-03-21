@@ -7,9 +7,7 @@ import java.util.ArrayList;
 public class Organizer extends Attendee {
     //public ArrayList<Event> ownedEvents;
     // empty constructor so it works with firestore
-
-    public Organizer(){};
-    public String type() {
-        return "organizer";
-    }
+    public Organizer(){
+        this.type = "organizer";
+    };
 }

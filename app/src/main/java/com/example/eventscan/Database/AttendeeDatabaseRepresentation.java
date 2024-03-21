@@ -20,7 +20,6 @@ public class AttendeeDatabaseRepresentation implements Serializable {
      */
     public Attendee toAttendee(){
         if(attendeeType.equals("Organizer")){
-            assert(attendee instanceof Organizer);
             return (Organizer) attendee;
         }
         return attendee;
