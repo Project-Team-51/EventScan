@@ -19,8 +19,8 @@
 
     <RelativeLayout
         android:id="@+id/bubbleContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_width="347dp"
+        android:layout_height="254dp"
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="125dp"
         android:layout_marginBottom="300dp"
@@ -32,14 +32,14 @@
             android:id="@+id/addEventDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@null"
+            android:gravity="top|start"
             android:hint="Enter Event Description"
+            android:inputType="textMultiLine"
+            android:maxLines="10"
             android:textColor="#D3E2F2"
             android:textColorHint="#D3E2F2"
-            android:textSize="20sp"
-            android:background="@null"
-            android:inputType="textMultiLine"
-            android:gravity="top|start"
-            android:maxLines="10" />
+            android:textSize="20sp" />
 
     </RelativeLayout>
 
@@ -68,7 +68,7 @@
 
 
     <Button
-        android:id="@+id/upload_poster"
+        android:id="@+id/confirmEvent"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
@@ -77,7 +77,7 @@
         android:layout_marginTop="-240dp"
         android:layout_marginRight="30dp"
         android:backgroundTint="#414E6E"
-        android:text="Upload Poster" />
+        android:text="Confirm Event" />
 
     <Button
         android:id="@+id/generate_QRCode"
@@ -91,7 +91,7 @@
         android:text="Make QR Code" />
 
     <Button
-        android:id="@+id/confirmEvent"
+        android:id="@+id/upload_poster"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="-290dp"
@@ -99,19 +99,37 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="30dp"
         android:backgroundTint="#414E6E"
-        android:text="Confirm Event" />
+        android:text="Upload Poster" />
 
     <ImageView
         android:id="@+id/posterView"
-        android:layout_width="139dp"
-        android:layout_height="150dp"
-        android:layout_below="@+id/confirmEvent"
+        android:layout_width="150dp"
+        android:layout_height="168dp"
+        android:layout_below="@+id/upload_poster"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="13dp"
+        android:layout_marginTop="83dp"
         android:layout_marginEnd="3dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="42dp"
         android:contentDescription="TODO"
         android:scaleType="centerInside" />
+
+    <Switch
+        android:id="@+id/attendeeLimit"
+        android:layout_width="242dp"
+        android:layout_height="33dp"
+        android:layout_below="@+id/generate_QRCode"
+        android:layout_alignEnd="@+id/confirmEvent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="33dp"
+        android:layout_marginTop="26dp"
+        android:layout_marginEnd="106dp"
+        android:layout_marginBottom="234dp"
+        android:text="Set Attendee Limit:"
+        android:textColor="#D3E2F2"
+        android:textColorHint="#D3E2F2"
+        android:textSize="20sp"
+        android:backgroundTint="#D3E2F2" />
 
 </RelativeLayout>

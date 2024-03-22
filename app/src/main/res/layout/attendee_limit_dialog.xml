@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/background_rounded">
+
+    <TextView
+        android:id="@+id/SetLimit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Set Attendee Limit"
+        android:textColor="#D3E2F2"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+
+    <EditText
+        android:id="@+id/editTextAttendeeLimit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/SetLimit"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:textColor="#D3E2F2"
+        android:textColorHint="#D3E2F2"
+        android:hint="Enter Attendee Limit"
+        android:inputType="number"
+        android:backgroundTint="#D3E2F2"/>
+
+    <Button
+        android:id="@+id/buttonOK"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextAttendeeLimit"
+        android:layout_alignEnd="@+id/editTextAttendeeLimit"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="1dp"
+        android:text="OK"
+        android:backgroundTint="#414E6E"
+        android:textColor="#D3E2F2" />
+
+    <Button
+        android:id="@+id/buttonCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/editTextAttendeeLimit"
+        android:layout_alignStart="@+id/editTextAttendeeLimit"
+        android:layout_gravity="center"
+        android:layout_marginEnd="82dp"
+        android:layout_marginTop="32dp"
+        android:text="Cancel"
+        android:backgroundTint="#414E6E"
+        android:textColor="#D3E2F2" /> <!-- Change text color -->
+
+</RelativeLayout>
