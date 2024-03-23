@@ -187,29 +187,28 @@ public class Database {
 
         /**
          * Add an attendee to an event if they aren't already on it
-         * @param eventDatabaseRepresentation the event to add to
-         * @param attendee the attendee to be added
-         * @return a task that will be resolved when the adding finishes
-         */
-        @NonNull
-        public Task<Void> addAttendee(@NonNull EventDatabaseRepresentation eventDatabaseRepresentation, @NonNull Attendee attendee) {
-            //https://firebase.google.com/docs/firestore/manage-data/add-data#update_elements_in_an_array
-            return eventsCollection
-                    .document(eventDatabaseRepresentation.getEventID())
-                    .update("attendees", FieldValue.arrayUnion(attendee));
-        }
-        /**
-         * Add an attendee to an event if they aren't already on it
          * @param event the event to add to
          * @param attendee the attendee to be added
          * @return a task that will be resolved when the adding finishes
          */
         @NonNull
         public Task<Void> addAttendee(@NonNull Event event, @NonNull Attendee attendee) {
-            EventDatabaseRepresentation eventDatabaseRepresentation = event.convertToDatabaseRepresentation();
             return eventsCollection
-                    .document(eventDatabaseRepresentation.getEventID())
+                    .document(event.getEventID())
                     .update("attendees", FieldValue.arrayUnion(attendee));
+        }
+
+        /**
+         * Remove an attendee from an event's 'attendees' field
+         * @param event the event to modify
+         * @param attendee the attendee to remove
+         * @return a task that will be resolved when the DB actions finish
+         */
+        @NonNull
+        public Task<Void> removeAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+            return eventsCollection
+                    .document(event.getEventID())
+                    .update("attendees", FieldValue.arrayRemove(attendee));
         }
 
         /**
