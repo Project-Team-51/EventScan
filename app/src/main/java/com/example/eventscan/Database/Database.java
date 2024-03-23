@@ -110,6 +110,17 @@ public class Database {
                     .document(attendee.getDeviceID())
                     .set(attendee);
         }
+
+        /**
+         * Delete an attendee from the database
+         * @param attendee the attendee to delete
+         * @return a task that will be resolved when the operation finishes
+         */
+        public Task<Void> delete(Attendee attendee){
+            return attendeeCollection
+                    .document(attendee.getDeviceID())
+                    .delete();
+        }
     }
 
     public class EventOperations {
@@ -247,6 +258,17 @@ public class Database {
                     });
         }
 
+        /**
+         * delete an event from the database
+         * @param event event to delete
+         * @return a task that will be resolved when the database actions are done
+         */
+        public Task<Void> delete(Event event){
+            return eventsCollection
+                    .document(event.getEventID())
+                    .delete();
+        }
+
     }
 
     private class posters{
@@ -306,6 +328,17 @@ public class Database {
                             linkType,
                             directedEvent
                     ));
+        }
+
+        /**
+         * delete the link between this QR code and anything it points to
+         * @param decoded_qr_data decoded data of the QR code to delete the link from
+         * @return a task that will be resolved when the database write is complete or failed
+         */
+        public Task<Void> delete(String decoded_qr_data){
+            return qrLinkCollection
+                    .document(decoded_qr_data)
+                    .delete();
         }
     }
 
