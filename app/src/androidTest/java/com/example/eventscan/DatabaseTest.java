@@ -175,13 +175,19 @@ public class DatabaseTest extends Database {
         Task<Event> potentiallyUpdatedEvent = db.events.create(event1);
         Tasks.await(potentiallyUpdatedEvent);
         Task<Void> addAttendeeTask = db.events.addAttendee(event1, attendee);
-        Tasks.await(potentiallyUpdatedEvent);
-        Task<Event> updatedEventTask = db.events.get(eventIDTest);
+        Tasks.await(addAttendeeTask);
+        Task<Event> updatedEventTask = db.events.get(event1.getEventID());
         Tasks.await(updatedEventTask);
         Event updatedEvent = updatedEventTask.getResult();
         // now add it locally
         event1.addAttendee(attendee);
         assertEquals(event1, updatedEvent);
+        Task<Void> removeAttendeeTask = db.events.removeAttendee(event1, attendee);
+        event1.removeAttendee(attendee);
+        Tasks.await(removeAttendeeTask);
+        Task<Event> getUpdatedEvent2Task = db.events.get(event1.getEventID());
+        Tasks.await(getUpdatedEvent2Task);
+        assertEquals(getUpdatedEvent2Task.getResult(), event1);
     }
 
 }
