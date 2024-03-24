@@ -66,7 +66,7 @@ public class Database {
     /**
      * Sets up self.attendees, self.events, etc...
      */
-    private void setupChildren(){
+    protected void setupChildren(){
         this.attendees = new AttendeeOperations(this);
         this.events = new EventOperations(this);
     }

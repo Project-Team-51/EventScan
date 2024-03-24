@@ -1,6 +1,7 @@
 package com.example.eventscan;
 
 import com.example.eventscan.Database.Database;
+import com.example.eventscan.Database.TestDatabase;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Entities.Organizer;
@@ -20,8 +21,25 @@ import java.util.concurrent.ExecutionException;
 
 public class DatabaseTest extends Database {
 
-    public static Database getInstance(){
-        return Database.getInstance();
+    private static final DatabaseTest instance = new DatabaseTest();
+    public static DatabaseTest getInstance(){
+        return instance;
+    }
+
+    public DatabaseTest(){
+        attendeeCollection = FirebaseFirestore.getInstance()
+                .collection("test")
+                .document("attendees")
+                .collection("attendees");
+        eventsCollection = FirebaseFirestore.getInstance()
+                .collection("test")
+                .document("events")
+                .collection("events");
+        qrLinkCollection = FirebaseFirestore.getInstance()
+                .collection("test")
+                .document("qr_links")
+                .collection("qr_links");
+        setupChildren();
     }
 
 
