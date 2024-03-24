@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Entities.Organizer;
-import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
@@ -19,7 +18,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * Helper class for easily pulling/pushing data from/to the database
@@ -93,6 +91,9 @@ public class Database {
                     .document(attendeeID).get()
                     .continueWith(task -> {
                         DocumentSnapshot documentSnapshot = task.getResult();
+                        if(documentSnapshot.get("type") == null){
+                            throw new Exception("Malformed attendee in firebase: " +attendeeID);
+                        }
                         if(documentSnapshot.get("type").toString().equals("organizer")){
                             return documentSnapshot.toObject(Organizer.class);
                         }
@@ -149,10 +150,16 @@ public class Database {
             // implementation written by me
             return eventsCollection.document(eventID).get().continueWithTask(task -> {
                 if(!task.isSuccessful()){
+                    if(task.getException() == null){
+                        return Tasks.forException(new Exception("Unknown Error occurred"));
+                    }
                     return Tasks.forException(task.getException());
                 }
                 ArrayList<Task<?>> tasks = new ArrayList<>();
                 EventDatabaseRepresentation eventDatabaseRepresentation = task.getResult().toObject(EventDatabaseRepresentation.class);
+                if(eventDatabaseRepresentation == null){
+                    throw new Exception("Unknown error occured when fetching event "+eventID);
+                }
                 Event event = eventDatabaseRepresentation.convertToBarebonesEvent();
                 // attendees get added
                 for(String attendeeID:eventDatabaseRepresentation.getAttendeeIDs()){
