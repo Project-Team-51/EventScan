@@ -202,7 +202,7 @@ public class Database {
         public Task<Void> addAttendee(@NonNull Event event, @NonNull Attendee attendee) {
             return eventsCollection
                     .document(event.getEventID())
-                    .update("attendees", FieldValue.arrayUnion(attendee));
+                    .update("attendeeIDs", FieldValue.arrayUnion(attendee.getDeviceID()));
         }
 
         /**
@@ -215,7 +215,7 @@ public class Database {
         public Task<Void> removeAttendee(@NonNull Event event, @NonNull Attendee attendee) {
             return eventsCollection
                     .document(event.getEventID())
-                    .update("attendees", FieldValue.arrayRemove(attendee));
+                    .update("attendeeIDs", FieldValue.arrayRemove(attendee.getDeviceID()));
         }
 
         /**

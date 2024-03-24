@@ -11,7 +11,7 @@
       <entry key="app">
         <State />
       </entry>
-      <entry key="event_save_and_recover()">
+      <entry key="event_add_remove_attendee()">
         <State />
       </entry>
       <entry key="organizer_save_and_recover()">

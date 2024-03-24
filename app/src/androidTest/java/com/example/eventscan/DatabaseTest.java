@@ -150,4 +150,38 @@ public class DatabaseTest extends Database {
         assertEquals(returnedEvent, event1Modified);
     }
 
+    @Test public void event_add_remove_attendee() throws ExecutionException, InterruptedException {
+        Database db = DatabaseTest.getInstance();
+        String eventIDTest = "9876543210";
+        Organizer organizer1 = new Organizer();
+        organizer1.setDeviceID("abc123");
+        organizer1.setPhoneNum("123456");
+        organizer1.setEmail("abc@abc.com");
+        organizer1.setName("Test Test");
+        organizer1.setBio("Test Bio");
+        organizer1.setProfilePictureID("123");
+        Event event1 = new Event(
+                "Test Event",
+                "Test Description",
+                organizer1,
+                null, // TODO add to test once functionality is done
+                eventIDTest
+        );
+        db.attendees.set(organizer1);
+        Attendee attendee = new Attendee();
+        attendee.setName("Event added test Attendee");
+        attendee.setBio("event added test bio");
+        attendee.setDeviceID("5910293");
+        Task<Event> potentiallyUpdatedEvent = db.events.create(event1);
+        Tasks.await(potentiallyUpdatedEvent);
+        Task<Void> addAttendeeTask = db.events.addAttendee(event1, attendee);
+        Tasks.await(potentiallyUpdatedEvent);
+        Task<Event> updatedEventTask = db.events.get(eventIDTest);
+        Tasks.await(updatedEventTask);
+        Event updatedEvent = updatedEventTask.getResult();
+        // now add it locally
+        event1.addAttendee(attendee);
+        assertEquals(event1, updatedEvent);
+    }
+
 }
