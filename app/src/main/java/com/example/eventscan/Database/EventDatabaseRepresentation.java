@@ -21,7 +21,7 @@ public class EventDatabaseRepresentation {
     private HashMap<String, Integer> checkedInAttendeeIDs;
     private ArrayList<String> interestedAttendeeIDs;
     private String organizerID;
-    private String posterID; // TODO make this a URI instead
+    private String posterID;
     private String eventID;
 
     public EventDatabaseRepresentation(){}
@@ -73,6 +73,10 @@ public class EventDatabaseRepresentation {
     }
     public String getEventID(){
         return eventID;
+    }
+
+    public String getPosterID() {
+        return  posterID;
     }
 
     public String getOrganizerID(){
