@@ -96,6 +96,9 @@ public class Database {
             return attendeeCollection
                     .document(attendeeID).get()
                     .continueWith(task -> {
+                        if(!task.isSuccessful()) {
+                            throw new Exception("attendee "+attendeeID+" does not exist or connection to firebase failed");
+                        }
                         DocumentSnapshot documentSnapshot = task.getResult();
                         if(!documentSnapshot.exists()){
                             throw new Exception("Attendee "+attendeeID+" is not in the firebase, was it written?");
