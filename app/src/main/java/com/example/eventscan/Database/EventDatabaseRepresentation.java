@@ -1,5 +1,6 @@
 package com.example.eventscan.Database;
 
+import android.graphics.Bitmap;
 import android.location.Location;
 
 import com.example.eventscan.Entities.Attendee;
