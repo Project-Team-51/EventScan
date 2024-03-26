@@ -90,6 +90,9 @@ public class Database {
             return attendeeCollection
                     .document(attendeeID).get()
                     .continueWith(task -> {
+                        if(!task.isSuccessful()) {
+                            throw new Exception("attendee "+attendeeID+" does not exist or connection to firebase failed");
+                        }
                         DocumentSnapshot documentSnapshot = task.getResult();
                         if(documentSnapshot.get("type") == null){
                             throw new Exception("Malformed attendee in firebase: " +attendeeID);
