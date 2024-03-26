@@ -1,7 +1,11 @@
 package com.example.eventscan.Fragments;
 
 
+import static android.content.ContentValues.TAG;
+
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Administrator;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
@@ -47,6 +52,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
     private ListView ownedEventsListView;
     private ListView inEventsListView;
     private ArrayList<Event> ownedEvents;
+    private String userType;
     private ArrayList<Event> inEvents;
     private EventArrayAdapter ownedEventsAdapter;
     private EventArrayAdapter inEventsAdapter;
@@ -73,7 +79,6 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         // initialize firestore
         db = FirebaseFirestore.getInstance();
         eventsCollection = db.collection("events");
-
         // update events in real time
         eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -99,12 +104,61 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         ownedEventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Event selectedBook = ownedEvents.get(position);
-                openDeleteEventFragment(selectedBook);
+                Event selectedEvent = ownedEvents.get(position);
+                if(userType.equals("attendee")){
+                    openEventView(selectedEvent);
+                }
+                else{
+                    openDeleteEventFragment(selectedEvent);
+                }
             }
         });
 
+        // Grab user type, organizer or Attendee
+        String deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        db.collection("attendees")
+                .document(deviceID)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot documentSnapshot = task.getResult();
+                        Attendee attendee = documentSnapshot.toObject(Attendee.class);
+                        userType = attendee.getType();
+                        customizeLayout(userType, view);
+                    } else {
+                        Log.e("elephant", "Error getting document: ", task.getException());
+                    }
+                });
+
         return view;
+
+    }
+
+    /**
+     * Changes layout based on user type.
+     *
+     * @param userType The user's selected role.
+     * @param view The view to be changed.
+     */
+    @SuppressLint("SetTextI18n")
+    private void customizeLayout(String userType, View view) {
+        TextView yourEventsText = view.findViewById(R.id.yourEventsText);
+        yourEventsText.setText("All Events");
+        if ("attendee".equals(userType)) {
+            yourEventsText.setText("All Events");
+            Log.d("elephant", "customizeLayout: success");
+        }
+    }
+
+    private void openEventView(Event selectedEvent){
+        ViewEvent ViewEventFragment = new ViewEvent();
+        // Create a Bundle and put the selected Event information
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("selectedEvent", selectedEvent);
+        ViewEventFragment.setArguments(bundle);
+        // Show the DeleteEvent fragment
+        ViewEventFragment.show(getParentFragmentManager(), "ViewEventFragment");
     }
 
     /**
@@ -165,7 +219,6 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 
                     }
                 });
-
         }
     // changed
     private void displayAttendees(ArrayList<User> attendeesList) {

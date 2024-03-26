@@ -1,6 +1,5 @@
 package com.example.eventscan.Entities;
 
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 
