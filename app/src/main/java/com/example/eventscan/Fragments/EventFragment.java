@@ -79,7 +79,6 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         // initialize firestore
         db = FirebaseFirestore.getInstance();
         eventsCollection = db.collection("events");
-
         // update events in real time
         eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -220,7 +219,6 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 
                     }
                 });
-
         }
     // changed
     private void displayAttendees(ArrayList<User> attendeesList) {

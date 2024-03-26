@@ -1,8 +1,11 @@
 package com.example.eventscan.Fragments;
 
 
+import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
+
 import android.app.Dialog;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,8 +24,13 @@ import androidx.fragment.app.Fragment;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Helpers.PosterUpload;
 import com.example.eventscan.R;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.Objects;
+
 
 public class ViewEvent extends DialogFragment {
 
@@ -53,10 +61,21 @@ public class ViewEvent extends DialogFragment {
 
         Button returnView = view.findViewById(R.id.return_view);
 
-        ImageView posterView = view.findViewById(R.id.poster_view);
-        Uri posterUri = Uri.parse(selectedEvent.getPoster());
-        //posterView.setImageURI(posterUri);
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference().child("poster_pictures");
+        StorageReference fileRef = storageRef.child(selectedEvent.getEventID());
 
+        fileRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(bytes -> {
+            // Decode the byte array into a Bitmap
+            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+
+            // Set the Bitmap to the ImageView
+            ImageView posterView = view.findViewById(R.id.poster_view);
+            posterView.setImageBitmap(bitmap);
+        }).addOnFailureListener(exception -> {
+            // Handle any errors
+            Log.e(TAG, "Failed to download image", exception);
+        });
 
         Fragment parentFragment = getParentFragment();
         EventFragment eventFragment = (EventFragment) parentFragment;
