@@ -164,7 +164,7 @@ public class Database {
                 // attendees get added
                 for(String attendeeID:eventDatabaseRepresentation.getAttendeeIDs()){
                     tasks.add(owner.attendees.get(attendeeID).addOnCompleteListener(task1 -> {
-                                event.addAttendee(task1.getResult());
+                                event.checkInAttendee(task1.getResult());
                             })
 
                     );

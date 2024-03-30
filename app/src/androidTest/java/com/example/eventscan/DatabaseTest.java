@@ -1,22 +1,16 @@
 package com.example.eventscan;
 
 import com.example.eventscan.Database.Database;
-import com.example.eventscan.Database.TestDatabase;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Entities.Organizer;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import android.util.Log;
-
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class DatabaseTest extends Database {
@@ -129,7 +123,7 @@ public class DatabaseTest extends Database {
         attendee.setName("Event added test Attendee");
         attendee.setBio("event added test bio");
         attendee.setDeviceID("5910293");
-        event1.addAttendee(attendee);
+        event1.checkInAttendee(attendee);
         Task<Void> setAttendeeTask = db.attendees.set(attendee);
         Tasks.await(setAttendeeTask);
         Task<Event> event1ModifiedTask = db.events.create(event1);
@@ -180,10 +174,10 @@ public class DatabaseTest extends Database {
         Tasks.await(updatedEventTask);
         Event updatedEvent = updatedEventTask.getResult();
         // now add it locally
-        event1.addAttendee(attendee);
+        event1.checkInAttendee(attendee);
         assertEquals(event1, updatedEvent);
         Task<Void> removeAttendeeTask = db.events.removeAttendee(event1, attendee);
-        event1.removeAttendee(attendee);
+        event1.removeCheckedInAttendee(attendee);
         Tasks.await(removeAttendeeTask);
         Task<Event> getUpdatedEvent2Task = db.events.get(event1.getEventID());
         Tasks.await(getUpdatedEvent2Task);

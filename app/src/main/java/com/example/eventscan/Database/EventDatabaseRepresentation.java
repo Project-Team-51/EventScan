@@ -1,6 +1,5 @@
 package com.example.eventscan.Database;
 
-import android.graphics.Bitmap;
 import android.location.Location;
 
 import com.example.eventscan.Entities.Attendee;
@@ -28,7 +27,7 @@ public class EventDatabaseRepresentation {
         desc = event.getDesc();
         attendeeIDs = new ArrayList<>();
         name = event.getName();
-        for(Attendee attendee: event.getAttendees()){
+        for(Attendee attendee: event.getCheckedInAttendeesList()){
             attendeeIDs.add(attendee.getDeviceID());
         }
         organizerID = event.getOrganizer().getDeviceID();
