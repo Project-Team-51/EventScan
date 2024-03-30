@@ -124,8 +124,10 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                     if (task.isSuccessful()) {
                         DocumentSnapshot documentSnapshot = task.getResult();
                         Attendee attendee = documentSnapshot.toObject(Attendee.class);
-                        userType = attendee.getType();
-                        customizeLayout(userType, view);
+                        if (attendee != null) {
+                            userType = attendee.getType();
+                            customizeLayout(userType, view);
+                        }
                     } else {
                         Log.e("elephant", "Error getting document: ", task.getException());
                     }
