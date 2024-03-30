@@ -4,6 +4,7 @@ import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -15,8 +16,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -51,6 +54,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
+import android.widget.CompoundButton;
 import java.util.UUID;
 /*
  * A dialog fragment that allows us to add a new event. The organizer who makes the event is designated the event owner,
@@ -66,6 +70,7 @@ public class AddEvent extends DialogFragment {
     private String eventID;
     private FirebaseFirestore db;
     private String deviceID;
+
     public interface OnEventAddedListener {
         void onEventAdded();
     }
@@ -118,6 +123,7 @@ public class AddEvent extends DialogFragment {
         Button generateQRCodeButton = view.findViewById(R.id.generate_QRCode);
         Button confirmEventButton = view.findViewById(R.id.confirmEvent);
         Button uploadPoster = view.findViewById(R.id.upload_poster);
+        Switch attendeeLimitSwitch = view.findViewById(R.id.attendeeLimit);
         imageView = view.findViewById(R.id.posterView);
 
 
@@ -171,7 +177,6 @@ public class AddEvent extends DialogFragment {
                 EditText eventDescEditText = view.findViewById(R.id.addEventDescription);
                 String eventName = eventNameEditText.getText().toString();
                 String eventDesc = eventDescEditText.getText().toString();
-
                 event.setDesc(eventDesc);
                 event.setName(eventName);
                 event.setPoster(posterUriString);
@@ -181,7 +186,6 @@ public class AddEvent extends DialogFragment {
 
                 // Poster
                 // Generate a unique filename for the poster imag
-
                 StorageReference storageRef = FirebaseStorage.getInstance().getReference();
                 StorageReference posterRef = storageRef.child("poster_pictures").child(eventID);
                 posterRef.putFile(posterUri);
@@ -203,14 +207,19 @@ public class AddEvent extends DialogFragment {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Log.w(TAG, "Error adding event to Firestore", e);
-
                             }
                         });
-
+            }
+        });
+        attendeeLimitSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    showAttendeeLimitDialog();
+                }
             }
         });
     }
-
     /**
      * Generates a QR code bitmap based on the provided event ID.
      *
@@ -329,5 +338,11 @@ public class AddEvent extends DialogFragment {
 
                 }
             });
+
+    private void showAttendeeLimitDialog() {
+        AttendeeLimitDialogFragment dialogFragment = new AttendeeLimitDialogFragment();
+        dialogFragment.show(getChildFragmentManager(), "attendee_limit_dialog");
+    }
+
 
 }
