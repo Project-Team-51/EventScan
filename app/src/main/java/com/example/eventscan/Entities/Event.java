@@ -132,6 +132,10 @@ public class Event implements Serializable {
         }
     }
 
+    public void removeInterestedAttendee(Attendee attendee){
+        this.interestedAttendees.remove(attendee);
+    }
+
     public ArrayList<Attendee> getInterestedAttendees(){
         return this.interestedAttendees;
     }
