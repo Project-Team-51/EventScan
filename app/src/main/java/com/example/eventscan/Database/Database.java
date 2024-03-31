@@ -17,8 +17,11 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,12 +46,12 @@ public class Database {
     protected CollectionReference attendeeCollection;
     protected CollectionReference eventsCollection;
     protected CollectionReference qrLinkCollection;
-    private final String storageRootFolder = "prod";
-    private final String postersStoragePath = "posters";
+    protected StorageReference posterStorageCollection;
 
     public AttendeeOperations attendees;
     public EventOperations events;
     public QRCodeOperations qr_codes;
+    public PosterOperations posters;
 
 
     private static final Database instance = new Database();
@@ -66,6 +69,9 @@ public class Database {
                 .collection("prod")
                 .document("qr_links")
                 .collection("qr_links");
+        posterStorageCollection = FirebaseStorage.getInstance().getReference()
+                        .child("prod")
+                        .child("posters");
         setupChildren();
     }
 
@@ -75,6 +81,7 @@ public class Database {
     protected void setupChildren(){
         this.attendees = new AttendeeOperations(this);
         this.events = new EventOperations(this);
+        this.posters = new PosterOperations(this);
     }
     public static Database getInstance(){
         return instance;
@@ -96,6 +103,9 @@ public class Database {
             return attendeeCollection
                     .document(attendeeID).get()
                     .continueWith(task -> {
+                        if(!task.isSuccessful()) {
+                            throw new Exception("attendee "+attendeeID+" does not exist or connection to firebase failed");
+                        }
                         DocumentSnapshot documentSnapshot = task.getResult();
                         if(!documentSnapshot.exists()){
                             throw new Exception("Attendee "+attendeeID+" is not in the firebase, was it written?");
@@ -150,6 +160,34 @@ public class Database {
          */
         public Task<ArrayList<Event>> getCheckedInEvents(Attendee attendee){
             throw new NotImplementedError(); // TODO delete if not needed
+        }
+
+        /**
+         * Create a unique ID for an attendee
+         * @return a unique Attendee ID
+         */
+        public Task<String> generateUniqueUserId() {
+            String randomID = ((Integer)((int)(Math.random()*10000000))).toString();
+            return attendeeCollection.document(randomID)
+                    .get()
+                    .continueWithTask(task -> {
+                        if(task.isSuccessful()) {
+                            if(!task.getResult().exists()){
+                                // nothing exists with this, we're good :)
+                                // make a blank document here to reserve it, and return the number
+                                Attendee blankAttendee = new Attendee();
+                                blankAttendee.setDeviceID(randomID);
+                                return owner.attendees.set(blankAttendee).continueWith(task1 -> {
+                                    return randomID;
+                                });
+                            } else {
+                                // exists, try again
+                                return generateUniqueUserId();
+                            }
+                        } else {
+                            return Tasks.forException(getTaskException(task));
+                        }
+                    });
         }
     }
 
@@ -305,20 +343,30 @@ public class Database {
 
     }
 
-    private class posters{
-        //TODO better references, owner class
-        FileDownloadTask get(String posterID, Uri destinationURI){
-            return FirebaseStorage.getInstance().getReference()
-                    .child(storageRootFolder)
-                    .child(postersStoragePath)
-                    .child(posterID)
-                    .getFile(destinationURI);
+    public class PosterOperations{
+        private Database owner;
 
+        private PosterOperations(Database owner){
+            this.owner = owner;
+        }
+        Task<File> get(String posterID) throws IOException {
+            File downloadDestination = File.createTempFile(posterID,"posterTemp");
+            return owner.posterStorageCollection
+                    .child(posterID)
+                    .getFile(downloadDestination)
+                    .continueWith(task -> {
+                        if(task.isSuccessful()) {
+                            return downloadDestination;
+                        } else {
+                            if(task.getException() == null){
+                                throw new Exception("Unknown Error occurred");
+                            }
+                            throw task.getException();
+                        }
+                    });
         }
         UploadTask set(String posterID, Uri posterUri){
-            return FirebaseStorage.getInstance().getReference()
-                    .child(storageRootFolder)
-                    .child(postersStoragePath)
+            return owner.posterStorageCollection
                     .child(posterID)
                     .putFile(posterUri);
         }
@@ -373,6 +421,33 @@ public class Database {
             return qrLinkCollection
                     .document(decoded_qr_data)
                     .delete();
+        }
+
+        /**
+         * Create a unique <b>decoded</b> QR data string, for writing a link
+         * @return a unique string for the decoded QR data
+         */
+        public Task<String> generateUniqueQrID(){
+            String randomID = ((Integer)((int)(Math.random()*10000000))).toString();
+            return qrLinkCollection.document(randomID)
+                    .get()
+                    .continueWithTask(task -> {
+                        if(task.isSuccessful()) {
+                            if(!task.getResult().exists()){
+                                // doesn't exist, we can use this
+                                // reserve just in case someone else does this at the same time
+                                return owner.qr_codes.set(randomID, null, -1)
+                                        .continueWith(task1 -> {
+                                            return randomID;
+                                        });
+                            } else {
+                                // already exists, try again
+                                return generateUniqueQrID();
+                            }
+                        } else {
+                            return Tasks.forException(getTaskException(task));
+                        }
+                    });
         }
     }
 

@@ -7,6 +7,7 @@ import com.example.eventscan.Entities.Organizer;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -33,6 +34,9 @@ public class DatabaseTest extends Database {
                 .collection("test")
                 .document("qr_links")
                 .collection("qr_links");
+        posterStorageCollection = FirebaseStorage.getInstance().getReference()
+                .child("test")
+                .child("posters");
         setupChildren();
     }
 
