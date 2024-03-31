@@ -260,6 +260,30 @@ public class Database {
                     .update("interestedAttendeeIDs", FieldValue.arrayRemove(attendee.getDeviceID()));
         }
 
+        public Task<String> generateUniqueUserId() {
+            String randomID = ((Integer)((int)(Math.random()*10000000))).toString();
+            return attendeeCollection.document(randomID)
+                    .get()
+                    .continueWithTask(task -> {
+                        if(task.isSuccessful()) {
+                            if(!task.getResult().exists()){
+                                // nothing exists with this, we're good :)
+                                // make a blank document here to reserve it, and return the number
+                                Attendee blankAttendee = new Attendee();
+                                blankAttendee.setDeviceID(randomID);
+                                return owner.attendees.set(blankAttendee).continueWith(task1 -> {
+                                    return randomID;
+                                });
+                            } else {
+                                // exists, try again
+                                return generateUniqueUserId();
+                            }
+                        } else {
+                            return Tasks.forException(getTaskException(task));
+                        }
+                    })
+        }
+
         /**
          * create an event on the database, with a guarantee that it has a unique ID
          * <p>
