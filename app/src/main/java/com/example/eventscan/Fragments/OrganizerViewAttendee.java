@@ -1,25 +1,20 @@
 package com.example.eventscan.Fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class OrganizerViewAttendee extends Fragment {
 
@@ -52,7 +47,7 @@ public class OrganizerViewAttendee extends Fragment {
                 // Query database to retrieve attendees for the specified event ID
                 db.collection("events").document(eventId).get().addOnSuccessListener(documentSnapshot -> {
                     Event e = documentSnapshot.toObject(Event.class);
-                    for(Attendee attendee : e.getAttendees()){
+                    for(Attendee attendee : e.getCheckedInAttendeesList()){
                         attendeesList.add(attendee.getName());
                     }
                     attendeesAdapter.notifyDataSetChanged();

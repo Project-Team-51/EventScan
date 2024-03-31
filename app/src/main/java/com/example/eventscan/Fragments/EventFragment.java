@@ -1,8 +1,6 @@
 package com.example.eventscan.Fragments;
 
 
-import static android.content.ContentValues.TAG;
-
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -11,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import android.widget.TextView;
@@ -20,8 +17,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.example.eventscan.Database.Database;
-import com.example.eventscan.Entities.Administrator;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 
@@ -42,7 +37,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-import java.util.List;
 /*
  * A fragment subclass that handles the displaying of events in two listviews. As of writing, it displays both attending classes
  * and owned classes as the same thing, which is all the events on the firestore. Clicking on an item in the ownedEvents list
@@ -216,7 +210,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                         if(task.isSuccessful()) {
                             Event event = document.toObject(Event.class);
                             // arraylist of type attendee
-                            ArrayList<Attendee> attendeesList = event.getAttendees();
+                            ArrayList<Attendee> attendeesList = event.getCheckedInAttendeesList();
                         } else {
                             Log.d("NAMEPOP", "Error getting documents: ", task.getException());
                         }

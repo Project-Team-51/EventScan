@@ -117,7 +117,7 @@ public class QRAnalyzer{
                             //TODO set the poster
 
                             // set the onclick of the button to sign you up
-                            if(event.getAttendees().contains(selfAttendee)){
+                            if(event.getCheckedInAttendeesList().contains(selfAttendee)){
                                 ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setText("You've Already signed up");
                             } else {
                                 ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setOnClickListener(v -> {
@@ -132,7 +132,7 @@ public class QRAnalyzer{
                                     if(selfAttendee == null){
                                         throw new RuntimeException("Attendee fetch failed :( This will be gracefully handled in the future");
                                     }
-                                    event.addAttendee(selfAttendee);
+                                    event.checkInAttendee(selfAttendee);
                                     // ↓ absolutely egregious, we need to change this as soon as possible
                                     db.collection("events").document(eventID).set(event);
                                     eventSignIn.cancel();

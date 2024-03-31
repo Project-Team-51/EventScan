@@ -1,6 +1,7 @@
 package com.example.eventscan.Database;
 
 import android.net.Uri;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
@@ -11,6 +12,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FileDownloadTask;
@@ -18,6 +20,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import kotlin.NotImplementedError;
 
 /**
  * Helper class for easily pulling/pushing data from/to the database
@@ -91,6 +97,9 @@ public class Database {
                     .document(attendeeID).get()
                     .continueWith(task -> {
                         DocumentSnapshot documentSnapshot = task.getResult();
+                        if(!documentSnapshot.exists()){
+                            throw new Exception("Attendee "+attendeeID+" is not in the firebase, was it written?");
+                        }
                         if(documentSnapshot.get("type") == null){
                             throw new Exception("Malformed attendee in firebase: " +attendeeID);
                         }
@@ -122,6 +131,26 @@ public class Database {
                     .document(attendee.getDeviceID())
                     .delete();
         }
+
+        /**
+         * <b>Not yet implemented, but will be</b>
+         * Get the list of events that this attendee is interested in
+         * @param attendee the attendee to search for
+         * @return the list of events that `attendee` is interested in
+         */
+        public Task<ArrayList<Event>> getInterestedEvents(Attendee attendee){
+            throw new NotImplementedError();
+        }
+
+        /**
+         * <b>May not be implemented in the future, let me know if you need this function</b>
+         * Get the list of events that this attendee has checked into
+         * @param attendee the attendee to search for
+         * @return the list of events that `attendee` has checked into
+         */
+        public Task<ArrayList<Event>> getCheckedInEvents(Attendee attendee){
+            throw new NotImplementedError(); // TODO delete if not needed
+        }
     }
 
     public class EventOperations {
@@ -132,16 +161,10 @@ public class Database {
         /**
          * get an Event object from the database
          * @param eventID ID of the event
-         * @param fetchAttendees if set to false, the Event's attendees will all be null
-         *                       this can save some query time if you know you know you don't need them
-         * @param fetchOrganizer if set to false, the Event's organizer will be null
-         *                       this can save some query time if you know you don't need it
-         * @param fetchPoster if set to false, the Event's poster will be null
-         *                    this can save some query time if you know you don't need it
-         * @return a Task\<Event\> object that will resolve to an Event later (or an error)
+         * @return a Task object that will resolve to an Event later (or an error)
          */
         @NonNull
-        public Task<Event> get(String eventID, boolean fetchAttendees, boolean fetchOrganizer, boolean fetchPoster){
+        public Task<Event> get(String eventID){
             // 2024-MR-20 OpenAI ChatGPT
             // I am writing java android and have a function that returns a firebase Task<Event> where event is a custom class. There is an EventDatabaseRepresentation stored in firebase, which contains a list of attendee IDs, the function needs to return a task that will fetch all of the attendees and only resolve when all of the sub-tasks are done, how is this possible?
             // -> provided information about tasks.whenAllComplete()
@@ -150,10 +173,7 @@ public class Database {
             // implementation written by me
             return eventsCollection.document(eventID).get().continueWithTask(task -> {
                 if(!task.isSuccessful()){
-                    if(task.getException() == null){
-                        return Tasks.forException(new Exception("Unknown Error occurred"));
-                    }
-                    return Tasks.forException(task.getException());
+                    return Tasks.forException(getTaskException(task));
                 }
                 ArrayList<Task<?>> tasks = new ArrayList<>();
                 EventDatabaseRepresentation eventDatabaseRepresentation = task.getResult().toObject(EventDatabaseRepresentation.class);
@@ -161,13 +181,21 @@ public class Database {
                     throw new Exception("Unknown error occured when fetching event "+eventID);
                 }
                 Event event = eventDatabaseRepresentation.convertToBarebonesEvent();
-                // attendees get added
-                for(String attendeeID:eventDatabaseRepresentation.getAttendeeIDs()){
+                // Interested attendees get added
+                for(String attendeeID : eventDatabaseRepresentation.getInterestedAttendeeIDs()){
                     tasks.add(owner.attendees.get(attendeeID).addOnCompleteListener(task1 -> {
-                                event.addAttendee(task1.getResult());
+                                event.addInterestedAttendee(task1.getResult());
                             })
-
                     );
+                }
+                // Checked-in attendees get added
+                for(Map.Entry<String, Integer> entry: eventDatabaseRepresentation.getCheckedInAttendeeIDs().entrySet()){
+                    tasks.add(owner.attendees.get(entry.getKey()).addOnCompleteListener(task1 -> {
+                        event.setAttendeeCheckInCount(
+                                task1.getResult(),
+                                entry.getValue()
+                        );
+                    }));
                 }
                 // organizer gets added
                 tasks.add(owner.attendees.get(eventDatabaseRepresentation.getOrganizerID())
@@ -181,15 +209,6 @@ public class Database {
                 });
             });
         }
-        /**
-         * get an Event object from the database
-         * @param eventID ID of the event
-         * @return a Task\<Event\> object, call getResult() on it to get the Event or an error
-         */
-        @NonNull
-        public Task<Event> get(String eventID){
-            return get(eventID, true, true, true);
-        }
 
 
         /**
@@ -199,10 +218,10 @@ public class Database {
          * @return a task that will be resolved when the adding finishes
          */
         @NonNull
-        public Task<Void> addAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+        public Task<Void> checkInAttendee(@NonNull Event event, @NonNull Attendee attendee) {
             return eventsCollection
                     .document(event.getEventID())
-                    .update("attendeeIDs", FieldValue.arrayUnion(attendee.getDeviceID()));
+                    .update(FieldPath.of("checkedInAttendeeIDs",attendee.getDeviceID()),FieldValue.increment(1));
         }
 
         /**
@@ -212,10 +231,23 @@ public class Database {
          * @return a task that will be resolved when the DB actions finish
          */
         @NonNull
-        public Task<Void> removeAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+        public Task<Void> removeCheckedInAttendee(@NonNull Event event, @NonNull Attendee attendee) {
             return eventsCollection
                     .document(event.getEventID())
-                    .update("attendeeIDs", FieldValue.arrayRemove(attendee.getDeviceID()));
+                    .update(FieldPath.of("checkedInAttendeeIDs", attendee.getDeviceID()), FieldValue.delete());
+        }
+
+        @NonNull
+        public Task<Void> addInterestedAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+            return eventsCollection
+                    .document(event.getEventID())
+                    .update("interestedAttendeeIDs", FieldValue.arrayUnion(attendee.getDeviceID()));
+        }
+
+        public Task<Void> removeInterestedAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+            return eventsCollection
+                    .document(event.getEventID())
+                    .update("interestedAttendeeIDs", FieldValue.arrayRemove(attendee.getDeviceID()));
         }
 
         /**
@@ -255,11 +287,7 @@ public class Database {
                                 return create(event); // recurse with new ID
                             }
                         } else {
-                            Exception taskException = task.getException();
-                            if(taskException != null){
-                                throw taskException;
-                            }
-                            throw new Exception("Unknown Error Occurred");
+                            return Tasks.forException(getTaskException(task));
                         }
                     });
         }
@@ -348,5 +376,8 @@ public class Database {
         }
     }
 
+    private Exception getTaskException(Task<?> task){
+        return (task.getException() != null) ? task.getException() : new Exception("Unknown Error Occurred");
+    }
 
 }
