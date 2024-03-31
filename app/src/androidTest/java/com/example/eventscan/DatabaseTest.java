@@ -144,7 +144,9 @@ public class DatabaseTest extends Database {
         assertEquals(returnedEvent, event1Modified);
     }
 
-    @Test public void event_add_remove_attendee() throws ExecutionException, InterruptedException {
+    @Test
+    public void event_check_in_remove_attendee() throws ExecutionException, InterruptedException {
+        // create dummy data
         Database db = DatabaseTest.getInstance();
         String eventIDTest = "9876543210";
         Organizer organizer1 = new Organizer();
@@ -166,16 +168,27 @@ public class DatabaseTest extends Database {
         attendee.setName("Event added test Attendee");
         attendee.setBio("event added test bio");
         attendee.setDeviceID("5910293");
+        // write it to the database
         Task<Event> potentiallyUpdatedEvent = db.events.create(event1);
         Tasks.await(potentiallyUpdatedEvent);
+        // check-in the attendee
         Task<Void> addAttendeeTask = db.events.checkInAttendee(event1, attendee);
         Tasks.await(addAttendeeTask);
+        // get the new event
         Task<Event> updatedEventTask = db.events.get(event1.getEventID());
         Tasks.await(updatedEventTask);
         Event updatedEvent = updatedEventTask.getResult();
-        // now add it locally
+        // check it in locally too, and verify they're equal
         event1.checkInAttendee(attendee);
         assertEquals(event1, updatedEvent);
+        // check them in a second time and verify they're equal
+        Tasks.await(db.events.checkInAttendee(event1, attendee));
+        event1.checkInAttendee(attendee);
+        Task<Event> updatedEventTask2 = db.events.get(event1.getEventID());
+        Tasks.await(updatedEventTask2);
+        assertEquals(updatedEventTask2.getResult(), event1);
+
+        // now remove them and verify as well
         Task<Void> removeAttendeeTask = db.events.removeCheckedInAttendee(event1, attendee);
         event1.removeCheckedInAttendee(attendee);
         Tasks.await(removeAttendeeTask);
