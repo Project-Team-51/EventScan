@@ -12,6 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+/**
+ * Helper class for managing location updates.
+ */
 public class GeolocationHandler {
 
     private static boolean locationUpdatesEnabled = false;
@@ -19,6 +22,10 @@ public class GeolocationHandler {
     private static LocationListener locationListener;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
 
+    /**
+     * Enables location updates if permissions are granted, otherwise requests permissions.
+     * @param context The context from which this method is called.
+     */
     public static void enableLocationUpdates(Context context) {
         // Initialize location manager and listener if not already initialized
         if (locationManager == null) {
@@ -27,7 +34,7 @@ public class GeolocationHandler {
         }
 
         // Check for location permissions
-        if (checkLocationPermissions(context)) {
+        if (checkLocationPermissions(context) && !locationUpdatesEnabled) {
             // Location permissions granted, enable updates
             toggleLocationUpdates();
         } else {
@@ -36,6 +43,9 @@ public class GeolocationHandler {
         }
     }
 
+    /**
+     * Disables location updates.
+     */
     public static void disableLocationUpdates() {
         if (locationManager != null && locationListener != null) {
             // Stop location updates
@@ -45,6 +55,11 @@ public class GeolocationHandler {
         }
     }
 
+    /**
+     * Checks if location permissions are granted.
+     * @param context The context from which this method is called.
+     * @return True if permissions are granted, false otherwise.
+     */
     private static boolean checkLocationPermissions(Context context) {
         // Check if location permissions are granted
         return ContextCompat.checkSelfPermission(context,
@@ -53,6 +68,10 @@ public class GeolocationHandler {
                 Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * Requests location permissions.
+     * @param activity The activity from which this method is called.
+     */
     private static void requestLocationPermissions(Activity activity) {
         // Request location permissions
         ActivityCompat.requestPermissions(activity,
@@ -61,6 +80,9 @@ public class GeolocationHandler {
                 LOCATION_PERMISSION_REQUEST_CODE);
     }
 
+    /**
+     * Toggles location updates based on current state.
+     */
     private static void toggleLocationUpdates() {
         if (locationUpdatesEnabled) {
             // Stop location updates
@@ -88,6 +110,10 @@ public class GeolocationHandler {
         }
     }
 
+    /**
+     * Creates a location listener for handling location updates.
+     * @return The created location listener.
+     */
     private static LocationListener createLocationListener() {
         return new LocationListener() {
             @Override
@@ -107,4 +133,3 @@ public class GeolocationHandler {
         };
     }
 }
-
