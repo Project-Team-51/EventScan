@@ -8,7 +8,7 @@ import com.example.eventscan.Entities.Event;
 public class QRDatabaseEventLink {
 
     /**QRs using this will direct the user to the "sign into event" page*/
-    public static final int DIRECT_SIGN_IN = 0;
+    public static final int DIRECT_CHECK_IN = 0;
 
 
     /**QRs using this will direct the user to the "see event details (and possibly add to the 'want to go' list)" page*/
