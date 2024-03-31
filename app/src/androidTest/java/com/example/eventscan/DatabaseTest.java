@@ -163,7 +163,7 @@ public class DatabaseTest extends Database {
                 null, // TODO add to test once functionality is done
                 eventIDTest
         );
-        db.attendees.set(organizer1);
+        Tasks.await(db.attendees.set(organizer1));
         Attendee attendee = new Attendee();
         attendee.setName("Event added test Attendee");
         attendee.setBio("event added test bio");
@@ -171,30 +171,79 @@ public class DatabaseTest extends Database {
         // write it to the database
         Task<Event> potentiallyUpdatedEvent = db.events.create(event1);
         Tasks.await(potentiallyUpdatedEvent);
+        event1 = potentiallyUpdatedEvent.getResult();
         // check-in the attendee
         Task<Void> addAttendeeTask = db.events.checkInAttendee(event1, attendee);
         Tasks.await(addAttendeeTask);
         // get the new event
-        Task<Event> updatedEventTask = db.events.get(event1.getEventID());
-        Tasks.await(updatedEventTask);
-        Event updatedEvent = updatedEventTask.getResult();
+        Task<Event> updatedEventSingleCheckIn = db.events.get(event1.getEventID());
+        Tasks.await(updatedEventSingleCheckIn);
         // check it in locally too, and verify they're equal
         event1.checkInAttendee(attendee);
-        assertEquals(event1, updatedEvent);
-        // check them in a second time and verify they're equal
+        assertEquals(event1, updatedEventSingleCheckIn.getResult());
+        // "check in" a second time and verify they're equal
         Tasks.await(db.events.checkInAttendee(event1, attendee));
         event1.checkInAttendee(attendee);
-        Task<Event> updatedEventTask2 = db.events.get(event1.getEventID());
-        Tasks.await(updatedEventTask2);
-        assertEquals(updatedEventTask2.getResult(), event1);
+        Task<Event> updatedEventDoubleCheckIn = db.events.get(event1.getEventID());
+        Tasks.await(updatedEventDoubleCheckIn);
+        assertEquals(updatedEventDoubleCheckIn.getResult(), event1);
+        assertNotEquals(event1, updatedEventSingleCheckIn.getResult());
 
-        // now remove them and verify as well
+        // now remove them and verify as well (also make sure they're unequal to the ones that have the attendee)
         Task<Void> removeAttendeeTask = db.events.removeCheckedInAttendee(event1, attendee);
         event1.removeCheckedInAttendee(attendee);
         Tasks.await(removeAttendeeTask);
-        Task<Event> getUpdatedEvent2Task = db.events.get(event1.getEventID());
-        Tasks.await(getUpdatedEvent2Task);
-        assertEquals(getUpdatedEvent2Task.getResult(), event1);
+        Task<Event> updatedEventDeletedCheckIns = db.events.get(event1.getEventID());
+        Tasks.await(updatedEventDeletedCheckIns);
+        assertEquals(updatedEventDeletedCheckIns.getResult(), event1);
+        // (make sure they're unequal to the ones that have the attendees)
+        assertNotEquals(event1, updatedEventDoubleCheckIn.getResult());
+    }
+
+    @Test
+    public void event_add_remove_interested_attendee() throws ExecutionException, InterruptedException {
+        // create dummy data
+        Database db = DatabaseTest.getInstance();
+        String eventIDTest = "207894213";
+        Organizer organizer1 = new Organizer();
+        organizer1.setDeviceID("12908ash98e2");
+        organizer1.setPhoneNum("1029384");
+        organizer1.setEmail("interested_test@abc.com");
+        organizer1.setName("Interested Test Organizer");
+        organizer1.setBio("Test Bio");
+        organizer1.setProfilePictureID("123");
+        Event event1 = new Event(
+                "Test Eventfor Interested Attendee",
+                "Test Description",
+                organizer1,
+                null, // TODO add to test once functionality is done
+                eventIDTest
+        );
+        Tasks.await(db.attendees.set(organizer1));
+        Attendee attendee = new Attendee();
+        attendee.setName("Interested Test Attendee");
+        attendee.setBio("Interested Test bio");
+        attendee.setDeviceID("12309865");
+        // add it to the DB
+        Task<Event> potentiallyUpdatedEvent = db.events.create(event1);
+        Tasks.await(potentiallyUpdatedEvent);
+        event1 = potentiallyUpdatedEvent.getResult();
+        Tasks.await(db.attendees.set(attendee));
+        // now add an interested attendee both here and there
+        event1.addInterestedAttendee(attendee);
+        Task<Void> addInterestedAttendeeTask = db.events.addInterestedAttendee(event1, attendee);
+        Tasks.await(addInterestedAttendeeTask);
+        Task<Event> addedInterestEventTask = db.events.get(event1.getEventID());
+        Tasks.await(addedInterestEventTask);
+        assertEquals(addedInterestEventTask.getResult(), event1);
+        // now remove and make sure they both are equal too (and unequal to the added ones)
+        event1.removeInterestedAttendee(attendee);
+        Tasks.await(db.events.removeInterestedAttendee(event1, attendee));
+        Task<Event> removeInterestEventTask = db.events.get(event1.getEventID());
+        Tasks.await(removeInterestEventTask);
+        assertEquals(removeInterestEventTask.getResult(), event1);
+        assertNotEquals(addedInterestEventTask.getResult(), event1);
+
     }
 
 }

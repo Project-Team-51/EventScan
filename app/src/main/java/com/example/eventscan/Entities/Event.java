@@ -185,7 +185,7 @@ public class Event implements Serializable {
         return Objects.equals(getLocation(), event.getLocation())
                 && Objects.equals(getDesc(), event.getDesc())
                 && Objects.equals(getName(), event.getName())
-                && Objects.equals(getCheckedInAttendeesList(), event.getCheckedInAttendeesList())
+                && Objects.equals(getCheckedInAttendees(), event.getCheckedInAttendees())
                 && Objects.equals(getOrganizer(), event.getOrganizer())
                 && Objects.equals(getPoster(), event.getPoster())
                 && Objects.equals(getEventID(), event.getEventID())

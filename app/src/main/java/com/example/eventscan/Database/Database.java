@@ -1,6 +1,7 @@
 package com.example.eventscan.Database;
 
 import android.net.Uri;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
@@ -94,6 +95,9 @@ public class Database {
                     .document(attendeeID).get()
                     .continueWith(task -> {
                         DocumentSnapshot documentSnapshot = task.getResult();
+                        if(!documentSnapshot.exists()){
+                            throw new Exception("Attendee "+attendeeID+" is not in the firebase, was it written?");
+                        }
                         if(documentSnapshot.get("type") == null){
                             throw new Exception("Malformed attendee in firebase: " +attendeeID);
                         }
@@ -209,6 +213,19 @@ public class Database {
             return eventsCollection
                     .document(event.getEventID())
                     .update(FieldPath.of("checkedInAttendeeIDs", attendee.getDeviceID()), FieldValue.delete());
+        }
+
+        @NonNull
+        public Task<Void> addInterestedAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+            return eventsCollection
+                    .document(event.getEventID())
+                    .update("interestedAttendeeIDs", FieldValue.arrayUnion(attendee.getDeviceID()));
+        }
+
+        public Task<Void> removeInterestedAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+            return eventsCollection
+                    .document(event.getEventID())
+                    .update("interestedAttendeeIDs", FieldValue.arrayRemove(attendee.getDeviceID()));
         }
 
         /**
