@@ -161,6 +161,34 @@ public class Database {
         public Task<ArrayList<Event>> getCheckedInEvents(Attendee attendee){
             throw new NotImplementedError(); // TODO delete if not needed
         }
+
+        /**
+         * Create a unique ID for an attendee
+         * @return a unique Attendee ID
+         */
+        public Task<String> generateUniqueUserId() {
+            String randomID = ((Integer)((int)(Math.random()*10000000))).toString();
+            return attendeeCollection.document(randomID)
+                    .get()
+                    .continueWithTask(task -> {
+                        if(task.isSuccessful()) {
+                            if(!task.getResult().exists()){
+                                // nothing exists with this, we're good :)
+                                // make a blank document here to reserve it, and return the number
+                                Attendee blankAttendee = new Attendee();
+                                blankAttendee.setDeviceID(randomID);
+                                return owner.attendees.set(blankAttendee).continueWith(task1 -> {
+                                    return randomID;
+                                });
+                            } else {
+                                // exists, try again
+                                return generateUniqueUserId();
+                            }
+                        } else {
+                            return Tasks.forException(getTaskException(task));
+                        }
+                    });
+        }
     }
 
     public class EventOperations {
@@ -258,30 +286,6 @@ public class Database {
             return eventsCollection
                     .document(event.getEventID())
                     .update("interestedAttendeeIDs", FieldValue.arrayRemove(attendee.getDeviceID()));
-        }
-
-        public Task<String> generateUniqueUserId() {
-            String randomID = ((Integer)((int)(Math.random()*10000000))).toString();
-            return attendeeCollection.document(randomID)
-                    .get()
-                    .continueWithTask(task -> {
-                        if(task.isSuccessful()) {
-                            if(!task.getResult().exists()){
-                                // nothing exists with this, we're good :)
-                                // make a blank document here to reserve it, and return the number
-                                Attendee blankAttendee = new Attendee();
-                                blankAttendee.setDeviceID(randomID);
-                                return owner.attendees.set(blankAttendee).continueWith(task1 -> {
-                                    return randomID;
-                                });
-                            } else {
-                                // exists, try again
-                                return generateUniqueUserId();
-                            }
-                        } else {
-                            return Tasks.forException(getTaskException(task));
-                        }
-                    });
         }
 
         /**
