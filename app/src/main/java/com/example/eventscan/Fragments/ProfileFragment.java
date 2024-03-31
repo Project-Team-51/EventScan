@@ -3,6 +3,7 @@ package com.example.eventscan.Fragments;
 import static android.content.ContentValues.TAG;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -60,7 +61,6 @@ public class ProfileFragment extends Fragment {
     Button saveProfileBtn;
     Button deleteProfilePicBtn;
     ToggleButton locationToggle;
-    GeolocationHandler geolocationHandler;
     ActivityResultLauncher<Intent> imagePickLauncher;
     Uri selectedImageUri;
     public String deviceID;
@@ -109,7 +109,6 @@ public class ProfileFragment extends Fragment {
         saveProfileBtn = view.findViewById(R.id.saveButton);
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
         locationToggle = view.findViewById(R.id.locationToggle);
-        geolocationHandler = new GeolocationHandler(getContext());
 
         deleteProfilePicBtn.setVisibility(isProfilePictureUploaded() ? View.VISIBLE : View.GONE);
 
@@ -163,15 +162,16 @@ public class ProfileFragment extends Fragment {
 
         // Geolocation Handling
         locationToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
             @Override
+
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    // User enabled location services
-                    geolocationHandler.enableLocationUpdates();
+                    GeolocationHandler.enableLocationUpdates(getContext());
 
                 } else {
                     // User disabled location services
-                    geolocationHandler.disableLocationUpdates();
+                    GeolocationHandler.disableLocationUpdates();
                 }
             }
         });
