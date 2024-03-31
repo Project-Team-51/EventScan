@@ -422,6 +422,33 @@ public class Database {
                     .document(decoded_qr_data)
                     .delete();
         }
+
+        /**
+         * Create a unique <b>decoded</b> QR data string, for writing a link
+         * @return a unique string for the decoded QR data
+         */
+        public Task<String> generateUniqueQrID(){
+            String randomID = ((Integer)((int)(Math.random()*10000000))).toString();
+            return qrLinkCollection.document(randomID)
+                    .get()
+                    .continueWithTask(task -> {
+                        if(task.isSuccessful()) {
+                            if(!task.getResult().exists()){
+                                // doesn't exist, we can use this
+                                // reserve just in case someone else does this at the same time
+                                return owner.qr_codes.set(randomID, null, -1)
+                                        .continueWith(task1 -> {
+                                            return randomID;
+                                        });
+                            } else {
+                                // already exists, try again
+                                return generateUniqueQrID();
+                            }
+                        } else {
+                            return Tasks.forException(getTaskException(task));
+                        }
+                    });
+        }
     }
 
     private Exception getTaskException(Task<?> task){
