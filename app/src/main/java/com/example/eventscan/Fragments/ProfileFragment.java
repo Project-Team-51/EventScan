@@ -20,12 +20,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.eventscan.Entities.Attendee;
+import com.example.eventscan.Helpers.GeolocationHandler;
 import com.example.eventscan.Helpers.ImageUploader;
 import com.example.eventscan.R;
 import com.github.dhaval2404.imagepicker.ImagePicker;
@@ -36,6 +38,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import android.provider.Settings.Secure;
+import android.widget.ToggleButton;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
@@ -56,6 +59,8 @@ public class ProfileFragment extends Fragment {
     EditText bioInput;
     Button saveProfileBtn;
     Button deleteProfilePicBtn;
+    ToggleButton locationToggle;
+    GeolocationHandler geolocationHandler;
     ActivityResultLauncher<Intent> imagePickLauncher;
     Uri selectedImageUri;
     public String deviceID;
@@ -103,6 +108,8 @@ public class ProfileFragment extends Fragment {
         bioInput = view.findViewById(R.id.homepageEditText);
         saveProfileBtn = view.findViewById(R.id.saveButton);
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
+        locationToggle = view.findViewById(R.id.locationToggle);
+        geolocationHandler = new GeolocationHandler(getContext());
 
         deleteProfilePicBtn.setVisibility(isProfilePictureUploaded() ? View.VISIBLE : View.GONE);
 
@@ -151,6 +158,21 @@ public class ProfileFragment extends Fragment {
             public void onClick(View view) {
                 // Calls a method to delete the profile picture
                 deleteProfilePicture();
+            }
+        });
+
+        // Geolocation Handling
+        locationToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // User enabled location services
+                    geolocationHandler.enableLocationUpdates();
+
+                } else {
+                    // User disabled location services
+                    geolocationHandler.disableLocationUpdates();
+                }
             }
         });
 
