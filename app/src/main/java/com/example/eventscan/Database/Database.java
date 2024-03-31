@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import kotlin.NotImplementedError;
+
 /**
  * Helper class for easily pulling/pushing data from/to the database
  * call the getter functions as early as possible,
@@ -128,6 +130,26 @@ public class Database {
             return attendeeCollection
                     .document(attendee.getDeviceID())
                     .delete();
+        }
+
+        /**
+         * <b>Not yet implemented, but will be</b>
+         * Get the list of events that this attendee is interested in
+         * @param attendee the attendee to search for
+         * @return the list of events that `attendee` is interested in
+         */
+        public Task<ArrayList<Event>> getInterestedEvents(Attendee attendee){
+            throw new NotImplementedError();
+        }
+
+        /**
+         * <b>May not be implemented in the future, let me know if you need this function</b>
+         * Get the list of events that this attendee has checked into
+         * @param attendee the attendee to search for
+         * @return the list of events that `attendee` has checked into
+         */
+        public Task<ArrayList<Event>> getCheckedInEvents(Attendee attendee){
+            throw new NotImplementedError(); // TODO delete if not needed
         }
     }
 
