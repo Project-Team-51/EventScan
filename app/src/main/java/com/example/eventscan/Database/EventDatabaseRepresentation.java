@@ -6,6 +6,8 @@ import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The representation of an Event inside the database
@@ -16,7 +18,8 @@ public class EventDatabaseRepresentation {
     private Location location;
     private String desc;
     private String name;
-    private ArrayList<String> attendeeIDs;
+    private HashMap<String, Integer> checkedInAttendeeIDs;
+    private ArrayList<String> interestedAttendeeIDs;
     private String organizerID;
     private String posterID; // TODO make this a URI instead
     private String eventID;
@@ -25,10 +28,16 @@ public class EventDatabaseRepresentation {
     public EventDatabaseRepresentation(Event event){
         location = event.getLocation();
         desc = event.getDesc();
-        attendeeIDs = new ArrayList<>();
+        interestedAttendeeIDs = new ArrayList<>();
         name = event.getName();
-        for(Attendee attendee: event.getCheckedInAttendeesList()){
-            attendeeIDs.add(attendee.getDeviceID());
+        for(Map.Entry<Attendee, Integer> entry : event.getCheckedInAttendees().entrySet()){
+            checkedInAttendeeIDs.put(
+                    entry.getKey().getDeviceID(),
+                    entry.getValue()
+            );
+        }
+        for(Attendee attendee : event.getInterestedAttendees()){
+            interestedAttendeeIDs.add(attendee.getDeviceID());
         }
         organizerID = event.getOrganizer().getDeviceID();
         posterID = event.getPoster();
@@ -37,8 +46,8 @@ public class EventDatabaseRepresentation {
     }
 
     /**
-     * converts self to a barebones event (the event contains all non-referenced data)
-     * @return
+     * converts self to a "barebones" event (the event contains all non-referenced data)
+     * @return an Event object containing only the fields that do not require additional Database fetches
      */
     Event convertToBarebonesEvent(){
         Event event = new Event();
@@ -49,8 +58,11 @@ public class EventDatabaseRepresentation {
 
         return event;
     }
-    public ArrayList<String> getAttendeeIDs() {
-        return attendeeIDs;
+    public HashMap<String, Integer> getCheckedInAttendeeIDs(){
+        return checkedInAttendeeIDs;
+    }
+    public ArrayList<String> getInterestedAttendeeIDs() {
+        return interestedAttendeeIDs;
     }
     public String getName(){
         return name;

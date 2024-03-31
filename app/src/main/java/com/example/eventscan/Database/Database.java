@@ -18,6 +18,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Helper class for easily pulling/pushing data from/to the database
@@ -132,16 +133,10 @@ public class Database {
         /**
          * get an Event object from the database
          * @param eventID ID of the event
-         * @param fetchAttendees if set to false, the Event's attendees will all be null
-         *                       this can save some query time if you know you know you don't need them
-         * @param fetchOrganizer if set to false, the Event's organizer will be null
-         *                       this can save some query time if you know you don't need it
-         * @param fetchPoster if set to false, the Event's poster will be null
-         *                    this can save some query time if you know you don't need it
-         * @return a Task\<Event\> object that will resolve to an Event later (or an error)
+         * @return a Task object that will resolve to an Event later (or an error)
          */
         @NonNull
-        public Task<Event> get(String eventID, boolean fetchAttendees, boolean fetchOrganizer, boolean fetchPoster){
+        public Task<Event> get(String eventID){
             // 2024-MR-20 OpenAI ChatGPT
             // I am writing java android and have a function that returns a firebase Task<Event> where event is a custom class. There is an EventDatabaseRepresentation stored in firebase, which contains a list of attendee IDs, the function needs to return a task that will fetch all of the attendees and only resolve when all of the sub-tasks are done, how is this possible?
             // -> provided information about tasks.whenAllComplete()
@@ -161,13 +156,21 @@ public class Database {
                     throw new Exception("Unknown error occured when fetching event "+eventID);
                 }
                 Event event = eventDatabaseRepresentation.convertToBarebonesEvent();
-                // attendees get added
-                for(String attendeeID:eventDatabaseRepresentation.getAttendeeIDs()){
+                // Interested attendees get added
+                for(String attendeeID : eventDatabaseRepresentation.getInterestedAttendeeIDs()){
                     tasks.add(owner.attendees.get(attendeeID).addOnCompleteListener(task1 -> {
-                                event.checkInAttendee(task1.getResult());
+                                event.addInterestedAttendee(task1.getResult());
                             })
-
                     );
+                }
+                // Checked-in attendees get added
+                for(Map.Entry<String, Integer> entry: eventDatabaseRepresentation.getCheckedInAttendeeIDs().entrySet()){
+                    tasks.add(owner.attendees.get(entry.getKey()).addOnCompleteListener(task1 -> {
+                        event.setAttendeeCheckInCount(
+                                task1.getResult(),
+                                entry.getValue()
+                        );
+                    }));
                 }
                 // organizer gets added
                 tasks.add(owner.attendees.get(eventDatabaseRepresentation.getOrganizerID())
@@ -180,15 +183,6 @@ public class Database {
                     return event;
                 });
             });
-        }
-        /**
-         * get an Event object from the database
-         * @param eventID ID of the event
-         * @return a Task\<Event\> object, call getResult() on it to get the Event or an error
-         */
-        @NonNull
-        public Task<Event> get(String eventID){
-            return get(eventID, true, true, true);
         }
 
 

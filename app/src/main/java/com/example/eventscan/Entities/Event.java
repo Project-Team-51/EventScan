@@ -90,6 +90,15 @@ public class Event implements Serializable {
     }
 
     /**
+     * specify a specific check-in count for an attendee to this event
+     * @param attendee the attendee to set the check-in count of
+     * @param checkInCount the count they should have
+     */
+    public void setAttendeeCheckInCount(Attendee attendee, int checkInCount) {
+        this.checkedInAttendees.put(attendee, checkInCount);
+    }
+
+    /**
      * remove any "check in" count this attendee may have
      * @param attendee the attendee to "erase"
      */
