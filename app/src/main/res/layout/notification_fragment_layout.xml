@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <!-- Background for whole fragment -->
+    <RelativeLayout
+        android:id="@+id/fragment_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_gradient">
+
+        <!-- First bubble container -->
+        <RelativeLayout
+            android:id="@+id/bubbleContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="125dp"
+            android:layout_marginBottom="300dp"
+            android:background="@drawable/background_rounded"
+            android:padding="15dp">
+
+            <EditText
+                android:id="@+id/event_announcement"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:gravity="top|start"
+                android:hint="Enter Announcement"
+                android:maxLines="10"
+                android:textColor="#D3E2F2"
+                android:textColorHint="#D3E2F2"
+                android:textSize="20sp"
+                android:text="" />
+
+        </RelativeLayout>
+
+        <!-- Second bubble container -->
+        <RelativeLayout
+            android:id="@+id/bubbleContainer2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="75dp"
+            android:layout_marginBottom="100dp"
+            android:background="@drawable/background_rounded"
+            android:padding="5dp">
+
+            <TextView
+                android:id="@+id/stored_event_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:gravity="center"
+                android:textColor="#D3E2F2"
+                android:textSize="20sp"
+                android:text="" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <!-- Buttons -->
+    <Button
+        android:id="@+id/cancel_noti"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fragment_background"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="-280dp"
+        android:backgroundTint="#414E6E"
+        android:text="Return" />
+
+    <Button
+        android:id="@+id/send_noti"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fragment_background"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="end"
+        android:layout_marginTop="-280dp"
+        android:layout_marginRight="30dp"
+        android:backgroundTint="#414E6E"
+        android:text="Send" />
+
+</RelativeLayout>

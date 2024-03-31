@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
             public void onClick(View v) {
                 // Load the EventFragment
                 EventFragment eventFragment = new EventFragment();
+                eventFragment.toggleEventsMode(true); // Set to Notify mode
                 loadFragment(eventFragment);
             }
         });
@@ -107,6 +108,16 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                 // Load the AttendeeFragment
                 QrScannerFragment qrscan = new QrScannerFragment();
                 loadFragment(qrscan);
+            }
+        });
+
+        buttonNotify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Load the EventFragment in Notify mode
+                EventFragment eventFragment = new EventFragment();
+                eventFragment.toggleNotifyMode(true); // Set to Notify mode
+                loadFragment(eventFragment);
             }
         });
     }
