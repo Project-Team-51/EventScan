@@ -29,6 +29,7 @@ public class EventDatabaseRepresentation {
         location = event.getLocation();
         desc = event.getDesc();
         interestedAttendeeIDs = new ArrayList<>();
+        checkedInAttendeeIDs = new HashMap<>();
         name = event.getName();
         for(Map.Entry<Attendee, Integer> entry : event.getCheckedInAttendees().entrySet()){
             checkedInAttendeeIDs.put(

@@ -168,7 +168,7 @@ public class DatabaseTest extends Database {
         attendee.setDeviceID("5910293");
         Task<Event> potentiallyUpdatedEvent = db.events.create(event1);
         Tasks.await(potentiallyUpdatedEvent);
-        Task<Void> addAttendeeTask = db.events.addAttendee(event1, attendee);
+        Task<Void> addAttendeeTask = db.events.checkInAttendee(event1, attendee);
         Tasks.await(addAttendeeTask);
         Task<Event> updatedEventTask = db.events.get(event1.getEventID());
         Tasks.await(updatedEventTask);
@@ -176,7 +176,7 @@ public class DatabaseTest extends Database {
         // now add it locally
         event1.checkInAttendee(attendee);
         assertEquals(event1, updatedEvent);
-        Task<Void> removeAttendeeTask = db.events.removeAttendee(event1, attendee);
+        Task<Void> removeAttendeeTask = db.events.removeCheckedInAttendee(event1, attendee);
         event1.removeCheckedInAttendee(attendee);
         Tasks.await(removeAttendeeTask);
         Task<Event> getUpdatedEvent2Task = db.events.get(event1.getEventID());

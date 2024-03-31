@@ -11,6 +11,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FileDownloadTask;
@@ -18,6 +19,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -145,10 +147,7 @@ public class Database {
             // implementation written by me
             return eventsCollection.document(eventID).get().continueWithTask(task -> {
                 if(!task.isSuccessful()){
-                    if(task.getException() == null){
-                        return Tasks.forException(new Exception("Unknown Error occurred"));
-                    }
-                    return Tasks.forException(task.getException());
+                    return Tasks.forException(getTaskException(task));
                 }
                 ArrayList<Task<?>> tasks = new ArrayList<>();
                 EventDatabaseRepresentation eventDatabaseRepresentation = task.getResult().toObject(EventDatabaseRepresentation.class);
@@ -193,10 +192,10 @@ public class Database {
          * @return a task that will be resolved when the adding finishes
          */
         @NonNull
-        public Task<Void> addAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+        public Task<Void> checkInAttendee(@NonNull Event event, @NonNull Attendee attendee) {
             return eventsCollection
                     .document(event.getEventID())
-                    .update("attendeeIDs", FieldValue.arrayUnion(attendee.getDeviceID()));
+                    .update(FieldPath.of("checkedInAttendeeIDs",attendee.getDeviceID()),FieldValue.increment(1));
         }
 
         /**
@@ -206,10 +205,10 @@ public class Database {
          * @return a task that will be resolved when the DB actions finish
          */
         @NonNull
-        public Task<Void> removeAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+        public Task<Void> removeCheckedInAttendee(@NonNull Event event, @NonNull Attendee attendee) {
             return eventsCollection
                     .document(event.getEventID())
-                    .update("attendeeIDs", FieldValue.arrayRemove(attendee.getDeviceID()));
+                    .update(FieldPath.of("checkedInAttendeeIDs", attendee.getDeviceID()), FieldValue.delete());
         }
 
         /**
@@ -249,11 +248,7 @@ public class Database {
                                 return create(event); // recurse with new ID
                             }
                         } else {
-                            Exception taskException = task.getException();
-                            if(taskException != null){
-                                throw taskException;
-                            }
-                            throw new Exception("Unknown Error Occurred");
+                            return Tasks.forException(getTaskException(task));
                         }
                     });
         }
@@ -342,5 +337,8 @@ public class Database {
         }
     }
 
+    private Exception getTaskException(Task<?> task){
+        return (task.getException() != null) ? task.getException() : new Exception("Unknown Error Occurred");
+    }
 
 }

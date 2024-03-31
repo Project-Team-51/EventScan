@@ -46,6 +46,7 @@ public class Event implements Serializable {
         this.name = eventName;
         this.desc = desc;
         this.checkedInAttendees = new HashMap<>();
+        this.interestedAttendees = new ArrayList<>();
         this.organizer = organizer;
         this.poster = poster;
         this.eventID = eventID;
@@ -181,13 +182,20 @@ public class Event implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return Objects.equals(getLocation(), event.getLocation()) && Objects.equals(getDesc(), event.getDesc()) && Objects.equals(getName(), event.getName()) && Objects.equals(getCheckedInAttendeesList(), event.getCheckedInAttendeesList()) && Objects.equals(getOrganizer(), event.getOrganizer()) && Objects.equals(getPoster(), event.getPoster()) && Objects.equals(getEventID(), event.getEventID());
+        return Objects.equals(getLocation(), event.getLocation())
+                && Objects.equals(getDesc(), event.getDesc())
+                && Objects.equals(getName(), event.getName())
+                && Objects.equals(getCheckedInAttendeesList(), event.getCheckedInAttendeesList())
+                && Objects.equals(getOrganizer(), event.getOrganizer())
+                && Objects.equals(getPoster(), event.getPoster())
+                && Objects.equals(getEventID(), event.getEventID())
+                && Objects.equals(getInterestedAttendees(), event.getInterestedAttendees());
     }
 
     @Override
     public int hashCode() {
         //auto-generated
-        return Objects.hash(getLocation(), getDesc(), getName(), getCheckedInAttendeesList(), getOrganizer(), getPoster(), getEventID());
+        return Objects.hash(getLocation(), getDesc(), getName(), getCheckedInAttendeesList(), getOrganizer(), getPoster(), getEventID(), getInterestedAttendees());
     }
 }
 
