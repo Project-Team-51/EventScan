@@ -71,7 +71,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
     private FirebaseFirestore db;
     private String deviceID;
 
-    private boolean isSingleUse = false;  // Default value for single use
+    //private boolean isSingleUse = false;
 
     public interface OnEventAddedListener {
         void onEventAdded();

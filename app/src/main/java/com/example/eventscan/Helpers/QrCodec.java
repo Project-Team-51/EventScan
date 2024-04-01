@@ -52,6 +52,14 @@ public class QrCodec {
         return toDecode.substring(15); // "EventScan_event" is 15 chars long
     }
 
+    /**
+     * Creates a new QR code for an event.
+     *
+     * @param event The event to create a QR code for.
+     * @param linkType the type of link.
+     *                 0 for sign in, 1 for seeing details
+     * @return The task of the QR code bitmap.
+     */
     public static Task<Bitmap> createNewQR(Event event, int linkType) {
         return Database.getInstance().qr_codes.generateUniqueQrID()
                 .continueWithTask(task -> {
@@ -72,6 +80,15 @@ public class QrCodec {
                 });
     }
 
+
+    /**
+     * Encodes a string to a QR image.
+     *
+     * @param encodedString The string to encode.
+     * @return The generated QRcode bitmap.
+     * @throws RuntimeException if an error occurs during the encoding process
+     *
+     */
     private static Bitmap encodeToQrImage(String encodedString){
         try {
             MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
