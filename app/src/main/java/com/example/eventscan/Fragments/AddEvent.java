@@ -151,9 +151,17 @@ public class AddEvent extends DialogFragment {
                 // Find views in the dialog layout
                 ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
                 Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
+                Switch switchCheckIn = dialogView.findViewById(R.id.switchCheckIn);
+
 
                 // Set the image view to the QR code
                 // TODO make it so the user can choose whether it's going to checkin or to see details
+                int directionType;
+                if (switchCheckIn.isChecked()) {
+                    directionType = QRDatabaseEventLink.DIRECT_CHECK_IN;
+                } else {
+                    directionType = QRDatabaseEventLink.DIRECT_SEE_DETAILS;
+                }
                 Task<Bitmap> qrCodeTask = QrCodec.createNewQR(event, QRDatabaseEventLink.DIRECT_SEE_DETAILS);
                 qrCodeTask.addOnSuccessListener(bitmap -> {
                     imageViewDialog.setImageBitmap(bitmap);
