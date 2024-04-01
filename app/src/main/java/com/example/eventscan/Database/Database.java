@@ -82,6 +82,7 @@ public class Database {
         this.attendees = new AttendeeOperations(this);
         this.events = new EventOperations(this);
         this.posters = new PosterOperations(this);
+        this.qr_codes = new QRCodeOperations(this);
     }
     public static Database getInstance(){
         return instance;
@@ -401,15 +402,17 @@ public class Database {
          * @param linkType the type of link.
          *                 Use QRDatabaseEventLink.DIRECT_SIGN_IN, or
          *                     QRDatabaseEventLink.DIRECT_SEE_DETAILS when setting this
-         * @return a Task that will be resolved when the database write is complete or failed
+         * @return a Task that contains QR data when completed
          */
-        public Task<Void> set(String decoded_qr_data, Event directedEvent, int linkType){
+        public Task<String> set(String decoded_qr_data, Event directedEvent, int linkType){
             return qrLinkCollection
                     .document(decoded_qr_data)
                     .set(new QRDatabaseEventLink(
                             linkType,
                             directedEvent
-                    ));
+                    )).continueWith(task -> {
+                        return decoded_qr_data;
+                    });
         }
 
         /**

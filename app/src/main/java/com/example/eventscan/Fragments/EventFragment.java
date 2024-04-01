@@ -99,7 +99,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event selectedEvent = ownedEvents.get(position);
-                if(userType.equals("attendee")){
+                if(userType.equals("organizer")){
                     openEventView(selectedEvent);
                 }
                 else{
