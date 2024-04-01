@@ -75,6 +75,10 @@ public class Database {
         setupChildren();
     }
 
+    public CollectionReference getEventsCollection(){return this.eventsCollection;}
+    public CollectionReference getAttendeeCollection(){return this.attendeeCollection;}
+    public CollectionReference getQrLinkCollection(){return this.attendeeCollection;}
+
     /**
      * Sets up self.attendees, self.events, etc...
      */
