@@ -3,6 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="16dp">
+
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="150dp"
@@ -17,21 +18,27 @@
         android:layout_below="@id/imageView"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/buttonSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Save to Cameral Roll"
-            android:layout_marginRight="16dp" />
+            android:layout_marginBottom="16dp" />
 
-        <Switch
-            android:id="@+id/switchCheckIn"
+        <Button
+            android:id="@+id/buttonCheckIn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Check-In"
-            android:checked="false"/>
+            android:text="Event Checkin"
+            android:layout_marginBottom="16dp"/>
+
+        <Button
+            android:id="@+id/buttonDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Event Details" />
 
     </LinearLayout>
 </RelativeLayout>

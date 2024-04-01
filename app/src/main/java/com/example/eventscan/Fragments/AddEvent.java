@@ -151,17 +151,39 @@ public class AddEvent extends DialogFragment {
                 // Find views in the dialog layout
                 ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
                 Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
-                Switch switchCheckIn = dialogView.findViewById(R.id.switchCheckIn);
+                Button buttonCheckIn = dialogView.findViewById(R.id.buttonCheckIn);
+                Button buttonDetails = dialogView.findViewById(R.id.buttonDetails);
+
+                // Determine direction type based on QRDatasbaseEventLink
+                int directionType = QRDatabaseEventLink.DIRECT_CHECK_IN; // wanna check in by default
+
+
+                buttonCheckIn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final int directionType = QRDatabaseEventLink.DIRECT_CHECK_IN;
+                        Task<Bitmap> qrCodeTask = QrCodec.createNewQR(event, directionType);
+                        qrCodeTask.addOnSuccessListener(bitmap -> {
+                            imageViewDialog.setImageBitmap(bitmap);
+                        });
+                    }
+                });
+
+                // Set click listener for Event Details button
+                buttonDetails.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final int directionType = QRDatabaseEventLink.DIRECT_SEE_DETAILS;
+                        Task<Bitmap> qrCodeTask = QrCodec.createNewQR(event, directionType);
+                        qrCodeTask.addOnSuccessListener(bitmap -> {
+                            imageViewDialog.setImageBitmap(bitmap);
+                        });
+                    }
+                });
 
 
                 // Set the image view to the QR code
                 // TODO make it so the user can choose whether it's going to checkin or to see details
-                int directionType;
-                if (switchCheckIn.isChecked()) {
-                    directionType = QRDatabaseEventLink.DIRECT_CHECK_IN;
-                } else {
-                    directionType = QRDatabaseEventLink.DIRECT_SEE_DETAILS;
-                }
                 Task<Bitmap> qrCodeTask = QrCodec.createNewQR(event, QRDatabaseEventLink.DIRECT_SEE_DETAILS);
                 qrCodeTask.addOnSuccessListener(bitmap -> {
                     imageViewDialog.setImageBitmap(bitmap);
