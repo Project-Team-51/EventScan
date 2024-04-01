@@ -404,6 +404,7 @@ public class Database {
          *                     QRDatabaseEventLink.DIRECT_SEE_DETAILS when setting this
          * @return a Task that contains QR data when completed
          */
+        //changed from void to string type
         public Task<String> set(String decoded_qr_data, Event directedEvent, int linkType){
             return qrLinkCollection
                     .document(decoded_qr_data)
