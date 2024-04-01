@@ -26,5 +26,12 @@
             android:text="Save to Cameral Roll"
             android:layout_marginRight="16dp" />
 
+        <Switch
+            android:id="@+id/switchCheckIn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Check-In"
+            android:checked="false"/>
+
     </LinearLayout>
 </RelativeLayout>
