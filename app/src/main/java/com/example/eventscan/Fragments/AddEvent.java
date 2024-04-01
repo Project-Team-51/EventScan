@@ -32,12 +32,14 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.eventscan.Activities.MainActivity;
 import com.example.eventscan.Activities.UserSelection;
+import com.example.eventscan.Database.QRDatabaseEventLink;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Helpers.QrCodec;
 import com.example.eventscan.Entities.Organizer;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -70,6 +72,8 @@ public class AddEvent extends DialogFragment {
     private String eventID;
     private FirebaseFirestore db;
     private String deviceID;
+
+    private boolean isSingleUse = false;  // Default value for single use
 
     public interface OnEventAddedListener {
         void onEventAdded();
@@ -139,9 +143,6 @@ public class AddEvent extends DialogFragment {
         generateQRCodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Generate QR code bitmap
-
-                Bitmap qrCodeBitmap = generateQRCode(QrCodec.encodeQRString(event.getEventID()));
 
                 // Inflate the dialog layout
                 View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
@@ -150,8 +151,13 @@ public class AddEvent extends DialogFragment {
                 ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
                 Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
 
-                // Set QR code bitmap to ImageView
-                imageViewDialog.setImageBitmap(qrCodeBitmap);
+                // Set the image view to the QR code
+                // TODO make it so the user can choose whether it's going to checkin or to see details
+                Task<Bitmap> qrCodeTask = QrCodec.createNewQR(event, QRDatabaseEventLink.DIRECT_SEE_DETAILS);
+                qrCodeTask.addOnSuccessListener(bitmap -> {
+                    imageViewDialog.setImageBitmap(bitmap);
+                });
+
 
                 // Create and show the dialog
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -163,12 +169,14 @@ public class AddEvent extends DialogFragment {
                 buttonSaveToCamera.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        saveQRCodeToCameraRoll(qrCodeBitmap);
+                        saveQRCodeToCameraRoll(qrCodeTask.getResult());
                         dialog.dismiss(); // Dismiss the dialog after saving
                     }
                 });
             }
         });
+
+
         confirmEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -220,23 +228,7 @@ public class AddEvent extends DialogFragment {
             }
         });
     }
-    /**
-     * Generates a QR code bitmap based on the provided event ID.
-     *
-     * @param eventID The ID of the event to be encoded into the QR code.
-     * @return The generated QR code bitmap.
-     * @throws RuntimeException if an error occurs during the encoding process.
-     */
-    private Bitmap generateQRCode(String eventID) {
-        try {
-            MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
-            BitMatrix bitMatrix = multiFormatWriter.encode(eventID, BarcodeFormat.QR_CODE, 500, 500);
-            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            return barcodeEncoder.createBitmap(bitMatrix);
-        } catch (WriterException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 
     /**
      * Displays a dialog containing the provided QR code bitmap.

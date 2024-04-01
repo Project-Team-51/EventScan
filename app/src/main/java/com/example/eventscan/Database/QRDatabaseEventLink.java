@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
  */
 public class QRDatabaseEventLink {
 
-    /**QRs using this will direct the user to the "sign into event" page*/
+    /**QRs using this will direct the user to the "check into event" page*/
     public static final int DIRECT_CHECK_IN = 0;
 
 
