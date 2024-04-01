@@ -23,15 +23,8 @@
             android:id="@+id/buttonSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Multiple Use QR"
+            android:text="Save to Cameral Roll"
             android:layout_marginRight="16dp" />
-
-        <Button
-            android:id="@+id/buttonSingleUseQR"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Single Use QR"
-            android:layout_gravity="center_vertical" />
 
     </LinearLayout>
 </RelativeLayout>
