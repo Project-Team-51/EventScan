@@ -34,7 +34,7 @@ public class GeolocationHandler {
         }
 
         // Check for location permissions
-        if (checkLocationPermissions(context)) {
+        if (checkLocationPermissions(context) && !locationUpdatesEnabled) {
             // Location permissions granted, enable updates
             toggleLocationUpdates();
         } else {
