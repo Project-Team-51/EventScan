@@ -249,6 +249,18 @@ public class Database {
             });
         }
 
+        /**
+         * get an event from the documentSnapshot of the document of this event
+         * @param doc the firestore documentSnapshot that contains the event in question
+         * @return a task that will resolve to an Event
+         */
+        public Task<Event> get(DocumentSnapshot doc){
+            if(doc.get("eventID") != null){
+                return get(doc.get("eventID").toString());
+            }
+            return Tasks.forException(new Exception("Tried to load an event from a non-event DocumentSnapshot"));
+        }
+
 
         /**
          * Add an attendee to an event if they aren't already on it
