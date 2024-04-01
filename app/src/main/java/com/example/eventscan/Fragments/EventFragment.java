@@ -32,7 +32,6 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -54,9 +53,9 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
     private ArrayList<Event> inEvents;
     private EventArrayAdapter ownedEventsAdapter;
     private EventArrayAdapter inEventsAdapter;
-
-    private FirebaseFirestore db;
     private CollectionReference eventsCollection;
+
+    private Database db;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -74,9 +73,9 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         ownedEventsListView.setAdapter(ownedEventsAdapter);
         inEventsListView.setAdapter(inEventsAdapter);
 
-        // initialize firestore
-        db = FirebaseFirestore.getInstance();
-        eventsCollection = db.collection("events");
+        db = Database.getInstance();
+
+        eventsCollection = db.getEventsCollection();
         // update events in real time
         eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -91,7 +90,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                     ArrayList<Task<Event>> updateTasks = new ArrayList<>();
                     AtomicInteger failed_fetches_amount = new AtomicInteger(); // AtomicInteger suggested by android studio
                     for (QueryDocumentSnapshot doc : querySnapshots) { // turn every stored "Event" into an event class, add to adapters
-                        Task<Event> fetchEventTask = Database.getInstance().events.get(doc);
+                        Task<Event> fetchEventTask = db.events.get(doc);
                         fetchEventTask.addOnCompleteListener(task -> {
                             if(!task.isSuccessful()){
                                 failed_fetches_amount.incrementAndGet();
@@ -128,24 +127,17 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 
         // Grab user type, organizer or Attendee
         String deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        //TODO ^^ this line needs to be changed to use a helper class that handles the 'self' attendee ID
 
-        db.collection("attendees")
-                .document(deviceID)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot documentSnapshot = task.getResult();
-                        Attendee attendee = documentSnapshot.toObject(Attendee.class);
-                        // TEMPORARY FIX
-                        // Must revamp how attendees are stored
-                        if (attendee != null) {
-                            userType = attendee.getType();
-                            customizeLayout(userType, view);
-                        }
-                    } else {
-                        Log.e("elephant", "Error getting document: ", task.getException());
-                    }
-                });
+        db.attendees.get(deviceID).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                Attendee attendee = task.getResult();
+                if(attendee != null){
+                    userType = attendee.getType();
+                    customizeLayout(userType, view);
+                }
+            }
+        });
 
         return view;
 
@@ -211,41 +203,44 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
     public void deleteEvent(Event event) {
         ownedEventsAdapter.remove(event);
         ownedEventsAdapter.notifyDataSetChanged();
-        db.collection("events").document(event.getEventID()).delete();
+        db.events.delete(event).addOnFailureListener(e -> {
+            Log.e("Delete event","Failed to delete event "+event.getEventID());
+        });
     }
 
-    private void fetchUsersForEvent(String eventId) {
-        // Assuming you have a CollectionReference for users
-        CollectionReference eventsCollection = db.collection("events");
-
-        // Query users collection for users associated with the given event ID
-        eventsCollection.document(eventId)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot document = task.getResult();
-                        if(task.isSuccessful()) {
-                            Event event = document.toObject(Event.class);
-                            // arraylist of type attendee
-                            ArrayList<Attendee> attendeesList = event.getCheckedInAttendeesList();
-                        } else {
-                            Log.d("NAMEPOP", "Error getting documents: ", task.getException());
-                        }
-
-                    }
-                });
-        }
-    // changed
-    private void displayAttendees(ArrayList<User> attendeesList) {
-        // Create an adapter for the list of attendees
-        UserArrayAdapter attendeeAdapter = new UserArrayAdapter(getActivity(), R.layout.attendee_list_content, attendeesList);
-
-        // Assuming you have a ListView in your layout with the id 'attendeesListView'
-        ListView attendeesListView = getView().findViewById(R.id.allUserList);
-
-        // Set the adapter to the ListView
-        attendeesListView.setAdapter(attendeeAdapter);
-    }
+// Commented out below code - the functions don't look complete and there are no usages - didn't update the DB calls yet because of the not-finished ambiguity
+//    private void fetchUsersForEvent(String eventId) {
+//        // Assuming you have a CollectionReference for users
+//        CollectionReference eventsCollection = db.collection("events");
+//
+//        // Query users collection for users associated with the given event ID
+//        eventsCollection.document(eventId)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        DocumentSnapshot document = task.getResult();
+//                        if(task.isSuccessful()) {
+//                            Event event = document.toObject(Event.class);
+//                            // arraylist of type attendee
+//                            ArrayList<Attendee> attendeesList = event.getCheckedInAttendeesList();
+//                        } else {
+//                            Log.d("NAMEPOP", "Error getting documents: ", task.getException());
+//                        }
+//
+//                    }
+//                });
+//        }
+//    // changed
+//    private void displayAttendees(ArrayList<User> attendeesList) {
+//        // Create an adapter for the list of attendees
+//        UserArrayAdapter attendeeAdapter = new UserArrayAdapter(getActivity(), R.layout.attendee_list_content, attendeesList);
+//
+//        // Assuming you have a ListView in your layout with the id 'attendeesListView'
+//        ListView attendeesListView = getView().findViewById(R.id.allUserList);
+//
+//        // Set the adapter to the ListView
+//        attendeesListView.setAdapter(attendeeAdapter);
+//    }
 
 }
