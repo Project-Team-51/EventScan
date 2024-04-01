@@ -32,6 +32,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.eventscan.Activities.MainActivity;
 import com.example.eventscan.Activities.UserSelection;
+import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.QRDatabaseEventLink;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Helpers.QrCodec;
@@ -188,35 +189,21 @@ public class AddEvent extends DialogFragment {
                 event.setDesc(eventDesc);
                 event.setName(eventName);
                 event.setPoster(posterUriString);
+                // TODO fetch the organizer first just in case
                 organizer = new Organizer();
                 organizer.setDeviceID(deviceID);
                 event.setOrganizer(organizer);
 
-                // Poster
-                // Generate a unique filename for the poster imag
-                StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-                StorageReference posterRef = storageRef.child("poster_pictures").child(eventID);
-                posterRef.putFile(posterUri);
-
-                Event event = new Event(eventName, eventDesc, organizer, posterUriString, eventID);
-                // Call the addEvent function with the retrieved information
-                db.collection("events").document(event.getEventID()).set(event)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "Event successfully added to Firestore");
-                                // Notify the listener that the event is added
-                                if (eventAddedListener != null) {
-                                    eventAddedListener.onEventAdded();
-                                }
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "Error adding event to Firestore", e);
-                            }
-                        });
+                Task<Event> createEventTask = Database.getInstance().events.create(event);
+                createEventTask.addOnSuccessListener(event1 -> {
+                    // event1 is an event that might have an updated eventID to make it unique
+                    Log.d(TAG, "Event successfully added to Firestore");
+                    if(eventAddedListener != null){
+                        eventAddedListener.onEventAdded();
+                    }
+                }).addOnFailureListener(e -> {
+                            Log.w(TAG,"Error adding event to firestore", e);
+                });
             }
         });
         attendeeLimitSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
