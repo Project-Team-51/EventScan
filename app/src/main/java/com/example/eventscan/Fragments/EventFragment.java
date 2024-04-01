@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 
@@ -27,6 +28,7 @@ import com.example.eventscan.Helpers.UserArrayAdapter;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -36,6 +38,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /*
  * A fragment subclass that handles the displaying of events in two listviews. As of writing, it displays both attending classes
@@ -84,13 +88,27 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                 if (querySnapshots != null) { // if there is an update then..
                     ownedEvents.clear();
                     inEvents.clear();
+                    ArrayList<Task<Event>> updateTasks = new ArrayList<>();
+                    AtomicInteger failed_fetches_amount = new AtomicInteger(); // AtomicInteger suggested by android studio
                     for (QueryDocumentSnapshot doc : querySnapshots) { // turn every stored "Event" into an event class, add to adapters
-                        Event event = doc.toObject(Event.class);
-                        ownedEventsAdapter.add(event);
-                        inEventsAdapter.add(event);
+                        Task<Event> fetchEventTask = Database.getInstance().events.get(doc);
+                        fetchEventTask.addOnCompleteListener(task -> {
+                            if(!task.isSuccessful()){
+                                failed_fetches_amount.incrementAndGet();
+                                return;
+                            }
+                            Event event = task.getResult();
+                            ownedEventsAdapter.add(event);
+                            inEventsAdapter.add(event);
+                        });
+                        updateTasks.add(fetchEventTask);
                     }
-                    ownedEventsAdapter.notifyDataSetChanged(); // update listviews
-                    inEventsAdapter.notifyDataSetChanged();
+                    // bigTask will be complete when all "fetchEventTask"s are complete from the loop above
+                    Task<List<Task<?>>> bigTask = Tasks.whenAllComplete(updateTasks);
+                    bigTask.addOnCompleteListener(task -> {
+                        ownedEventsAdapter.notifyDataSetChanged(); // update listviews
+                        inEventsAdapter.notifyDataSetChanged();
+                    });
                 }
             }
         });
