@@ -32,6 +32,7 @@ import com.example.eventscan.Activities.MainActivity;
 
 import com.example.eventscan.Activities.UserSelection;
 
+
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.QRDatabaseEventLink;
 
