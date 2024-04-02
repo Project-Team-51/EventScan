@@ -2,15 +2,12 @@ package com.example.eventscan.Fragments;
 
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
-import android.app.FragmentManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +28,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.eventscan.Activities.MainActivity;
-import com.example.eventscan.Activities.UserSelection;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Helpers.QrCodec;
 import com.example.eventscan.Entities.Organizer;
@@ -54,13 +50,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
-import android.widget.CompoundButton;
-import java.util.UUID;
+
 /*
  * A dialog fragment that allows us to add a new event. The organizer who makes the event is designated the event owner,
  * and the new event is pushed to the Firestore where every users all events list will promptly update and add it.
  */
-public class AddEvent extends DialogFragment {
+public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragment.AttendeeLimitListener {
 
     private Event event;
     private Organizer organizer;
@@ -215,7 +210,7 @@ public class AddEvent extends DialogFragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    showAttendeeLimitDialog();
+                    showAttendeeLimitDialog(event);
                 }
             }
         });
@@ -339,9 +334,16 @@ public class AddEvent extends DialogFragment {
                 }
             });
 
-    private void showAttendeeLimitDialog() {
+    private void showAttendeeLimitDialog(Event event) {
         AttendeeLimitDialogFragment dialogFragment = new AttendeeLimitDialogFragment();
+        dialogFragment.setAttendeeLimitListener(this); // Set the listener
         dialogFragment.show(getChildFragmentManager(), "attendee_limit_dialog");
+    }
+
+    public void onAttendeeLimitSet(int attendeeLimit) {
+        // Handle the attendee limit set by the user here
+        // For example, set it to the event object
+        event.setAttendeeLimit(attendeeLimit);
     }
 
 

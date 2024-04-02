@@ -20,6 +20,12 @@ import androidx.fragment.app.DialogFragment;
 
 public class AttendeeLimitDialogFragment extends DialogFragment {
 
+    public interface AttendeeLimitListener {
+        void onAttendeeLimitSet(int attendeeLimit);
+    }
+
+    private AttendeeLimitListener listener;
+
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.attendee_limit_dialog, null);
@@ -34,6 +40,11 @@ public class AttendeeLimitDialogFragment extends DialogFragment {
                 String attendeeLimitString = attendeeLimit.getText().toString();
                 if (!attendeeLimitString.isEmpty()) {
                     int attendeeLimitValue = Integer.parseInt(attendeeLimitString);
+                    if (attendeeLimitValue == 0) {
+                        Toast.makeText(requireContext(), "Limit of 0 is not allowed", Toast.LENGTH_SHORT).show();
+                    } else {
+                        confirmAttendeeLimit(attendeeLimitValue);
+                    }
                 } else {
                     Toast.makeText(requireContext(), "Please enter a valid integer", Toast.LENGTH_SHORT).show();
                 }
@@ -52,5 +63,16 @@ public class AttendeeLimitDialogFragment extends DialogFragment {
         dialog.setContentView(view);
 
         return dialog;
+    }
+
+    public void setAttendeeLimitListener(AttendeeLimitListener listener) {
+        this.listener = listener;
+    }
+
+    private void confirmAttendeeLimit(int attendeeLimitValue) {
+        if (listener != null) {
+            listener.onAttendeeLimitSet(attendeeLimitValue);
+        }
+        dismiss();
     }
 }
