@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 
@@ -27,15 +28,17 @@ import com.example.eventscan.Helpers.UserArrayAdapter;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /*
  * A fragment subclass that handles the displaying of events in two listviews. As of writing, it displays both attending classes
@@ -50,9 +53,9 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
     private ArrayList<Event> inEvents;
     private EventArrayAdapter ownedEventsAdapter;
     private EventArrayAdapter inEventsAdapter;
-
-    private FirebaseFirestore db;
     private CollectionReference eventsCollection;
+
+    private Database db;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,9 +73,9 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         ownedEventsListView.setAdapter(ownedEventsAdapter);
         inEventsListView.setAdapter(inEventsAdapter);
 
-        // initialize firestore
-        db = FirebaseFirestore.getInstance();
-        eventsCollection = db.collection("events");
+        db = Database.getInstance();
+
+        eventsCollection = db.getEventsCollection();
         // update events in real time
         eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -84,13 +87,27 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                 if (querySnapshots != null) { // if there is an update then..
                     ownedEvents.clear();
                     inEvents.clear();
+                    ArrayList<Task<Event>> updateTasks = new ArrayList<>();
+                    AtomicInteger failed_fetches_amount = new AtomicInteger(); // AtomicInteger suggested by android studio
                     for (QueryDocumentSnapshot doc : querySnapshots) { // turn every stored "Event" into an event class, add to adapters
-                        Event event = doc.toObject(Event.class);
-                        ownedEventsAdapter.add(event);
-                        inEventsAdapter.add(event);
+                        Task<Event> fetchEventTask = db.events.get(doc);
+                        fetchEventTask.addOnCompleteListener(task -> {
+                            if(!task.isSuccessful()){
+                                failed_fetches_amount.incrementAndGet();
+                                return;
+                            }
+                            Event event = task.getResult();
+                            ownedEventsAdapter.add(event);
+                            inEventsAdapter.add(event);
+                        });
+                        updateTasks.add(fetchEventTask);
                     }
-                    ownedEventsAdapter.notifyDataSetChanged(); // update listviews
-                    inEventsAdapter.notifyDataSetChanged();
+                    // bigTask will be complete when all "fetchEventTask"s are complete from the loop above
+                    Task<List<Task<?>>> bigTask = Tasks.whenAllComplete(updateTasks);
+                    bigTask.addOnCompleteListener(task -> {
+                        ownedEventsAdapter.notifyDataSetChanged(); // update listviews
+                        inEventsAdapter.notifyDataSetChanged();
+                    });
                 }
             }
         });
@@ -99,7 +116,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event selectedEvent = ownedEvents.get(position);
-                if(userType.equals("attendee")){
+                if(userType.equals("organizer")){
                     openEventView(selectedEvent);
                 }
                 else{
@@ -110,24 +127,17 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 
         // Grab user type, organizer or Attendee
         String deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        //TODO ^^ this line needs to be changed to use a helper class that handles the 'self' attendee ID
 
-        db.collection("attendees")
-                .document(deviceID)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot documentSnapshot = task.getResult();
-                        Attendee attendee = documentSnapshot.toObject(Attendee.class);
-                        // TEMPORARY FIX
-                        // Must revamp how attendees are stored
-                        if (attendee != null) {
-                            userType = attendee.getType();
-                            customizeLayout(userType, view);
-                        }
-                    } else {
-                        Log.e("elephant", "Error getting document: ", task.getException());
-                    }
-                });
+        db.attendees.get(deviceID).addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                Attendee attendee = task.getResult();
+                if(attendee != null){
+                    userType = attendee.getType();
+                    customizeLayout(userType, view);
+                }
+            }
+        });
 
         return view;
 
@@ -193,41 +203,44 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
     public void deleteEvent(Event event) {
         ownedEventsAdapter.remove(event);
         ownedEventsAdapter.notifyDataSetChanged();
-        db.collection("events").document(event.getEventID()).delete();
+        db.events.delete(event).addOnFailureListener(e -> {
+            Log.e("Delete event","Failed to delete event "+event.getEventID());
+        });
     }
 
-    private void fetchUsersForEvent(String eventId) {
-        // Assuming you have a CollectionReference for users
-        CollectionReference eventsCollection = db.collection("events");
-
-        // Query users collection for users associated with the given event ID
-        eventsCollection.document(eventId)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        DocumentSnapshot document = task.getResult();
-                        if(task.isSuccessful()) {
-                            Event event = document.toObject(Event.class);
-                            // arraylist of type attendee
-                            ArrayList<Attendee> attendeesList = event.getCheckedInAttendeesList();
-                        } else {
-                            Log.d("NAMEPOP", "Error getting documents: ", task.getException());
-                        }
-
-                    }
-                });
-        }
-    // changed
-    private void displayAttendees(ArrayList<User> attendeesList) {
-        // Create an adapter for the list of attendees
-        UserArrayAdapter attendeeAdapter = new UserArrayAdapter(getActivity(), R.layout.attendee_list_content, attendeesList);
-
-        // Assuming you have a ListView in your layout with the id 'attendeesListView'
-        ListView attendeesListView = getView().findViewById(R.id.allUserList);
-
-        // Set the adapter to the ListView
-        attendeesListView.setAdapter(attendeeAdapter);
-    }
+// Commented out below code - the functions don't look complete and there are no usages - didn't update the DB calls yet because of the not-finished ambiguity
+//    private void fetchUsersForEvent(String eventId) {
+//        // Assuming you have a CollectionReference for users
+//        CollectionReference eventsCollection = db.collection("events");
+//
+//        // Query users collection for users associated with the given event ID
+//        eventsCollection.document(eventId)
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        DocumentSnapshot document = task.getResult();
+//                        if(task.isSuccessful()) {
+//                            Event event = document.toObject(Event.class);
+//                            // arraylist of type attendee
+//                            ArrayList<Attendee> attendeesList = event.getCheckedInAttendeesList();
+//                        } else {
+//                            Log.d("NAMEPOP", "Error getting documents: ", task.getException());
+//                        }
+//
+//                    }
+//                });
+//        }
+//    // changed
+//    private void displayAttendees(ArrayList<User> attendeesList) {
+//        // Create an adapter for the list of attendees
+//        UserArrayAdapter attendeeAdapter = new UserArrayAdapter(getActivity(), R.layout.attendee_list_content, attendeesList);
+//
+//        // Assuming you have a ListView in your layout with the id 'attendeesListView'
+//        ListView attendeesListView = getView().findViewById(R.id.allUserList);
+//
+//        // Set the adapter to the ListView
+//        attendeesListView.setAdapter(attendeeAdapter);
+//    }
 
 }

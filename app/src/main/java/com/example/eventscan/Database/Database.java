@@ -15,6 +15,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -75,6 +77,10 @@ public class Database {
         setupChildren();
     }
 
+    public CollectionReference getEventsCollection(){return this.eventsCollection;}
+    public CollectionReference getAttendeeCollection(){return this.attendeeCollection;}
+    public CollectionReference getQrLinkCollection(){return this.attendeeCollection;}
+
     /**
      * Sets up self.attendees, self.events, etc...
      */
@@ -82,6 +88,7 @@ public class Database {
         this.attendees = new AttendeeOperations(this);
         this.events = new EventOperations(this);
         this.posters = new PosterOperations(this);
+        this.qr_codes = new QRCodeOperations(this);
     }
     public static Database getInstance(){
         return instance;
@@ -248,6 +255,32 @@ public class Database {
             });
         }
 
+        /**
+         * get an event from the documentSnapshot of the document of this event
+         * @param doc the firestore documentSnapshot that contains the event in question
+         * @return a task that will resolve to an Event
+         */
+        public Task<Event> get(DocumentSnapshot doc){
+            if(doc.get("eventID") != null){
+                return get(doc.get("eventID").toString());
+            }
+            return Tasks.forException(new Exception("Tried to load an event from a non-event DocumentSnapshot"));
+        }
+
+        /**
+         * Check if an eventID exists as an event
+         * @param eventID the event ID to search for
+         * @return a task that will resolve to a boolean of whether it exists in the DB or not
+         */
+        public Task<Boolean> checkExistence(String eventID){
+            return eventsCollection.document(eventID).get().continueWithTask(task -> {
+                if(!task.isSuccessful()){
+                    return Tasks.forException(getTaskException(task));
+                }
+                return Tasks.forResult(task.getResult().exists());
+            });
+        }
+
 
         /**
          * Add an attendee to an event if they aren't already on it
@@ -401,15 +434,17 @@ public class Database {
          * @param linkType the type of link.
          *                 Use QRDatabaseEventLink.DIRECT_SIGN_IN, or
          *                     QRDatabaseEventLink.DIRECT_SEE_DETAILS when setting this
-         * @return a Task that will be resolved when the database write is complete or failed
+         * @return a Task that contains QR data when completed
          */
-        public Task<Void> set(String decoded_qr_data, Event directedEvent, int linkType){
+        public Task<String> set(String decoded_qr_data, Event directedEvent, int linkType){
             return qrLinkCollection
                     .document(decoded_qr_data)
                     .set(new QRDatabaseEventLink(
                             linkType,
                             directedEvent
-                    ));
+                    )).continueWith(task -> {
+                        return decoded_qr_data;
+                    });
         }
 
         /**
@@ -449,9 +484,33 @@ public class Database {
                         }
                     });
         }
+
+        /**
+         * Get a list of existing decoded QR strings that link to this event
+         * useful if you don't want to keep generating QR codes for the same event
+         * @param event the event to find existing QR codes for
+         * @param linkType the link type to search for
+         * @return a list of decoded QR data that links to the specified event with the specified link type
+         */
+        public Task<ArrayList<String>> getExistingQRsForEvent(Event event, int linkType){
+            return owner.qrLinkCollection
+                    .whereEqualTo("directedEventID",event.getEventID())
+                    .whereEqualTo("directionType",linkType)
+                    .get().continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<String> results = new ArrayList<>();
+                        for(QueryDocumentSnapshot queryDocumentSnapshot:task.getResult()){
+                            results.add(queryDocumentSnapshot.getId());
+                        }
+                        return Tasks.forResult(results);
+                    });
+
+        }
     }
 
-    private Exception getTaskException(Task<?> task){
+    public static Exception getTaskException(Task<?> task){
         return (task.getException() != null) ? task.getException() : new Exception("Unknown Error Occurred");
     }
 
