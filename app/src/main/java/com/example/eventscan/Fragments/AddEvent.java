@@ -2,15 +2,12 @@ package com.example.eventscan.Fragments;
 
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
-import android.app.FragmentManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,24 +28,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.eventscan.Activities.MainActivity;
-import com.example.eventscan.Activities.UserSelection;
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.QRDatabaseEventLink;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Helpers.QrCodec;
 import com.example.eventscan.Entities.Organizer;
 import com.example.eventscan.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.journeyapps.barcodescanner.BarcodeEncoder;
+import com.google.android.gms.tasks.Tasks;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -57,8 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
-import android.widget.CompoundButton;
-import java.util.UUID;
+
 /*
  * A dialog fragment that allows us to add a new event. The organizer who makes the event is designated the event owner,
  * and the new event is pushed to the Firestore where every users all events list will promptly update and add it.
@@ -71,7 +57,7 @@ public class AddEvent extends DialogFragment {
     private Uri posterUri;
     private String posterUriString;
     private String eventID;
-    private FirebaseFirestore db;
+    private Database db;
     private String deviceID;
 
     //private boolean isSingleUse = false;
@@ -124,8 +110,9 @@ public class AddEvent extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        db = FirebaseFirestore.getInstance();
-        Button generateQRCodeButton = view.findViewById(R.id.generate_QRCode);
+        db = Database.getInstance();
+        Button generateQRCodeCheckInButton = view.findViewById(R.id.generate_QRCode_check_in);
+        Button generateQRCodeDetailsButton = view.findViewById(R.id.generate_QRCode_see_details);
         Button confirmEventButton = view.findViewById(R.id.confirmEvent);
         Button uploadPoster = view.findViewById(R.id.upload_poster);
         Switch attendeeLimitSwitch = view.findViewById(R.id.attendeeLimit);
@@ -141,70 +128,60 @@ public class AddEvent extends DialogFragment {
         });
 
 
-        generateQRCodeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        generateQRCodeCheckInButton.setOnClickListener(v -> {
+            View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
+            ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
+            Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
+            int linkType = QRDatabaseEventLink.DIRECT_CHECK_IN;
 
-                // Inflate the dialog layout
-                View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
+            // setup the task to run as early as possible
+            Task<Bitmap> getQRTask = QrCodec.createOrGetQR(event, linkType, false);
+            getQRTask.addOnSuccessListener(bitmap -> {
+                imageViewDialog.setImageBitmap(bitmap);
+            });
+            // rest of fragment setup
+            // Create and show the dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setView(dialogView);
+            AlertDialog dialog = builder.create();
+            dialog.show();
 
-                // Find views in the dialog layout
-                ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
-                Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
-                Button buttonCheckIn = dialogView.findViewById(R.id.buttonCheckIn);
-                Button buttonDetails = dialogView.findViewById(R.id.buttonDetails);
+            // Set click listener for the "Save to Camera Roll" button
+            buttonSaveToCamera.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveQRCodeToCameraRoll(getQRTask.getResult());
+                    dialog.dismiss(); // Dismiss the dialog after saving
+                }
+            });
+        });
 
-                // Determine direction type based on QRDatasbaseEventLink
-                int directionType = QRDatabaseEventLink.DIRECT_CHECK_IN; // wanna check in by default
+        generateQRCodeDetailsButton.setOnClickListener(v -> {
+            View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
+            ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
+            Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
+            int linkType = QRDatabaseEventLink.DIRECT_SEE_DETAILS;
 
+            // setup the task to run as early as possible
+            Task<Bitmap> getQRTask = QrCodec.createOrGetQR(event, linkType, false);
+            getQRTask.addOnSuccessListener(bitmap -> {
+                imageViewDialog.setImageBitmap(bitmap);
+            });
+            // rest of fragment setup
+            // Create and show the dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setView(dialogView);
+            AlertDialog dialog = builder.create();
+            dialog.show();
 
-                buttonCheckIn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final int directionType = QRDatabaseEventLink.DIRECT_CHECK_IN;
-                        Task<Bitmap> qrCodeTask = QrCodec.createNewQR(event, directionType);
-                        qrCodeTask.addOnSuccessListener(bitmap -> {
-                            imageViewDialog.setImageBitmap(bitmap);
-                        });
-                    }
-                });
-
-                // Set click listener for Event Details button
-                buttonDetails.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final int directionType = QRDatabaseEventLink.DIRECT_SEE_DETAILS;
-                        Task<Bitmap> qrCodeTask = QrCodec.createNewQR(event, directionType);
-                        qrCodeTask.addOnSuccessListener(bitmap -> {
-                            imageViewDialog.setImageBitmap(bitmap);
-                        });
-                    }
-                });
-
-
-                // Set the image view to the QR code
-                // TODO make it so the user can choose whether it's going to checkin or to see details
-                Task<Bitmap> qrCodeTask = QrCodec.createNewQR(event, QRDatabaseEventLink.DIRECT_SEE_DETAILS);
-                qrCodeTask.addOnSuccessListener(bitmap -> {
-                    imageViewDialog.setImageBitmap(bitmap);
-                });
-
-
-                // Create and show the dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setView(dialogView);
-                AlertDialog dialog = builder.create();
-                dialog.show();
-
-                // Set click listener for the "Save to Camera Roll" button
-                buttonSaveToCamera.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        saveQRCodeToCameraRoll(qrCodeTask.getResult());
-                        dialog.dismiss(); // Dismiss the dialog after saving
-                    }
-                });
-            }
+            // Set click listener for the "Save to Camera Roll" button
+            buttonSaveToCamera.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveQRCodeToCameraRoll(getQRTask.getResult());
+                    dialog.dismiss(); // Dismiss the dialog after saving
+                }
+            });
         });
 
 
