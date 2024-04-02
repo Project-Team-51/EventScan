@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="16dp">
@@ -10,7 +11,8 @@
         android:layout_height="150dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:contentDescription="QR Code" />
+        android:contentDescription="QR Code"
+        app:srcCompat="@drawable/qrcode" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -26,19 +28,6 @@
             android:layout_height="wrap_content"
             android:text="Save to Cameral Roll"
             android:layout_marginBottom="16dp" />
-
-        <Button
-            android:id="@+id/buttonCheckIn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Event Checkin"
-            android:layout_marginBottom="16dp"/>
-
-        <Button
-            android:id="@+id/buttonDetails"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Event Details" />
 
     </LinearLayout>
 </RelativeLayout>
