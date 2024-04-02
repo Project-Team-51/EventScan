@@ -9,6 +9,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.OptIn;
@@ -17,11 +18,14 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.UseCase;
 
+import com.example.eventscan.Database.Database;
+import com.example.eventscan.Database.QRDatabaseEventLink;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -31,9 +35,12 @@ import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /*
 This class handles the opening of the camera, as well as scanning the QR Code and retrieving the relevant information
 from it. Will be consolidated with QR Codec in the future.
@@ -76,16 +83,66 @@ public class QRAnalyzer{
             InputImage image = InputImage.fromMediaImage(mediaImage, imageProxy.getImageInfo().getRotationDegrees());
             Task<List<Barcode>> result = scanner.process(image).addOnSuccessListener(
                     barcodes -> {
-                        for(Barcode bcode: barcodes){
-                            if(QrCodec.verifyQRStringDecodable(Objects.requireNonNull(bcode.getRawValue()))){
-                                // this QR code most likely fits our encoding scheme
-                                String eventID = QrCodec.decodeQRString(Objects.requireNonNull(bcode.getRawValue()));
-                                Log.d("QR SCAN", "This should now go to sign up for event "+eventID);
-                                createSignInDialog(eventID);
+                        ArrayList<Task<QRDatabaseEventLink>> fetchQRTasks = new ArrayList<>();
+                        ArrayList<QRDatabaseEventLink> fetchedLinks = new ArrayList<>();
+                        AtomicBoolean hasError = new AtomicBoolean(false);
+                        for(Barcode barcode: barcodes){
+                            if(barcode.getRawValue() == null || !QrCodec.verifyQRStringDecodable(barcode.getRawValue())){
+                                continue;
                             }
+                            // this QR code is most likely from us (fits the encoding scheme)
+                            String barcodeContent = QrCodec.decodeQRString(barcode.getRawValue());
+                            Task<QRDatabaseEventLink> getQRTask = Database.getInstance().qr_codes.get(barcodeContent);
+                            getQRTask.continueWithTask(task -> {
+                                if(!task.isSuccessful()){
+                                    return Tasks.forException(Database.getTaskException(task));
+                                }
+                                return Database.getInstance().events.checkExistence(task.getResult().getDirectedEventID())
+                                        .continueWithTask(task1 -> {
+                                            if(!task1.isSuccessful()){
+                                                return Tasks.forException(Database.getTaskException(task1));
+                                            }
+                                            if(task1.getResult()){
+                                                // the event actually exists, return the result of the qr_codes.get() task (1 layer up)
+                                                return Tasks.forResult(task.getResult());
+                                            }
+                                            // else the event doesn't exist, return an error
+                                            return Tasks.forException(new Exception("Searched event does not exist"));
+                                        });
+                            });
+                            getQRTask.addOnCompleteListener(task -> {
+                                if(!task.isSuccessful()){
+                                    hasError.set(true);
+                                }
+                                fetchedLinks.add(task.getResult());
+                            });
+                            fetchQRTasks.add(getQRTask);
                         }
+                        Tasks.whenAllComplete(fetchQRTasks).addOnCompleteListener(task -> {
+                            // ideally fetchedLinks is only one, and hasError is false
+                            // if we have at least one event, use the first one, otherwise we can display the error if we have one
+                            if(!fetchedLinks.isEmpty()){
+                                createScanResultDialog(fetchedLinks.get(0));
+                            }
+                            else if(hasError.get()){
+                                Toast.makeText(context, "Error scanning one or more QR codes", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                Toast.makeText(context, "Unknown error when scanning QR codes", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
             );
+            scanner.close();
+        }
+    }
+
+    private void createScanResultDialog(QRDatabaseEventLink link){
+        switch(link.getDirectionType()){
+            case QRDatabaseEventLink.DIRECT_CHECK_IN:
+                //TODO
+            case QRDatabaseEventLink.DIRECT_SEE_DETAILS:
+                createSignInDialog(link.getDirectedEventID());
         }
     }
 
