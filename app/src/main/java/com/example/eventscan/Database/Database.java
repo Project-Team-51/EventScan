@@ -1,6 +1,7 @@
 package com.example.eventscan.Database;
 
 import android.net.Uri;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
@@ -11,13 +12,23 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import kotlin.NotImplementedError;
 
 /**
  * Helper class for easily pulling/pushing data from/to the database
@@ -37,12 +48,12 @@ public class Database {
     protected CollectionReference attendeeCollection;
     protected CollectionReference eventsCollection;
     protected CollectionReference qrLinkCollection;
-    private final String storageRootFolder = "prod";
-    private final String postersStoragePath = "posters";
+    protected StorageReference posterStorageCollection;
 
     public AttendeeOperations attendees;
     public EventOperations events;
     public QRCodeOperations qr_codes;
+    public PosterOperations posters;
 
 
     private static final Database instance = new Database();
@@ -60,8 +71,15 @@ public class Database {
                 .collection("prod")
                 .document("qr_links")
                 .collection("qr_links");
+        posterStorageCollection = FirebaseStorage.getInstance().getReference()
+                        .child("prod")
+                        .child("posters");
         setupChildren();
     }
+
+    public CollectionReference getEventsCollection(){return this.eventsCollection;}
+    public CollectionReference getAttendeeCollection(){return this.attendeeCollection;}
+    public CollectionReference getQrLinkCollection(){return this.attendeeCollection;}
 
     /**
      * Sets up self.attendees, self.events, etc...
@@ -69,6 +87,8 @@ public class Database {
     protected void setupChildren(){
         this.attendees = new AttendeeOperations(this);
         this.events = new EventOperations(this);
+        this.posters = new PosterOperations(this);
+        this.qr_codes = new QRCodeOperations(this);
     }
     public static Database getInstance(){
         return instance;
@@ -90,7 +110,13 @@ public class Database {
             return attendeeCollection
                     .document(attendeeID).get()
                     .continueWith(task -> {
+                        if(!task.isSuccessful()) {
+                            throw new Exception("attendee "+attendeeID+" does not exist or connection to firebase failed");
+                        }
                         DocumentSnapshot documentSnapshot = task.getResult();
+                        if(!documentSnapshot.exists()){
+                            throw new Exception("Attendee "+attendeeID+" is not in the firebase, was it written?");
+                        }
                         if(documentSnapshot.get("type") == null){
                             throw new Exception("Malformed attendee in firebase: " +attendeeID);
                         }
@@ -122,6 +148,54 @@ public class Database {
                     .document(attendee.getDeviceID())
                     .delete();
         }
+
+        /**
+         * <b>Not yet implemented, but will be</b>
+         * Get the list of events that this attendee is interested in
+         * @param attendee the attendee to search for
+         * @return the list of events that `attendee` is interested in
+         */
+        public Task<ArrayList<Event>> getInterestedEvents(Attendee attendee){
+            throw new NotImplementedError();
+        }
+
+        /**
+         * <b>May not be implemented in the future, let me know if you need this function</b>
+         * Get the list of events that this attendee has checked into
+         * @param attendee the attendee to search for
+         * @return the list of events that `attendee` has checked into
+         */
+        public Task<ArrayList<Event>> getCheckedInEvents(Attendee attendee){
+            throw new NotImplementedError(); // TODO delete if not needed
+        }
+
+        /**
+         * Create a unique ID for an attendee
+         * @return a unique Attendee ID
+         */
+        public Task<String> generateUniqueUserId() {
+            String randomID = ((Integer)((int)(Math.random()*10000000))).toString();
+            return attendeeCollection.document(randomID)
+                    .get()
+                    .continueWithTask(task -> {
+                        if(task.isSuccessful()) {
+                            if(!task.getResult().exists()){
+                                // nothing exists with this, we're good :)
+                                // make a blank document here to reserve it, and return the number
+                                Attendee blankAttendee = new Attendee();
+                                blankAttendee.setDeviceID(randomID);
+                                return owner.attendees.set(blankAttendee).continueWith(task1 -> {
+                                    return randomID;
+                                });
+                            } else {
+                                // exists, try again
+                                return generateUniqueUserId();
+                            }
+                        } else {
+                            return Tasks.forException(getTaskException(task));
+                        }
+                    });
+        }
     }
 
     public class EventOperations {
@@ -132,16 +206,10 @@ public class Database {
         /**
          * get an Event object from the database
          * @param eventID ID of the event
-         * @param fetchAttendees if set to false, the Event's attendees will all be null
-         *                       this can save some query time if you know you know you don't need them
-         * @param fetchOrganizer if set to false, the Event's organizer will be null
-         *                       this can save some query time if you know you don't need it
-         * @param fetchPoster if set to false, the Event's poster will be null
-         *                    this can save some query time if you know you don't need it
-         * @return a Task\<Event\> object that will resolve to an Event later (or an error)
+         * @return a Task object that will resolve to an Event later (or an error)
          */
         @NonNull
-        public Task<Event> get(String eventID, boolean fetchAttendees, boolean fetchOrganizer, boolean fetchPoster){
+        public Task<Event> get(String eventID){
             // 2024-MR-20 OpenAI ChatGPT
             // I am writing java android and have a function that returns a firebase Task<Event> where event is a custom class. There is an EventDatabaseRepresentation stored in firebase, which contains a list of attendee IDs, the function needs to return a task that will fetch all of the attendees and only resolve when all of the sub-tasks are done, how is this possible?
             // -> provided information about tasks.whenAllComplete()
@@ -150,10 +218,7 @@ public class Database {
             // implementation written by me
             return eventsCollection.document(eventID).get().continueWithTask(task -> {
                 if(!task.isSuccessful()){
-                    if(task.getException() == null){
-                        return Tasks.forException(new Exception("Unknown Error occurred"));
-                    }
-                    return Tasks.forException(task.getException());
+                    return Tasks.forException(getTaskException(task));
                 }
                 ArrayList<Task<?>> tasks = new ArrayList<>();
                 EventDatabaseRepresentation eventDatabaseRepresentation = task.getResult().toObject(EventDatabaseRepresentation.class);
@@ -161,13 +226,21 @@ public class Database {
                     throw new Exception("Unknown error occured when fetching event "+eventID);
                 }
                 Event event = eventDatabaseRepresentation.convertToBarebonesEvent();
-                // attendees get added
-                for(String attendeeID:eventDatabaseRepresentation.getAttendeeIDs()){
+                // Interested attendees get added
+                for(String attendeeID : eventDatabaseRepresentation.getInterestedAttendeeIDs()){
                     tasks.add(owner.attendees.get(attendeeID).addOnCompleteListener(task1 -> {
-                                event.addAttendee(task1.getResult());
+                                event.addInterestedAttendee(task1.getResult());
                             })
-
                     );
+                }
+                // Checked-in attendees get added
+                for(Map.Entry<String, Integer> entry: eventDatabaseRepresentation.getCheckedInAttendeeIDs().entrySet()){
+                    tasks.add(owner.attendees.get(entry.getKey()).addOnCompleteListener(task1 -> {
+                        event.setAttendeeCheckInCount(
+                                task1.getResult(),
+                                entry.getValue()
+                        );
+                    }));
                 }
                 // organizer gets added
                 tasks.add(owner.attendees.get(eventDatabaseRepresentation.getOrganizerID())
@@ -181,14 +254,31 @@ public class Database {
                 });
             });
         }
+
         /**
-         * get an Event object from the database
-         * @param eventID ID of the event
-         * @return a Task\<Event\> object, call getResult() on it to get the Event or an error
+         * get an event from the documentSnapshot of the document of this event
+         * @param doc the firestore documentSnapshot that contains the event in question
+         * @return a task that will resolve to an Event
          */
-        @NonNull
-        public Task<Event> get(String eventID){
-            return get(eventID, true, true, true);
+        public Task<Event> get(DocumentSnapshot doc){
+            if(doc.get("eventID") != null){
+                return get(doc.get("eventID").toString());
+            }
+            return Tasks.forException(new Exception("Tried to load an event from a non-event DocumentSnapshot"));
+        }
+
+        /**
+         * Check if an eventID exists as an event
+         * @param eventID the event ID to search for
+         * @return a task that will resolve to a boolean of whether it exists in the DB or not
+         */
+        public Task<Boolean> checkExistence(String eventID){
+            return eventsCollection.document(eventID).get().continueWithTask(task -> {
+                if(!task.isSuccessful()){
+                    return Tasks.forException(getTaskException(task));
+                }
+                return Tasks.forResult(task.getResult().exists());
+            });
         }
 
 
@@ -199,10 +289,10 @@ public class Database {
          * @return a task that will be resolved when the adding finishes
          */
         @NonNull
-        public Task<Void> addAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+        public Task<Void> checkInAttendee(@NonNull Event event, @NonNull Attendee attendee) {
             return eventsCollection
                     .document(event.getEventID())
-                    .update("attendeeIDs", FieldValue.arrayUnion(attendee.getDeviceID()));
+                    .update(FieldPath.of("checkedInAttendeeIDs",attendee.getDeviceID()),FieldValue.increment(1));
         }
 
         /**
@@ -212,10 +302,23 @@ public class Database {
          * @return a task that will be resolved when the DB actions finish
          */
         @NonNull
-        public Task<Void> removeAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+        public Task<Void> removeCheckedInAttendee(@NonNull Event event, @NonNull Attendee attendee) {
             return eventsCollection
                     .document(event.getEventID())
-                    .update("attendeeIDs", FieldValue.arrayRemove(attendee.getDeviceID()));
+                    .update(FieldPath.of("checkedInAttendeeIDs", attendee.getDeviceID()), FieldValue.delete());
+        }
+
+        @NonNull
+        public Task<Void> addInterestedAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+            return eventsCollection
+                    .document(event.getEventID())
+                    .update("interestedAttendeeIDs", FieldValue.arrayUnion(attendee.getDeviceID()));
+        }
+
+        public Task<Void> removeInterestedAttendee(@NonNull Event event, @NonNull Attendee attendee) {
+            return eventsCollection
+                    .document(event.getEventID())
+                    .update("interestedAttendeeIDs", FieldValue.arrayRemove(attendee.getDeviceID()));
         }
 
         /**
@@ -255,11 +358,7 @@ public class Database {
                                 return create(event); // recurse with new ID
                             }
                         } else {
-                            Exception taskException = task.getException();
-                            if(taskException != null){
-                                throw taskException;
-                            }
-                            throw new Exception("Unknown Error Occurred");
+                            return Tasks.forException(getTaskException(task));
                         }
                     });
         }
@@ -277,20 +376,30 @@ public class Database {
 
     }
 
-    private class posters{
-        //TODO better references, owner class
-        FileDownloadTask get(String posterID, Uri destinationURI){
-            return FirebaseStorage.getInstance().getReference()
-                    .child(storageRootFolder)
-                    .child(postersStoragePath)
-                    .child(posterID)
-                    .getFile(destinationURI);
+    public class PosterOperations{
+        private Database owner;
 
+        private PosterOperations(Database owner){
+            this.owner = owner;
+        }
+        Task<File> get(String posterID) throws IOException {
+            File downloadDestination = File.createTempFile(posterID,"posterTemp");
+            return owner.posterStorageCollection
+                    .child(posterID)
+                    .getFile(downloadDestination)
+                    .continueWith(task -> {
+                        if(task.isSuccessful()) {
+                            return downloadDestination;
+                        } else {
+                            if(task.getException() == null){
+                                throw new Exception("Unknown Error occurred");
+                            }
+                            throw task.getException();
+                        }
+                    });
         }
         UploadTask set(String posterID, Uri posterUri){
-            return FirebaseStorage.getInstance().getReference()
-                    .child(storageRootFolder)
-                    .child(postersStoragePath)
+            return owner.posterStorageCollection
                     .child(posterID)
                     .putFile(posterUri);
         }
@@ -325,15 +434,17 @@ public class Database {
          * @param linkType the type of link.
          *                 Use QRDatabaseEventLink.DIRECT_SIGN_IN, or
          *                     QRDatabaseEventLink.DIRECT_SEE_DETAILS when setting this
-         * @return a Task that will be resolved when the database write is complete or failed
+         * @return a Task that contains QR data when completed
          */
-        public Task<Void> set(String decoded_qr_data, Event directedEvent, int linkType){
+        public Task<String> set(String decoded_qr_data, Event directedEvent, int linkType){
             return qrLinkCollection
                     .document(decoded_qr_data)
                     .set(new QRDatabaseEventLink(
                             linkType,
                             directedEvent
-                    ));
+                    )).continueWith(task -> {
+                        return decoded_qr_data;
+                    });
         }
 
         /**
@@ -346,7 +457,61 @@ public class Database {
                     .document(decoded_qr_data)
                     .delete();
         }
+
+        /**
+         * Create a unique <b>decoded</b> QR data string, for writing a link
+         * @return a unique string for the decoded QR data
+         */
+        public Task<String> generateUniqueQrID(){
+            String randomID = ((Integer)((int)(Math.random()*10000000))).toString();
+            return qrLinkCollection.document(randomID)
+                    .get()
+                    .continueWithTask(task -> {
+                        if(task.isSuccessful()) {
+                            if(!task.getResult().exists()){
+                                // doesn't exist, we can use this
+                                // reserve just in case someone else does this at the same time
+                                return owner.qr_codes.set(randomID, null, -1)
+                                        .continueWith(task1 -> {
+                                            return randomID;
+                                        });
+                            } else {
+                                // already exists, try again
+                                return generateUniqueQrID();
+                            }
+                        } else {
+                            return Tasks.forException(getTaskException(task));
+                        }
+                    });
+        }
+
+        /**
+         * Get a list of existing decoded QR strings that link to this event
+         * useful if you don't want to keep generating QR codes for the same event
+         * @param event the event to find existing QR codes for
+         * @param linkType the link type to search for
+         * @return a list of decoded QR data that links to the specified event with the specified link type
+         */
+        public Task<ArrayList<String>> getExistingQRsForEvent(Event event, int linkType){
+            return owner.qrLinkCollection
+                    .whereEqualTo("directedEventID",event.getEventID())
+                    .whereEqualTo("directionType",linkType)
+                    .get().continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<String> results = new ArrayList<>();
+                        for(QueryDocumentSnapshot queryDocumentSnapshot:task.getResult()){
+                            results.add(queryDocumentSnapshot.getId());
+                        }
+                        return Tasks.forResult(results);
+                    });
+
+        }
     }
 
+    public static Exception getTaskException(Task<?> task){
+        return (task.getException() != null) ? task.getException() : new Exception("Unknown Error Occurred");
+    }
 
 }

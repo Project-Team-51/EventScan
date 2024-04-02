@@ -1,7 +1,8 @@
 package com.example.eventscan.Entities;
 
 import android.location.Location;
-import android.net.Uri;
+
+import java.util.HashMap;
 
 import com.example.eventscan.Database.EventDatabaseRepresentation;
 
@@ -18,7 +19,8 @@ public class Event implements Serializable {
     private Location location;
     private String desc;
     private String name;
-    public ArrayList<Attendee> attendees;
+    private HashMap<Attendee, Integer> checkedInAttendees;
+    private ArrayList<Attendee> interestedAttendees;
     private Organizer organizer;
     private String poster;
     private String eventID;
@@ -27,7 +29,8 @@ public class Event implements Serializable {
   
     // empty constructor so it works with firestore
     public Event() {
-        this.attendees = new ArrayList<>();
+        this.checkedInAttendees = new HashMap<>();
+        this.interestedAttendees = new ArrayList<>();
     };
 
     /**
@@ -42,7 +45,8 @@ public class Event implements Serializable {
     public Event(String eventName, String desc, Organizer organizer, String poster, String eventID) {
         this.name = eventName;
         this.desc = desc;
-        this.attendees = new ArrayList<>();
+        this.checkedInAttendees = new HashMap<>();
+        this.interestedAttendees = new ArrayList<>();
         this.organizer = organizer;
         this.poster = poster;
         this.eventID = eventID;
@@ -78,16 +82,79 @@ public class Event implements Serializable {
         return name;
     }
 
-    public void addAttendee(Attendee attendee) {
-        attendees.add(attendee);
+    /**
+     * "check in" an attendee, the event keeps track of how many times someone has been checked in
+     * @param attendee the attendee to check in
+     */
+    public void checkInAttendee(Attendee attendee) {
+        this.checkedInAttendees.merge(attendee, 1, Integer::sum);
     }
 
-    public void removeAttendee(Attendee attendee) {
-        attendees.remove(attendee);
+    /**
+     * specify a specific check-in count for an attendee to this event
+     * @param attendee the attendee to set the check-in count of
+     * @param checkInCount the count they should have
+     */
+    public void setAttendeeCheckInCount(Attendee attendee, int checkInCount) {
+        this.checkedInAttendees.put(attendee, checkInCount);
     }
 
-    public ArrayList<Attendee> getAttendees() {
-        return attendees;
+    /**
+     * remove any "check in" count this attendee may have
+     * @param attendee the attendee to "erase"
+     */
+    public void removeCheckedInAttendee(Attendee attendee) {
+        this.checkedInAttendees.remove(attendee);
+    }
+
+    /**
+     * get an ArrayList of the currently checked in attendees, <b>Does not contain the count</b>
+     * This only exists for legacy reasons, use getCheckedInAttendees() instead to get their count too
+     * @return an ArrayList of attendees that have been checked in at least once.
+     */
+    public ArrayList<Attendee> getCheckedInAttendeesList() {
+        ArrayList<Attendee> output = new ArrayList<>();
+        for(Attendee attendee: this.checkedInAttendees.keySet()){
+            if(this.checkedInAttendees.get(attendee) > 0){
+                output.add(attendee);
+            } else {
+                throw new RuntimeException("There is a checked in attendee with a <= 0 check-in count, this should not be possible");
+            }
+        }
+        return output;
+    }
+
+    /**
+     * @return a hashmap that maps attendee object to check-in count
+     */
+    public HashMap<Attendee, Integer> getCheckedInAttendees(){
+        return this.checkedInAttendees;
+    }
+
+    /**
+     * add an attendee to the list of interested attendees for this event,
+     * only if it hasn't been added previously
+     * @param attendee the attendee to be added to the interested attendees list
+     */
+    public void addInterestedAttendee(Attendee attendee){
+        if(!this.interestedAttendees.contains(attendee)) {
+            this.interestedAttendees.add(attendee);
+        }
+    }
+
+    /**
+     * remove an attendee from the list of attendees interested in this event
+     * @param attendee the attendee to remove
+     */
+    public void removeInterestedAttendee(Attendee attendee){
+        this.interestedAttendees.remove(attendee);
+    }
+
+    /**
+     * @return the list of attendees interested in this event
+     */
+    public ArrayList<Attendee> getInterestedAttendees(){
+        return this.interestedAttendees;
     }
 
     public Organizer getOrganizer() {
@@ -115,13 +182,20 @@ public class Event implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return Objects.equals(getLocation(), event.getLocation()) && Objects.equals(getDesc(), event.getDesc()) && Objects.equals(getName(), event.getName()) && Objects.equals(getAttendees(), event.getAttendees()) && Objects.equals(getOrganizer(), event.getOrganizer()) && Objects.equals(getPoster(), event.getPoster()) && Objects.equals(getEventID(), event.getEventID());
+        return Objects.equals(getLocation(), event.getLocation())
+                && Objects.equals(getDesc(), event.getDesc())
+                && Objects.equals(getName(), event.getName())
+                && Objects.equals(getCheckedInAttendees(), event.getCheckedInAttendees())
+                && Objects.equals(getOrganizer(), event.getOrganizer())
+                && Objects.equals(getPoster(), event.getPoster())
+                && Objects.equals(getEventID(), event.getEventID())
+                && Objects.equals(getInterestedAttendees(), event.getInterestedAttendees());
     }
 
     @Override
     public int hashCode() {
         //auto-generated
-        return Objects.hash(getLocation(), getDesc(), getName(), getAttendees(), getOrganizer(), getPoster(), getEventID());
+        return Objects.hash(getLocation(), getDesc(), getName(), getCheckedInAttendeesList(), getOrganizer(), getPoster(), getEventID(), getInterestedAttendees());
     }
 }
 

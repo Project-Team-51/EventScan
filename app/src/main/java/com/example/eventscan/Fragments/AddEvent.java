@@ -2,15 +2,12 @@ package com.example.eventscan.Fragments;
 
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
-import android.app.FragmentManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,21 +28,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.eventscan.Activities.MainActivity;
-import com.example.eventscan.Activities.UserSelection;
+import com.example.eventscan.Database.Database;
+import com.example.eventscan.Database.QRDatabaseEventLink;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Helpers.QrCodec;
 import com.example.eventscan.Entities.Organizer;
 import com.example.eventscan.R;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.journeyapps.barcodescanner.BarcodeEncoder;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -54,8 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
-import android.widget.CompoundButton;
-import java.util.UUID;
+
 /*
  * A dialog fragment that allows us to add a new event. The organizer who makes the event is designated the event owner,
  * and the new event is pushed to the Firestore where every users all events list will promptly update and add it.
@@ -68,8 +57,10 @@ public class AddEvent extends DialogFragment {
     private Uri posterUri;
     private String posterUriString;
     private String eventID;
-    private FirebaseFirestore db;
+    private Database db;
     private String deviceID;
+
+    //private boolean isSingleUse = false;
 
     public interface OnEventAddedListener {
         void onEventAdded();
@@ -119,8 +110,9 @@ public class AddEvent extends DialogFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        db = FirebaseFirestore.getInstance();
-        Button generateQRCodeButton = view.findViewById(R.id.generate_QRCode);
+        db = Database.getInstance();
+        Button generateQRCodeCheckInButton = view.findViewById(R.id.generate_QRCode_check_in);
+        Button generateQRCodeDetailsButton = view.findViewById(R.id.generate_QRCode_see_details);
         Button confirmEventButton = view.findViewById(R.id.confirmEvent);
         Button uploadPoster = view.findViewById(R.id.upload_poster);
         Switch attendeeLimitSwitch = view.findViewById(R.id.attendeeLimit);
@@ -136,39 +128,63 @@ public class AddEvent extends DialogFragment {
         });
 
 
-        generateQRCodeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Generate QR code bitmap
+        generateQRCodeCheckInButton.setOnClickListener(v -> {
+            View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
+            ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
+            Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
+            int linkType = QRDatabaseEventLink.DIRECT_CHECK_IN;
 
-                Bitmap qrCodeBitmap = generateQRCode(QrCodec.encodeQRString(event.getEventID()));
+            // setup the task to run as early as possible
+            Task<Bitmap> getQRTask = QrCodec.createOrGetQR(event, linkType, false);
+            getQRTask.addOnSuccessListener(bitmap -> {
+                imageViewDialog.setImageBitmap(bitmap);
+            });
+            // rest of fragment setup
+            // Create and show the dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setView(dialogView);
+            AlertDialog dialog = builder.create();
+            dialog.show();
 
-                // Inflate the dialog layout
-                View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
-
-                // Find views in the dialog layout
-                ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
-                Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
-
-                // Set QR code bitmap to ImageView
-                imageViewDialog.setImageBitmap(qrCodeBitmap);
-
-                // Create and show the dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setView(dialogView);
-                AlertDialog dialog = builder.create();
-                dialog.show();
-
-                // Set click listener for the "Save to Camera Roll" button
-                buttonSaveToCamera.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        saveQRCodeToCameraRoll(qrCodeBitmap);
-                        dialog.dismiss(); // Dismiss the dialog after saving
-                    }
-                });
-            }
+            // Set click listener for the "Save to Camera Roll" button
+            buttonSaveToCamera.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveQRCodeToCameraRoll(getQRTask.getResult());
+                    dialog.dismiss(); // Dismiss the dialog after saving
+                }
+            });
         });
+
+        generateQRCodeDetailsButton.setOnClickListener(v -> {
+            View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
+            ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
+            Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
+            int linkType = QRDatabaseEventLink.DIRECT_SEE_DETAILS;
+
+            // setup the task to run as early as possible
+            Task<Bitmap> getQRTask = QrCodec.createOrGetQR(event, linkType, false);
+            getQRTask.addOnSuccessListener(bitmap -> {
+                imageViewDialog.setImageBitmap(bitmap);
+            });
+            // rest of fragment setup
+            // Create and show the dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setView(dialogView);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            // Set click listener for the "Save to Camera Roll" button
+            buttonSaveToCamera.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveQRCodeToCameraRoll(getQRTask.getResult());
+                    dialog.dismiss(); // Dismiss the dialog after saving
+                }
+            });
+        });
+
+
         confirmEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -180,35 +196,21 @@ public class AddEvent extends DialogFragment {
                 event.setDesc(eventDesc);
                 event.setName(eventName);
                 event.setPoster(posterUriString);
+                // TODO fetch the organizer first just in case
                 organizer = new Organizer();
                 organizer.setDeviceID(deviceID);
                 event.setOrganizer(organizer);
 
-                // Poster
-                // Generate a unique filename for the poster imag
-                StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-                StorageReference posterRef = storageRef.child("poster_pictures").child(eventID);
-                posterRef.putFile(posterUri);
-
-                Event event = new Event(eventName, eventDesc, organizer, posterUriString, eventID);
-                // Call the addEvent function with the retrieved information
-                db.collection("events").document(event.getEventID()).set(event)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "Event successfully added to Firestore");
-                                // Notify the listener that the event is added
-                                if (eventAddedListener != null) {
-                                    eventAddedListener.onEventAdded();
-                                }
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "Error adding event to Firestore", e);
-                            }
-                        });
+                Task<Event> createEventTask = Database.getInstance().events.create(event);
+                createEventTask.addOnSuccessListener(event1 -> {
+                    // event1 is an event that might have an updated eventID to make it unique
+                    Log.d(TAG, "Event successfully added to Firestore");
+                    if(eventAddedListener != null){
+                        eventAddedListener.onEventAdded();
+                    }
+                }).addOnFailureListener(e -> {
+                            Log.w(TAG,"Error adding event to firestore", e);
+                });
             }
         });
         attendeeLimitSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -220,23 +222,7 @@ public class AddEvent extends DialogFragment {
             }
         });
     }
-    /**
-     * Generates a QR code bitmap based on the provided event ID.
-     *
-     * @param eventID The ID of the event to be encoded into the QR code.
-     * @return The generated QR code bitmap.
-     * @throws RuntimeException if an error occurs during the encoding process.
-     */
-    private Bitmap generateQRCode(String eventID) {
-        try {
-            MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
-            BitMatrix bitMatrix = multiFormatWriter.encode(eventID, BarcodeFormat.QR_CODE, 500, 500);
-            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            return barcodeEncoder.createBitmap(bitMatrix);
-        } catch (WriterException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 
     /**
      * Displays a dialog containing the provided QR code bitmap.
