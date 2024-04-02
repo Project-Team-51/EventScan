@@ -24,7 +24,7 @@ public class Event implements Serializable {
     private Organizer organizer;
     private String poster;
     private String eventID;
-    public Integer attendeeLimit;
+    public Integer attendeeLimit = -1;
     public Integer getAttendeeLimit() {
         return attendeeLimit;
     }

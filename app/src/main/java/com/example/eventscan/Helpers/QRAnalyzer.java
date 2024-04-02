@@ -178,6 +178,11 @@ public class QRAnalyzer{
                                 ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setText("You've Already signed up");
                             } else {
                                 ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setOnClickListener(v -> {
+                                    // -1 is a place holder for attendee limit initially
+                                    if (event.getAttendeeLimit() != 1 && event.getCheckedInAttendeesList().size()  >= event.getAttendeeLimit()) {
+                                        Toast.makeText(context, "Attendee limit reached for this event.", Toast.LENGTH_SHORT).show();
+                                        return; // Do not proceed with sign-in
+                                    }
                                     // make sure the selfAttendee has been returned, quick and dirty code, this will be changed
                                     while(!attendeeFetchCompleted){
                                         try {

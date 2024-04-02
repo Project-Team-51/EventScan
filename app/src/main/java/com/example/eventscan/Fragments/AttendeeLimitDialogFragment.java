@@ -40,8 +40,8 @@ public class AttendeeLimitDialogFragment extends DialogFragment {
                 String attendeeLimitString = attendeeLimit.getText().toString();
                 if (!attendeeLimitString.isEmpty()) {
                     int attendeeLimitValue = Integer.parseInt(attendeeLimitString);
-                    if (attendeeLimitValue == 0) {
-                        Toast.makeText(requireContext(), "Limit of 0 is not allowed", Toast.LENGTH_SHORT).show();
+                    if (attendeeLimitValue <= 0) {
+                        Toast.makeText(requireContext(), "Limit must be greater than 0", Toast.LENGTH_SHORT).show();
                     } else {
                         confirmAttendeeLimit(attendeeLimitValue);
                     }
