@@ -13,7 +13,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
         android:textColor="#D3E2F2"
-        android:text="Your Events"
+        android:text=""
         android:textSize="30sp" />
     <RelativeLayout
         android:id="@+id/bubbleContainer"

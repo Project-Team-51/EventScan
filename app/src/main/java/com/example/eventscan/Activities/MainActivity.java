@@ -41,10 +41,13 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         Intent intent = getIntent();
-
+        String userType = intent.getStringExtra("userType");
         if (savedInstanceState == null) {
             // Load the default fragment (EventFragment)
             EventFragment eventFragment = new EventFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("userType", userType);
+            eventFragment.setArguments(bundle);
             loadFragment(eventFragment);
         }
 
@@ -57,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
         buttonAllPic = findViewById(R.id.buttonAllPic);
         buttonAllProfile = findViewById(R.id.buttonAllP);
 
-        String userType = intent.getStringExtra("userType");
         hideAllButtons();
         // Show buttons based on user type
         if (userType != null) {

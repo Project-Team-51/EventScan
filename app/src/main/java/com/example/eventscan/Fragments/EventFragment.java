@@ -63,6 +63,21 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.admin_observer_fragment, container, false);
+        Bundle bundle = this.getArguments();
+        TextView textView = (TextView) view.findViewById(R.id.yourEventsText);
+
+        if (bundle != null) {
+            String userType = bundle.getString("userType");
+            switch (userType) {
+                case "Organizer":
+                    textView.setText("Your Events");
+                    break;
+                case "Admin":
+                case "Attendee":
+                    textView.setText("All Events");
+                    break;
+            }
+        }
 
         ownedEvents = new ArrayList<>();
         inEvents = new ArrayList<>();
@@ -116,7 +131,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 
         // Grab user type, organizer or Attendee
         String deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-
+/*
         db.collection("attendees")
                 .document(deviceID)
                 .get()
@@ -134,7 +149,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                         Log.e("elephant", "Error getting document: ", task.getException());
                     }
                 });
-
+*/
         return view;
 
     }
@@ -234,6 +249,11 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 
         // Set the adapter to the ListView
         attendeesListView.setAdapter(attendeeAdapter);
+    }
+
+    public void setText(String text){
+        TextView textView = (TextView) getView().findViewById(R.id.yourEventsText);
+        textView.setText(text);
     }
 
 }
