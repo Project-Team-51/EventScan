@@ -265,6 +265,20 @@ public class Database {
             return Tasks.forException(new Exception("Tried to load an event from a non-event DocumentSnapshot"));
         }
 
+        /**
+         * Check if an eventID exists as an event
+         * @param eventID the event ID to search for
+         * @return a task that will resolve to a boolean of whether it exists in the DB or not
+         */
+        public Task<Boolean> checkExistence(String eventID){
+            return eventsCollection.document(eventID).get().continueWithTask(task -> {
+                if(!task.isSuccessful()){
+                    return Tasks.forException(getTaskException(task));
+                }
+                return Tasks.forResult(task.getResult().exists());
+            });
+        }
+
 
         /**
          * Add an attendee to an event if they aren't already on it
@@ -470,7 +484,7 @@ public class Database {
         }
     }
 
-    private Exception getTaskException(Task<?> task){
+    public static Exception getTaskException(Task<?> task){
         return (task.getException() != null) ? task.getException() : new Exception("Unknown Error Occurred");
     }
 
