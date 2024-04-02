@@ -9,7 +9,7 @@ import android.graphics.Bitmap;
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Event;
 import com.google.android.gms.tasks.Task;
-import com.google.mlkit.vision.barcode.common.Barcode;
+import com.google.android.gms.tasks.Tasks;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
@@ -57,11 +57,15 @@ public class QrCodec {
      *
      * @param event The event to create a QR code for.
      * @param linkType the type of link.
-     *                 0 for sign in, 1 for seeing details
+     *                 use QRDatabaseEventLink.DIRECT_[XYZ] as the argument
+     * @param forceNewCreation if true, force the creation of a new code,
+     *                         if false it will try to reuse an existing code for this event and link type
      * @return The task of the QR code bitmap.
      */
-    public static Task<Bitmap> createNewQR(Event event, int linkType) {
-        return Database.getInstance().qr_codes.generateUniqueQrID()
+    public static Task<Bitmap> createOrGetQR(Event event, int linkType, boolean forceNewCreation) {
+        //                            if forcing...       get a unique ID...                                     else check if we can use an existing one
+        Task<String> getQRDataTask = (forceNewCreation) ? Database.getInstance().qr_codes.generateUniqueQrID() : getExistingQRDataElseReserve(event, linkType);
+        return getQRDataTask
                 .continueWithTask(task -> {
                     if (!task.isSuccessful()) {
                         throw new Exception("No bueno");
@@ -75,8 +79,7 @@ public class QrCodec {
                     }
                     String qrID = task.getResult();
                     String newlyEncoded = encodeQRString(qrID);
-                    Bitmap qrCode = encodeToQrImage(newlyEncoded);
-                    return qrCode;
+                    return encodeToQrImage(newlyEncoded);
                 });
     }
 
@@ -100,4 +103,36 @@ public class QrCodec {
         }
     }
 
+    /**
+     * Get an existing QR Data string that points to this event with this link type,
+     * or return a new one if none exist
+     * @param event the event to search for
+     * @param linkType the link type to search for
+     * @return a task which will have a string of QR data that either
+     *         already points to this event with this link type,
+     *         or is new and freshly reserved to be pointing in the desired way
+     */
+    private static Task<String> getExistingQRDataElseReserve(Event event, int linkType){
+        Database db = Database.getInstance();
+        return db.qr_codes
+                .getExistingQRsForEvent(event, linkType)
+                .continueWithTask(task -> {
+                    if(!task.isSuccessful()){
+                        return Tasks.forException(Database.getTaskException(task));
+                    }
+                    if(task.getResult().isEmpty()){
+                        // if we can't find any existing ones, get a unique ID and set it
+                        return db.qr_codes.generateUniqueQrID()
+                                .continueWithTask(task1 -> {
+                                    // set it, and return the unique ID all the way back up
+                                    return db.qr_codes.set(task1.getResult(), event, linkType)
+                                            .continueWith(task2 -> {
+                                                return task1.getResult();
+                                            });
+                                });
+                    }
+                    // else, something exists, we can use it
+                    return Tasks.forResult(task.getResult().get(0));
+                });
+    }
 }

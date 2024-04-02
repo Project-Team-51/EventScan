@@ -15,6 +15,8 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -481,6 +483,30 @@ public class Database {
                             return Tasks.forException(getTaskException(task));
                         }
                     });
+        }
+
+        /**
+         * Get a list of existing decoded QR strings that link to this event
+         * useful if you don't want to keep generating QR codes for the same event
+         * @param event the event to find existing QR codes for
+         * @param linkType the link type to search for
+         * @return a list of decoded QR data that links to the specified event with the specified link type
+         */
+        public Task<ArrayList<String>> getExistingQRsForEvent(Event event, int linkType){
+            return owner.qrLinkCollection
+                    .whereEqualTo("directedEventID",event.getEventID())
+                    .whereEqualTo("directionType",linkType)
+                    .get().continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<String> results = new ArrayList<>();
+                        for(QueryDocumentSnapshot queryDocumentSnapshot:task.getResult()){
+                            results.add(queryDocumentSnapshot.getId());
+                        }
+                        return Tasks.forResult(results);
+                    });
+
         }
     }
 
