@@ -252,6 +252,7 @@ public class Database {
                 }
                 // organizer gets added
                 if(eventDatabaseRepresentation.getOrganizerID() != null) {
+                    
                     tasks.add(owner.attendees.get(eventDatabaseRepresentation.getOrganizerID())
                             .addOnCompleteListener(task1 -> {
                                 Attendee attendee = task1.getResult();
