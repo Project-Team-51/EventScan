@@ -19,9 +19,6 @@ public class QRDatabaseEventLink {
     @Nullable
     private String directedEventID; // the ID of the event to direct the scanner to
 
-    public QRDatabaseEventLink(){
-    }
-
     /**
      * Create a QRDatabaseRedirection object
      * @param directionType the type of direction to use, when implementing, use QRDatabaseEventLink.DIRECT_SIGN_IN or DIRECT_SEE_DETAILS

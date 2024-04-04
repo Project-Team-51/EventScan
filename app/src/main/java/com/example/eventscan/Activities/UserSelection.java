@@ -8,14 +8,13 @@ import android.view.View;
 import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Organizer;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.UUID;
 
 public class UserSelection extends AppCompatActivity {
@@ -24,14 +23,14 @@ public class UserSelection extends AppCompatActivity {
     private static final String KEY_SELECTION = "Selection";
     private static final String PREF_INSTALLATION_ID = "InstallationId";
 
-    private Database db;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.userselection);
-        db = Database.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         String installationId = getInstallationId();
 
@@ -98,30 +97,44 @@ public class UserSelection extends AppCompatActivity {
         return sharedPreferences.getString(PREF_INSTALLATION_ID, null);
     }
 
-    // creates an attendee user in the database and navigates to AttendeeEventsView activity
+    // creates an attendee user in Firestore and navigates to AttendeeEventsView activity
     private void createAttendeeUser() {
         String installationId = getInstallationId();
         Attendee attendee = new Attendee();
-        db.attendees.set(attendee)
-            .addOnSuccessListener(voidReturn -> {
-                Intent intent = new Intent(UserSelection.this, MainActivity.class);
-                intent.putExtra("userType", "Attendee");
-                startActivity(intent);
-                finish();
-            });
+        db.collection("users").document(installationId).set(attendee)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Intent intent = new Intent(UserSelection.this, MainActivity.class);
+                            intent.putExtra("userType", "Attendee");
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            // Error creating user
+                        }
+                    }
+                });
     }
 
     // creates an organizer user in Firestore and navigates to OrganizerEventsView activity
     private void createOrganizerUser() {
         String installationId = getInstallationId();
         Organizer organizer = new Organizer();
-        db.attendees.set(organizer)
-            .addOnSuccessListener(voidReturn -> {
-                Intent intent = new Intent(UserSelection.this, MainActivity.class);
-                intent.putExtra("userType", "Organizer");
-                startActivity(intent);
-                finish();
-            });
+        db.collection("users").document(installationId).set(organizer)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Intent intent = new Intent(UserSelection.this, MainActivity.class);
+                            intent.putExtra("userType", "Organizer");
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            // Error creating user
+                        }
+                    }
+                });
     }
 
     // saves the user selection (organizer or attendee) to shared preferences
