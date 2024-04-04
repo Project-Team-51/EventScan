@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventscan.Fragments.AddEvent;
+import com.example.eventscan.Fragments.AttendeeFragment;
 import com.example.eventscan.Fragments.EventFragment;
 import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.Fragments.QrScannerFragment;
@@ -41,10 +42,13 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         Intent intent = getIntent();
-
+        String userType = intent.getStringExtra("userType");
         if (savedInstanceState == null) {
             // Load the default fragment (EventFragment)
             EventFragment eventFragment = new EventFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("userType", userType);
+            eventFragment.setArguments(bundle);
             loadFragment(eventFragment);
         }
 
@@ -57,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
         buttonAllPic = findViewById(R.id.buttonAllPic);
         buttonAllProfile = findViewById(R.id.buttonAllP);
 
-        String userType = intent.getStringExtra("userType");
         hideAllButtons();
         // Show buttons based on user type
         if (userType != null) {
@@ -109,7 +112,16 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                 loadFragment(qrscan);
             }
         });
+        buttonAllProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Load the EventFragment
+                AttendeeFragment attendeeFragment = new AttendeeFragment();
+                loadFragment(attendeeFragment);
+            }
+        });
     }
+
 
 
     /**

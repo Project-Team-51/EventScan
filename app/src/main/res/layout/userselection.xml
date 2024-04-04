@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient">
@@ -9,63 +9,60 @@
         android:id="@+id/eventscantext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/chooseyourusertype"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="100dp"
-        android:fontFamily="sans-serif-light"
+        android:layout_marginTop="100dp"
         android:text="EventScan"
         android:textColor="#D3E2F2"
-        android:textSize="48sp">
-
-    </TextView>
+        android:textSize="48sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
         android:id="@+id/chooseyourusertype"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/buttonOrganizer"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="15dp"
-        android:fontFamily="sans-serif-light"
+        android:layout_marginTop="15dp"
         android:text="What type of user are you?"
         android:textColor="#D3E2F2"
-        android:textSize="24sp">
-
-    </TextView>
+        android:textSize="24sp"
+        app:layout_constraintTop_toBottomOf="@+id/eventscantext"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <Button
         android:id="@+id/buttonAttendee"
-        android:layout_width="wrap_content"
+        android:layout_width="160dp"
         android:layout_height="38dp"
-        android:layout_above="@+id/buttonAdministrator"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="12dp"
+        android:layout_marginTop="40dp"
         android:backgroundTint="#414E6E"
         android:text="@string/attendee"
-        android:textColor="#D3E2F2" />
-
+        android:textColor="#D3E2F2"
+        app:layout_constraintTop_toBottomOf="@+id/chooseyourusertype"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <Button
         android:id="@+id/buttonOrganizer"
-        android:layout_width="wrap_content"
+        android:layout_width="160dp"
         android:layout_height="38dp"
-        android:layout_above="@+id/buttonAttendee"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="12dp"
+        android:layout_marginTop="8dp"
         android:backgroundTint="#414E6E"
         android:text="@string/organizer"
-        android:textColor="#D3E2F2" />
+        android:textColor="#D3E2F2"
+        app:layout_constraintTop_toBottomOf="@+id/buttonAttendee"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <Button
         android:id="@+id/buttonAdministrator"
-        android:layout_width="wrap_content"
+        android:layout_width="160dp"
         android:layout_height="38dp"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="280dp"
+        android:layout_marginTop="8dp"
         android:backgroundTint="#414E6E"
-        android:layout_centerHorizontal="true"
         android:text="@string/administrator"
-        android:textColor="#D3E2F2" />
+        android:textColor="#D3E2F2"
+        app:layout_constraintTop_toBottomOf="@+id/buttonOrganizer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
