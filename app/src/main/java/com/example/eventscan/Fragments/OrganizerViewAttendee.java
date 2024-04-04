@@ -9,7 +9,6 @@ import android.widget.ListView;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
@@ -19,7 +18,7 @@ import java.util.ArrayList;
 
 public class OrganizerViewAttendee extends Fragment {
 
-    private Database db;
+    private FirebaseFirestore db;
     private ListView attendeesListView;
     private ArrayList<String> attendeesList;
     private ArrayAdapter<String> attendeesAdapter;
@@ -32,7 +31,7 @@ public class OrganizerViewAttendee extends Fragment {
         View view = inflater.inflate(R.layout.attendee_list_content, container, false);
 
         // Initialize Firebase Firestore instance
-        db = Database.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         // Initialize UI components
         attendeesListView = view.findViewById(R.id.allUserList);
@@ -46,8 +45,9 @@ public class OrganizerViewAttendee extends Fragment {
             String eventId = args.getString("eventId");
             if (eventId != null) {
                 // Query database to retrieve attendees for the specified event ID
-                db.events.get(eventId).addOnSuccessListener(event -> {
-                    for(Attendee attendee: event.getCheckedInAttendeesList()){
+                db.collection("events").document(eventId).get().addOnSuccessListener(documentSnapshot -> {
+                    Event e = documentSnapshot.toObject(Event.class);
+                    for(Attendee attendee : e.getCheckedInAttendeesList()){
                         attendeesList.add(attendee.getName());
                     }
                     attendeesAdapter.notifyDataSetChanged();

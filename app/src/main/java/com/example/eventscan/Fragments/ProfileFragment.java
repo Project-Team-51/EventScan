@@ -27,7 +27,6 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Helpers.GeolocationHandler;
 import com.example.eventscan.Helpers.ImageUploader;
@@ -53,7 +52,7 @@ import kotlin.jvm.functions.Function1;
 
 public class ProfileFragment extends Fragment {
 
-    private Database db;
+    private FirebaseFirestore db;
     ImageView profilePic;
     EditText usernameInput;
     EditText phoneInput;
@@ -98,7 +97,7 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        db = Database.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         deviceID = Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
 
@@ -187,13 +186,16 @@ public class ProfileFragment extends Fragment {
      * @param attendee The Attendee object containing profile information.
      */
     private void saveAttendeeProfile(Attendee attendee) {
-        db.attendees.set(attendee).addOnSuccessListener(voidReturn -> {
-            Log.d(TAG, "Profile saved successfully");
-        }).addOnFailureListener(e -> {
-            Log.d(TAG, "Error saving profile");
-        });
+        db.collection("attendees")
+                .document(deviceID) // Use deviceID as a document ID
+                .set(attendee)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Profile saved successfully");
+                })
+                .addOnFailureListener(e -> {
+                    Log.d(TAG, "Error saving profile");
+                });
 
-        //TODO replace with DB call
         if(selectedImageUri !=null){
             StorageReference storageRef = FirebaseStorage.getInstance().getReference();
             StorageReference profilePicRef = storageRef.child("profile_pics").child(deviceID);
@@ -245,9 +247,14 @@ public class ProfileFragment extends Fragment {
      * Loads the user's profile information from Firestore and updates the UI.
      */
     private void loadProfileInfo() {
-        db.attendees.get(deviceID)
-                .addOnSuccessListener(attendee -> {
+        db.collection("attendees")
+                .document(deviceID)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Attendee attendee = documentSnapshot.toObject(Attendee.class);
                         updateUIWithProfileInfo(attendee);
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Log.e(TAG, "Error retrieving profile information", e);
@@ -271,7 +278,6 @@ public class ProfileFragment extends Fragment {
 
             // Load profile picture using Glide or Picasso (or any image loading library)
             if (attendee.getProfilePictureID() != null) {
-                // TODO replace with DB call
                 StorageReference profilePicRef = FirebaseStorage.getInstance()
                         .getReference()
                         .child("profile_pics")
