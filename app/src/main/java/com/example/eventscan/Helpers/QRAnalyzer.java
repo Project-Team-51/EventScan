@@ -143,15 +143,6 @@ public class QRAnalyzer{
         }
     }
 
-    private void createScanResultDialog(QRDatabaseEventLink link){
-        switch(link.getDirectionType()){
-            case QRDatabaseEventLink.DIRECT_CHECK_IN:
-                //TODO
-            case QRDatabaseEventLink.DIRECT_SEE_DETAILS:
-                createSignInDialog(link.getDirectedEventID());
-        }
-    }
-
     /**
      * Creates a sign-in dialog for the event.
      *

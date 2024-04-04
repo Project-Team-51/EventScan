@@ -56,8 +56,6 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
     private CollectionReference eventsCollection;
     private Database db;
 
-    private Database db;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.admin_observer_fragment, container, false);
