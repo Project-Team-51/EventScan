@@ -1,27 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent">
 
     <!-- Background for whole fragment -->
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/fragment_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/background_gradient">
 
         <!-- First bubble container -->
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/bubbleContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="30dp"
-            android:layout_marginTop="400dp"
-            android:layout_marginBottom="200dp"
+            android:layout_marginTop="45dp"
+            android:layout_marginBottom="100dp"
+            android:padding="5dp"
             android:background="@drawable/background_rounded"
-            android:padding="15dp">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/stored_event_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:gravity="center"
+                android:textColor="#D3E2F2"
+                android:textSize="20sp"
+                android:text=""
+                app:layout_constraintTop_toTopOf="@+id/bubbleContainer"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Second bubble container -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bubbleContainer2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="95dp"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginBottom="400dp"
+            android:background="@drawable/background_rounded"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
 
             <TextView
                 android:id="@+id/stored_event_desc"
@@ -32,57 +63,53 @@
                 android:maxLines="10"
                 android:textColor="#D3E2F2"
                 android:textSize="20sp"
-                android:text="" />
+                android:text=""
+                app:layout_constraintEnd_toEndOf="@id/bubbleContainer2"
+                app:layout_constraintStart_toStartOf="@id/bubbleContainer2"
+                app:layout_constraintTop_toTopOf="@id/bubbleContainer2"
+                />
 
-        </RelativeLayout>
-
-        <!-- Second bubble container -->
-        <RelativeLayout
-            android:id="@+id/bubbleContainer2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="30dp"
-            android:layout_marginTop="75dp"
-            android:layout_marginBottom="100dp"
-            android:background="@drawable/background_rounded"
-            android:padding="5dp">
-
-            <TextView
-                android:id="@+id/stored_event_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:gravity="center"
-                android:textColor="#D3E2F2"
-                android:textSize="20sp"
-                android:text="" />
-
-        </RelativeLayout>
 
         <!-- Poster -->
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
         <ImageView
             android:id="@+id/poster_view"
             android:layout_width="wrap_content"
             android:layout_height="174dp"
+            android:layout_marginTop="15dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentEnd="true"
             android:layout_gravity="center_horizontal"
-            android:layout_marginStart="100dp"
-            android:layout_marginTop="200dp"
-            android:layout_marginEnd="100dp" />
-
-    </RelativeLayout>
-
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bubbleContainer2"
+            app:layout_constraintStart_toEndOf="@id/return_view"/>
     <!-- Buttons -->
-    <Button
-        android:id="@+id/return_view"
-        android:layout_width="160dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/fragment_background"
-        android:layout_marginStart="120dp"
-        android:layout_marginTop="-70dp"
-        android:backgroundTint="#414E6E"
-        android:text="Return" />
+        <Button
+            android:id="@+id/return_view"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/fragment_background"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="30dp"
+            android:backgroundTint="#414E6E"
+            android:text="Return"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bubbleContainer2"/>
+        <Button
+            android:id="@+id/delete_event"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="30dp"
+            android:layout_below="@+id/fragment_background"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="end"
+            android:layout_marginRight="30dp"
+            android:backgroundTint="#414E6E"
+            android:text="DELETE"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/return_view"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

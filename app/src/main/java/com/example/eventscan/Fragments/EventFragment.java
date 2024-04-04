@@ -1,7 +1,7 @@
 package com.example.eventscan.Fragments;
 
-
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Attendee;
+import com.example.eventscan.Entities.DeviceID;
 import com.example.eventscan.Entities.Event;
 
 import com.example.eventscan.Entities.User;
@@ -53,12 +54,32 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
     private EventArrayAdapter ownedEventsAdapter;
     private EventArrayAdapter inEventsAdapter;
     private CollectionReference eventsCollection;
-
     private Database db;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.admin_observer_fragment, container, false);
+        Bundle bundle = this.getArguments();
+        TextView textView = (TextView) view.findViewById(R.id.yourEventsText);
+
+        String myDeviceID = DeviceID.getDeviceID(requireContext());
+        Log.d("DeviceID", "Device ID: " + myDeviceID);
+
+        // Get reference to the TextView
+
+
+        // Set the device ID text to the TextView
+        userType = DeviceID.getUserType(requireContext());
+        switch (userType) {
+            case "Organizer":
+                textView.setText("Your Events");
+                break;
+            case "Admin":
+            case "Attendee":
+                textView.setText("All Events");
+                break;
+        }
+
 
         ownedEvents = new ArrayList<>();
         inEvents = new ArrayList<>();
@@ -125,10 +146,9 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         });
 
         // Grab user type, organizer or Attendee
-        String deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         //TODO ^^ this line needs to be changed to use a helper class that handles the 'self' attendee ID
 
-        db.attendees.get(deviceID).addOnCompleteListener(task -> {
+        db.attendees.get(myDeviceID).addOnCompleteListener(task -> {
             if(task.isSuccessful()){
                 Attendee attendee = task.getResult();
                 if(attendee != null){
@@ -137,7 +157,6 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                 }
             }
         });
-
         return view;
 
     }
@@ -241,5 +260,10 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 //        // Set the adapter to the ListView
 //        attendeesListView.setAdapter(attendeeAdapter);
 //    }
+
+    public void setText(String text){
+        TextView textView = (TextView) getView().findViewById(R.id.yourEventsText);
+        textView.setText(text);
+    }
 
 }
