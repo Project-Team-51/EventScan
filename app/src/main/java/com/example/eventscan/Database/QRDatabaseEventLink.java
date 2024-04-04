@@ -22,6 +22,7 @@ public class QRDatabaseEventLink {
     public QRDatabaseEventLink(){
     }
 
+
     /**
      * Create a QRDatabaseRedirection object
      * @param directionType the type of direction to use, when implementing, use QRDatabaseEventLink.DIRECT_SIGN_IN or DIRECT_SEE_DETAILS

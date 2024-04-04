@@ -21,6 +21,7 @@ public class User implements Serializable {
     private String profilePictureID;
     public ArrayList<Event> inEvents;
 
+
     public User(String name, String password) {
         this.name = name;
         this.password = password;

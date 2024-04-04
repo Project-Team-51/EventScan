@@ -50,6 +50,7 @@ public class Database {
     protected CollectionReference qrLinkCollection;
     protected StorageReference posterStorageCollection;
 
+
     protected CollectionReference adminCollection;
 
     public AttendeeOperations attendees;

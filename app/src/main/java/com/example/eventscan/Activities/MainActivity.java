@@ -18,6 +18,7 @@ import com.example.eventscan.R;
 
 
 
+
 /*
  * The main activity that an Admin sees. Calls fragments instead of other activities. The navigation
  * bar at the bottom allows access to the EventFragment or the AttendeeFragment. By default, it shows

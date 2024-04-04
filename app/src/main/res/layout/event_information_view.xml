@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         android:background="@drawable/background_gradient">
 
+
         <!-- First bubble container -->
         <RelativeLayout
             android:id="@+id/bubbleContainer"

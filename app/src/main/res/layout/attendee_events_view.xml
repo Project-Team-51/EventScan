@@ -20,6 +20,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         android:layout_marginTop="25dp" />
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bubbleContainer"
         android:layout_width="0dp"

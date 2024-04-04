@@ -21,6 +21,7 @@ import com.google.firebase.FirebaseApp;
 public class LoginActivity extends AppCompatActivity {
     private Database db;
 
+
     /**
      * Called when the activity is created. Initializes Firebase Firestore and sets up
      * the UI components for user login.
