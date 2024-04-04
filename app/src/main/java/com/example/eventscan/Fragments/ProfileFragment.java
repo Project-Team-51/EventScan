@@ -170,6 +170,12 @@ public class ProfileFragment extends Fragment {
             public void onClick(View view) {
                 // Calls a method to delete the profile picture
                 deleteProfilePicture();
+
+                // Updates UI to display the default profile picture
+                profilePic.setImageResource(defaultProfileIcon);
+
+                // Hides the delete profile pic button
+                deleteProfilePicBtn.setVisibility(View.GONE);
             }
         });
 
