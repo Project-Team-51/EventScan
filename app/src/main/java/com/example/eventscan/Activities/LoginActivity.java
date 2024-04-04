@@ -12,11 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 /*
  * This activity handles the logging in of an admin. Prompts the user to enter a user and password, and checks the inputted
  * text to the admin credentials stored in Firestore. Has error handling for incorrect credentials and a failure to connect to firestore.
