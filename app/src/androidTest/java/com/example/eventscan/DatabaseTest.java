@@ -146,6 +146,7 @@ public class DatabaseTest extends Database {
         Event returnedEvent = returnEvent.getResult();
         assertEquals(event1Modified, returnedEvent);
         assertEquals(returnedEvent, event1Modified);
+        assertNotNull(returnedEvent.getOrganizer());
     }
 
     @Test
