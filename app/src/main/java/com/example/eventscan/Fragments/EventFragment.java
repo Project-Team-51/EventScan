@@ -111,6 +111,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             }
         });
 
+
         ownedEventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
