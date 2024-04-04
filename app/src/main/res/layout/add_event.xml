@@ -1,37 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent">
 
+
     <TextView
         android:id="@+id/create_event"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
+        android:layout_marginHorizontal="30dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="100dp"
         android:text="Create Event"
         android:textColor="#D3E2F2"
         android:textSize="30sp"
         android:textStyle="bold"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bubbleContainer"
         android:layout_width="347dp"
         android:layout_height="254dp"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="125dp"
-        android:layout_marginBottom="300dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="100dp"
         android:background="@drawable/background_rounded"
-        android:padding="15dp">
+        android:padding="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/editTextContainer">
 
 
         <EditText
             android:id="@+id/addEventDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:background="@null"
             android:gravity="top|start"
             android:hint="Enter Event Description"
@@ -39,108 +48,120 @@
             android:maxLines="10"
             android:textColor="#D3E2F2"
             android:textColorHint="#D3E2F2"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            app:layout_constraintTop_toTopOf="@+id/bubbleContainer" />
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/editTextContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
-        android:layout_marginTop="75dp"
+        android:layout_marginTop="15dp"
         android:layout_marginBottom="100dp"
         android:background="@drawable/background_rounded"
-        android:padding="5dp">
+        android:padding="5dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/create_event">
 
         <EditText
             android:id="@+id/add_edit_event_Name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:autofillHints=""
             android:background="@null"
             android:gravity="center"
             android:hint="Enter Event Name"
+            android:inputType="text"
             android:textColor="#D3E2F2"
             android:textColorHint="#D3E2F2"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            app:layout_constraintTop_toTopOf="@+id/editTextContainer" />
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <Button
         android:id="@+id/confirmEvent"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
         android:layout_below="@id/bubbleContainer"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="-240dp"
-        android:layout_marginRight="30dp"
+        android:layout_gravity="end"
+        android:layout_marginLeft="30dp"
         android:backgroundTint="#414E6E"
-        android:text="Confirm Event" />
+        android:text="Confirm Event"
+        app:layout_constraintTop_toBottomOf="@+id/generate_QRCode_check_in"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <Button
         android:id="@+id/generate_QRCode_check_in"
         android:layout_width="160dp"
-        android:layout_below="@id/bubbleContainer"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-290dp"
-        android:layout_alignParentLeft="true"
+        android:layout_below="@id/bubbleContainer"
         android:layout_marginLeft="30dp"
         android:backgroundTint="#414E6E"
-        android:text="Get Check in QR" />
+        android:text="Get Check in QR"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/generate_QRCode_see_details" />
 
     <Button
         android:id="@+id/generate_QRCode_see_details"
         android:layout_width="160dp"
-        android:layout_below="@id/bubbleContainer"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-230dp"
+        android:layout_below="@id/bubbleContainer"
         android:layout_alignParentLeft="true"
+        android:layout_marginTop="15dp"
         android:layout_marginLeft="30dp"
         android:backgroundTint="#414E6E"
-        android:text="Get Details QR" />
+        android:text="Get Details QR"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bubbleContainer" />
 
     <Button
         android:id="@+id/upload_poster"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-290dp"
         android:layout_below="@id/bubbleContainer"
         android:layout_alignParentRight="true"
+        android:layout_marginTop="15dp"
         android:layout_marginRight="30dp"
         android:backgroundTint="#414E6E"
-        android:text="Upload Poster" />
+        android:text="Upload Poster"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/bubbleContainer" />
 
     <ImageView
         android:id="@+id/posterView"
-        android:layout_width="150dp"
-        android:layout_height="168dp"
+        android:layout_width="168dp"
+        android:layout_height="189dp"
         android:layout_below="@+id/upload_poster"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="83dp"
-        android:layout_marginEnd="3dp"
-        android:layout_marginBottom="42dp"
+        android:layout_marginTop="12dp"
         android:contentDescription="TODO"
-        android:scaleType="centerInside" />
+        android:scaleType="centerInside"
+        app:layout_constraintTop_toBottomOf="@+id/upload_poster"
+        app:layout_constraintStart_toEndOf="@id/generate_QRCode_check_in"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
     <Switch
         android:id="@+id/attendeeLimit"
-        android:layout_width="242dp"
+        android:layout_width="150dp"
         android:layout_height="33dp"
         android:layout_below="@+id/generate_QRCode_see_details"
         android:layout_alignEnd="@+id/confirmEvent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="33dp"
-        android:layout_marginTop="26dp"
-        android:layout_marginEnd="106dp"
-        android:layout_marginBottom="234dp"
-        android:text="Set Attendee Limit:"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="15dp"
+        android:backgroundTint="#D3E2F2"
+        android:text="Set Limit:"
         android:textColor="#D3E2F2"
         android:textColorHint="#D3E2F2"
         android:textSize="20sp"
-        android:backgroundTint="#D3E2F2" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/confirmEvent"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
