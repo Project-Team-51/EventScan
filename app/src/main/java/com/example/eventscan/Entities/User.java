@@ -15,7 +15,6 @@ public class User implements Serializable {
     private String password;
     private String email;
     private String bio;
-    private Boolean checkedIn;
     private Location location;
     private String deviceID;
     private String profilePictureID;
@@ -48,10 +47,6 @@ public class User implements Serializable {
             return bio;
         }
 
-        public Boolean isCheckedIn() {
-            return checkedIn;
-        }
-
         public Location getLocation() {
             return location;
         }
@@ -76,10 +71,6 @@ public class User implements Serializable {
 
         public void setBio(String bio) {
             this.bio = bio;
-        }
-
-        public void setCheckedIn(Boolean checkedIn) {
-            this.checkedIn = checkedIn;
         }
 
         public void setPassword(String password) {

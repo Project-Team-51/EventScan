@@ -101,7 +101,7 @@ public class UserSelection extends AppCompatActivity {
     private void createAttendeeUser() {
         String installationId = getInstallationId();
         Attendee attendee = new Attendee();
-        db.collection("users").document(installationId).set(attendee)
+        db.collection("attendees").document(installationId).set(attendee)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {

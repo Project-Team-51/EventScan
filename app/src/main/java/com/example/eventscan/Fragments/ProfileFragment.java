@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.eventscan.Entities.Attendee;
+import com.example.eventscan.Entities.DeviceID;
 import com.example.eventscan.Helpers.GeolocationHandler;
 import com.example.eventscan.Helpers.ImageUploader;
 import com.example.eventscan.R;
@@ -99,8 +100,8 @@ public class ProfileFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
-        deviceID = Secure.getString(getContext().getContentResolver(), Secure.ANDROID_ID);
-
+        deviceID = DeviceID.getDeviceID(requireContext());
+        Log.d("DeviceID", "Device ID: " + deviceID);
         profilePic = view.findViewById(R.id.profileImageView);
         usernameInput = view.findViewById(R.id.nameEditText);
         phoneInput = view.findViewById(R.id.phoneEditText);

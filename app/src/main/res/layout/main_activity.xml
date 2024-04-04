@@ -1,108 +1,112 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_gradient"
     tools:context=".Activities.MainActivity">
 
-    <RelativeLayout
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/fragment_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/navigationBar" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/navigationBar"
         android:layout_width="match_parent"
         android:layout_height="67dp"
         android:layout_alignParentBottom="true"
         android:background="#191E30"
-        android:padding="5dp">
-
-
-        <ImageButton
-            android:id="@+id/buttonProfile"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="30dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Button 2"
-            android:scaleType="centerInside"
-            android:src="@drawable/profilebox" />
+        android:padding="5dp"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageButton
             android:id="@+id/buttonEvents"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="30dp"
-            android:scaleType="centerInside"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="15dp"
             android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Button 1"
-            android:src="@drawable/events" />
+            android:scaleType="centerInside"
+            android:src="@drawable/events"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <ImageButton
             android:id="@+id/buttonQR"
             android:layout_width="55dp"
             android:layout_height="55dp"
-            android:layout_centerHorizontal="true"
             android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Button 1"
             android:scaleType="centerInside"
-            android:src="@drawable/qrcode" />
+            android:src="@drawable/qrcode"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/buttonAdd"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_toEndOf="@id/buttonEvents"
-            android:layout_toStartOf="@id/buttonQR"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:scaleType="centerInside"
             android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Button 1"
-            android:src="@drawable/addeventbutton" />
+            android:scaleType="centerInside"
+            android:src="@drawable/addeventbutton"
+            app:layout_constraintEnd_toStartOf="@id/buttonQR"
+            app:layout_constraintStart_toEndOf="@id/buttonEvents"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageButton
+            android:id="@+id/buttonProfile"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="15dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:scaleType="centerInside"
+            android:src="@drawable/profilebox"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
         <ImageButton
             android:id="@+id/buttonAllPic"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_toEndOf="@id/buttonEvents"
-            android:layout_toStartOf="@id/buttonQR"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:scaleType="centerInside"
+
             android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Button 1"
-            android:src="@drawable/allpic" />
+            android:scaleType="centerInside"
+            android:src="@drawable/allpic"
+            app:layout_constraintEnd_toStartOf="@+id/buttonProfile"
+            app:layout_constraintStart_toEndOf="@id/buttonQR"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <ImageButton
             android:id="@+id/buttonNoti"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_toEndOf="@id/buttonQR"
-            android:layout_toStartOf="@id/buttonProfile"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:scaleType="centerInside"
             android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Button 1"
-            android:src="@drawable/notify" />
+            android:scaleType="centerInside"
+            android:src="@drawable/notify"
+            app:layout_constraintEnd_toStartOf="@+id/buttonProfile"
+            app:layout_constraintStart_toEndOf="@id/buttonQR"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
         <ImageButton
             android:id="@+id/buttonAllP"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_toEndOf="@id/buttonQR"
-            android:layout_toStartOf="@id/buttonProfile"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:scaleType="centerInside"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:background="?android:attr/selectableItemBackground"
-            android:contentDescription="Button 1"
-            android:src="@drawable/allprofile" />
-    </RelativeLayout>
+            android:scaleType="centerInside"
+            android:src="@drawable/allprofile"
+            app:layout_constraintEnd_toStartOf="@id/buttonQR"
+            app:layout_constraintStart_toEndOf="@id/buttonEvents"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_container_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-
-</RelativeLayout>
