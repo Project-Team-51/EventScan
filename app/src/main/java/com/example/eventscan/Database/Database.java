@@ -243,14 +243,16 @@ public class Database {
                     }));
                 }
                 // organizer gets added
-                tasks.add(owner.attendees.get(eventDatabaseRepresentation.getOrganizerID())
-                        .addOnCompleteListener(task1 -> {
-                            Attendee attendee = task1.getResult();
-                            event.setOrganizer((Organizer) attendee);
-                        }));
+                if(eventDatabaseRepresentation.getOrganizerID() != null) {
+                    tasks.add(owner.attendees.get(eventDatabaseRepresentation.getOrganizerID())
+                            .addOnCompleteListener(task1 -> {
+                                Attendee attendee = task1.getResult();
+                                event.setOrganizer((Organizer) attendee);
+                            }));
+                }
                 // TODO fetch poster
                 return Tasks.whenAllComplete(tasks).continueWith(task1 -> {
-                    return event;
+                     return event;
                 });
             });
         }
