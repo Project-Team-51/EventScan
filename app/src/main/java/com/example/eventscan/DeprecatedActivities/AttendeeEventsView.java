@@ -1,5 +1,6 @@
 package com.example.eventscan.DeprecatedActivities;
 
+import com.example.eventscan.Database.Database;
 import com.example.eventscan.Helpers.EventArrayAdapter;
 
 import android.content.Context;
@@ -20,9 +21,9 @@ import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.Fragments.QrScannerFragment;
 import com.example.eventscan.R;
-import com.google.firebase.firestore.CollectionReference;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -49,8 +50,7 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
     private EventArrayAdapter announcementsAdapter;
 
     // Firebase
-    private FirebaseFirestore db;
-    private CollectionReference eventsCollection;
+    private Database db;
 
     /**
      * Called when the activity is created. Initializes UI components, adapters,
@@ -87,11 +87,10 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
         announcementsListView.setAdapter(announcementsAdapter);
 
         // Firebase
-        db = FirebaseFirestore.getInstance();
-        eventsCollection = db.collection("events"); // Initialize eventsCollection here
+        db = Database.getInstance();
 
         // Set up Firestore snapshot listener
-        eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.getEventsCollection().addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
@@ -101,13 +100,19 @@ public class AttendeeEventsView extends AppCompatActivity implements View.OnClic
                 if (querySnapshots != null) { // if there is an update then..
                     upcomingEvents.clear();
                     eventAnnouncements.clear();
+                    ArrayList<Task<Event>> updateTasks = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : querySnapshots) { // turn every stored "Event" into an event class, add to adapters
-                        Event event = doc.toObject(Event.class);
-                        upcomingEventsAdapter.add(event);
-                        announcementsAdapter.add(event); // CHANGE FOR ANNOUNCEMENTS
+                        updateTasks.add(
+                                db.events.get(doc.get("eventID", String.class)).addOnSuccessListener(event -> {
+                                    upcomingEventsAdapter.add(event);
+                                    announcementsAdapter.add(event); // CHANGE FOR ANNOUNCEMENTS
+                                })
+                        );
                     }
-                    upcomingEventsAdapter.notifyDataSetChanged(); // update listviews
-                    announcementsAdapter.notifyDataSetChanged();
+                    Tasks.whenAllComplete(updateTasks).addOnCompleteListener(task -> {
+                        upcomingEventsAdapter.notifyDataSetChanged(); // update listviews
+                        announcementsAdapter.notifyDataSetChanged();
+                    });
                 }
             }
         });

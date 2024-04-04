@@ -11,14 +11,17 @@ import android.widget.ListView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventscan.Database.Database;
+import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Entities.User;
 import com.example.eventscan.Helpers.EventArrayAdapter;
 import com.example.eventscan.Helpers.UserArrayAdapter;
 import com.example.eventscan.R;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -35,8 +38,7 @@ public class AttendeeFragment extends Fragment implements DeleteProfile.DeletePr
     private ArrayList<User> allUser;
     private ListView allUserList;
     private UserArrayAdapter userAdapter;
-    private FirebaseFirestore db;
-    private CollectionReference usersCollection;
+    private Database db;
 
     /**
      * Called to have the fragment instantiate its user interface view.
@@ -54,12 +56,10 @@ public class AttendeeFragment extends Fragment implements DeleteProfile.DeletePr
         allUserList = view.findViewById(R.id.allUserList);
         allUserList.setAdapter(userAdapter);
 
-        // initialize firestore
-        db = FirebaseFirestore.getInstance();
-        usersCollection = db.collection("users");
+        db = Database.getInstance();
 
         // update events in real time
-        usersCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+        db.getAttendeeCollection().addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
                 if (error != null) {
@@ -68,11 +68,18 @@ public class AttendeeFragment extends Fragment implements DeleteProfile.DeletePr
                 }
                 if (querySnapshots != null) { // if there is an update then..
                     allUser.clear();
+                    ArrayList<Task<Attendee>> userFetchTasks = new ArrayList<>();
                     for (QueryDocumentSnapshot doc : querySnapshots) { // turn every stored "Event" into an event class, add to adapters
-                        User user = doc.toObject(User.class);
-                        userAdapter.add(user);
+                        userFetchTasks.add(
+                                db.attendees.get(doc.get("deviceID",String.class))
+                                        .addOnSuccessListener(user -> {
+                                            userAdapter.add(user);
+                                        })
+                        );
                     }
-                    userAdapter.notifyDataSetChanged(); // update listviews
+                    Tasks.whenAllComplete(userFetchTasks).addOnCompleteListener(task -> {
+                        userAdapter.notifyDataSetChanged(); // update listviews
+                    });
                 }
             }
         });
@@ -122,6 +129,9 @@ public class AttendeeFragment extends Fragment implements DeleteProfile.DeletePr
         // removes user from both the adapter and the firestore.
         userAdapter.remove(user);
         userAdapter.notifyDataSetChanged();
-        db.collection("users").document(user.getDeviceID()).delete();
+        Attendee temp = new Attendee();
+        temp.setDeviceID(user.getDeviceID());
+        db.attendees.delete(temp);
+        //TODO refactor this so it uses Attendees instead of Users
     }
 }
