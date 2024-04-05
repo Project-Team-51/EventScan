@@ -100,7 +100,7 @@
             android:layout_gravity="end"
             android:layout_marginRight="30dp"
             android:backgroundTint="#414E6E"
-            android:text="DELETE"
+            android:text="ENROLL"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/return_view"/>
 
