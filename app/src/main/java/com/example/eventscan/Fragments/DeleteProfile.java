@@ -54,34 +54,15 @@ public class DeleteProfile extends DialogFragment {
         assert getArguments() != null;
         User selectedUser = (User) getArguments().getSerializable("selectedProfile");
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.fragment_delete_event_admin, null);
-        TextView profileNameText = view.findViewById(R.id.stored_event_name);
+        View view = inflater.inflate(R.layout.fragment_profile, null);
+        TextView profileNameText = view.findViewById(R.id.nameEditText);
         profileNameText.setText(selectedUser.getName());
-
-        TextView eventDetailsTextView = view.findViewById(R.id.stored_event_desc);
-        eventDetailsTextView.setText(selectedUser.getBio());
 
         Dialog dialog = new Dialog(requireContext());
         dialog.setContentView(view);
-        Button delEvent = view.findViewById(R.id.delete_event);
-        Button returnAdmin = view.findViewById(R.id.return_admin);
         Fragment parentFragment = getParentFragment();
         ProfileFragment profileFragment = (ProfileFragment) parentFragment;
 
-        delEvent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (deleteProfileListener != null) {
-                    deleteProfileListener.onDeleteProfile(selectedUser);}
-                dismiss();
-            }
-        });
-        returnAdmin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
         Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
 
