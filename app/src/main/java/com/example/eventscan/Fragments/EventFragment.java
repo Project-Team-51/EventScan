@@ -143,7 +143,6 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                         openDeleteEventFragment(selectedEvent);
                         break;
                     case "Attendee":
-                        //openEventView(selectedEvent);
                         openEventView(selectedEvent);
                         break;
                 }
