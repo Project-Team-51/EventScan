@@ -5,6 +5,8 @@ import static android.content.ContentValues.TAG;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +33,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.DeviceID;
+import com.example.eventscan.Entities.PicGen;
 import com.example.eventscan.Helpers.GeolocationHandler;
 import com.example.eventscan.Helpers.ImageUploader;
 import com.example.eventscan.R;
@@ -42,6 +46,8 @@ import com.google.firebase.storage.StorageReference;
 
 import android.provider.Settings.Secure;
 import android.widget.ToggleButton;
+
+import java.util.Random;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
@@ -65,6 +71,7 @@ public class ProfileFragment extends Fragment {
     ToggleButton locationToggle;
     ActivityResultLauncher<Intent> imagePickLauncher;
     Uri selectedImageUri;
+    public String attendeeName;
     public String deviceID;
     private static final int defaultProfileIcon = R.drawable.profile_icon;
 
@@ -112,9 +119,14 @@ public class ProfileFragment extends Fragment {
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
         locationToggle = view.findViewById(R.id.locationToggle);
 
-        deleteProfilePicBtn.setVisibility(isProfilePictureUploaded() ? View.VISIBLE : View.GONE);
-
         loadProfileInfo();
+
+        deleteProfilePicBtn.setOnClickListener(new View.OnClickListener(){
+           @Override
+               public void onClick(View view) {
+               PicGen.regenerateProfilePicture(requireContext(), attendeeName);
+           }
+        });
 
         saveProfileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,6 +171,12 @@ public class ProfileFragment extends Fragment {
             public void onClick(View view) {
                 // Calls a method to delete the profile picture
                 deleteProfilePicture();
+
+                // Updates UI to display the default profile picture
+                profilePic.setImageResource(defaultProfileIcon);
+
+                // Hides the delete profile pic button
+                deleteProfilePicBtn.setVisibility(View.GONE);
             }
         });
 
@@ -177,7 +195,14 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
-
+        Log.d("ProfileFragment", "Profile picture exists: " + PicGen.isProfilePictureExists(requireContext()));
+        if (PicGen.isProfilePictureExists(requireContext())) {
+            Bitmap profileBitmap = PicGen.loadProfilePicture(requireContext());
+            profilePic.setImageBitmap(profileBitmap);
+        } else {
+            Bitmap pic = loadProfilePicture();
+            PicGen.saveProfilePicture(requireContext(), pic);
+        }
         return view;
     }
 
@@ -265,12 +290,13 @@ public class ProfileFragment extends Fragment {
         if (attendee != null) {
             // Assuming that you have getters in the Attendee class
             usernameInput.setText(attendee.getName());
+            attendeeName = attendee.getName();
             phoneInput.setText(attendee.getPhoneNum());
             emailInput.setText(attendee.getEmail());
             bioInput.setText(attendee.getBio());
 
 
-            // Load profile picture using Glide or Picasso (or any image loading library)
+            // Load profile picture
             if (attendee.getProfilePictureID() != null) {
                 // TODO replace with DB call
                 StorageReference profilePicRef = FirebaseStorage.getInstance()
@@ -299,5 +325,26 @@ public class ProfileFragment extends Fragment {
             }
         }
     }
+    private Bitmap loadProfilePicture() {
+        if (PicGen.isProfilePictureExists(requireContext())) {
+            return PicGen.loadProfilePicture(requireContext());
+        } else {
 
+            // If profile picture doesn't exist, generate it based on username
+            String username = attendeeName;
+            String nameToUse = TextUtils.isEmpty(username) ? getRandomLetter() : username;
+            Bitmap profileBitmap = PicGen.generateProfilePicture(nameToUse, 200); // Adjust size as needed
+            profilePic.setImageBitmap(profileBitmap);
+
+            // Save
+            PicGen.saveProfilePicture(requireContext(), profileBitmap);
+            return profileBitmap;
+        }
+    }
+
+    private String getRandomLetter() {
+        Random random = new Random();
+        char randomChar = (char) (random.nextInt(26) + 'a');
+        return String.valueOf(randomChar).toUpperCase(); // Convert to uppercase to match the profile picture generator
+    }
 }
