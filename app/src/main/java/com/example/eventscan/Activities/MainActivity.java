@@ -24,7 +24,7 @@ import com.example.eventscan.R;
  * bar at the bottom allows access to the EventFragment or the AttendeeFragment. By default, it shows
  * the EventFragment. This activity will become the overall MainActivity in the near future, and most
  * activities will be refactored into fragments that are called from this activity depending on buttons pressed
- * and user permissions.
+ * and user permissions. hello
  */
 
 
@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                 loadFragment(qrscan);
             }
         });
+
         buttonAllProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                 loadFragment(attendeeFragment);
             }
         });
+
 
         buttonNotify.setOnClickListener(new View.OnClickListener() {
             @Override

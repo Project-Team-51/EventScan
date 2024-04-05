@@ -24,9 +24,8 @@ public class Event implements Serializable {
     private Organizer organizer;
     private String poster;
     private String eventID;
+    public String eventAnnouncement;
 
-  
-  
     // empty constructor so it works with firestore
     public Event() {
         this.checkedInAttendees = new HashMap<>();
@@ -171,6 +170,13 @@ public class Event implements Serializable {
 
     public void setPoster(String poster) {
         this.poster = poster;
+    }
+
+    public void setEventAnnouncement(String eventAnnouncement) {
+        this.eventAnnouncement = eventAnnouncement;
+    }
+    public String getEventAnnouncement() {
+        return eventAnnouncement;
     }
 
     public EventDatabaseRepresentation convertToDatabaseRepresentation(){

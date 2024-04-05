@@ -66,6 +66,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
+        android:inputType="phone"
         android:hint="Phone Number"
         android:textColor="#D3E2F2"
         android:textColorHint="#D3E2F2"
