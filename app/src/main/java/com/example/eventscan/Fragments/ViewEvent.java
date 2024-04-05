@@ -46,7 +46,6 @@ public class ViewEvent extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         assert getArguments() != null;
         Event selectedEvent = (Event) getArguments().getSerializable("selectedEvent");
-
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.event_information_view, null);
 
@@ -57,6 +56,7 @@ public class ViewEvent extends DialogFragment {
         eventDetailsTextView.setText(selectedEvent.getDesc());
 
         Dialog dialog = new Dialog(requireContext());
+        dialog.setCanceledOnTouchOutside(true);
         dialog.setContentView(view);
 
         Button returnView = view.findViewById(R.id.return_view);
