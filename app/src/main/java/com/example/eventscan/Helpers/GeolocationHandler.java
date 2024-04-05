@@ -132,4 +132,9 @@ public class GeolocationHandler {
             public void onProviderDisabled(String provider) {}
         };
     }
+<<<<<<< HEAD
 }
+=======
+}
+
+>>>>>>> 2929b8b43b8b6e35236125037c7c000d0907a8c1

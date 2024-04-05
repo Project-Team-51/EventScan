@@ -26,9 +26,12 @@ import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+<<<<<<< HEAD
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+=======
+>>>>>>> 2929b8b43b8b6e35236125037c7c000d0907a8c1
 import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
@@ -50,7 +53,7 @@ public class QRAnalyzer{
 
     BarcodeScanner scanner;
     Context context;
-    FirebaseFirestore db;
+    Database db;
     Attendee selfAttendee = null;
     boolean attendeeFetchCompleted; // this will be removed later, just for forcing synchronous code
     public QRAnalyzer(Context context){
@@ -59,13 +62,12 @@ public class QRAnalyzer{
                         .setBarcodeFormats(Barcode.FORMAT_QR_CODE).build();
         scanner = BarcodeScanning.getClient(options);
         this.context = context;
-        db = FirebaseFirestore.getInstance();
+        db = Database.getInstance();
 
         // TODO replace this with a databaseHelper style static method call
         String deviceID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        db.collection("attendees").document(deviceID).get().addOnSuccessListener(documentSnapshot -> {
-            selfAttendee = documentSnapshot.toObject(Attendee.class);
-            attendeeFetchCompleted = true;
+        db.attendees.get(deviceID).addOnSuccessListener(attendee -> {
+            selfAttendee = attendee;
         }).addOnFailureListener(e -> {
             Log.e("QR SCAN", "couldn't fetch selfAttendee: "+e.toString());
             attendeeFetchCompleted = true;
@@ -131,9 +133,22 @@ public class QRAnalyzer{
                                 Toast.makeText(context, "Unknown error when scanning QR codes", Toast.LENGTH_SHORT).show();
                             }
                         });
+<<<<<<< HEAD
+=======
+                        scanner.close();
+>>>>>>> 2929b8b43b8b6e35236125037c7c000d0907a8c1
                     }
             );
             scanner.close();
+        }
+    }
+
+    private void createScanResultDialog(QRDatabaseEventLink link){
+        switch(link.getDirectionType()){
+            case QRDatabaseEventLink.DIRECT_CHECK_IN:
+                //TODO
+            case QRDatabaseEventLink.DIRECT_SEE_DETAILS:
+                createSignInDialog(link.getDirectedEventID());
         }
     }
 
@@ -155,9 +170,17 @@ public class QRAnalyzer{
         Dialog eventSignIn = new Dialog(context);
         eventSignIn.setContentView(R.layout.fragment_event_sign_in);
         eventSignIn.setCancelable(true);
-        // get the data loaded in
-        CollectionReference eventCollection = db.collection("events");
+        Log.d("QR SCAN", eventID);
+        Database.getInstance().events.get(eventID)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Event event = task.getResult();
+                        ((TextView) eventSignIn.findViewById(R.id.sign_in_event_name)).setText(event.getName());
+                        ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText(event.getDesc());
+                        Log.d("QR SCAN","completed, successful");
+                        //TODO set the poster
 
+<<<<<<< HEAD
         //https://firebase.google.com/docs/firestore/query-data/get-data#java_4
         eventCollection.document(eventID).get()
 
@@ -200,13 +223,35 @@ public class QRAnalyzer{
                                     eventSignIn.cancel();
                                 });
                             }
+=======
+                        // set the onclick of the button to sign you up
+                        if(event.getCheckedInAttendeesList().contains(selfAttendee)){
+                            ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setText("You've Already signed up");
+>>>>>>> 2929b8b43b8b6e35236125037c7c000d0907a8c1
                         } else {
-                            Log.e("QR SCAN", "Event "+eventID+" not found in firebase");
-                            Log.e("QR_SCAN", task.getException().toString());
-                            ((TextView) eventSignIn.findViewById(R.id.sign_in_event_name)).setText("Event "+eventID);
-                            ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText("Not found\n(you may be offline)");
-                            ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setVisibility(GONE);
+                            ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setOnClickListener(v -> {
+                                // make sure the selfAttendee has been returned, quick and dirty code, this will be changed
+                                while(!attendeeFetchCompleted){
+                                    try {
+                                        Thread.sleep(20);
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                }
+                                if(selfAttendee == null){
+                                    throw new RuntimeException("Attendee fetch failed :( This will be gracefully handled in the future");
+                                }
+                                event.checkInAttendee(selfAttendee);
+                                db.events.checkInAttendee(event, selfAttendee);
+                                eventSignIn.cancel();
+                            });
                         }
+                    } else {
+                        Log.e("QR SCAN", "Event "+eventID+" not found in firebase");
+                        Log.e("QR_SCAN", task.getException().toString());
+                        ((TextView) eventSignIn.findViewById(R.id.sign_in_event_name)).setText("Event "+eventID);
+                        ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText("Not found\n(you may be offline)");
+                        ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setVisibility(GONE);
                     }
                 });
 

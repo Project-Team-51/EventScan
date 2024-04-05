@@ -36,6 +36,7 @@ import com.example.eventscan.Activities.UserSelection;
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.QRDatabaseEventLink;
 
+
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Helpers.QrCodec;
 import com.example.eventscan.Entities.Organizer;

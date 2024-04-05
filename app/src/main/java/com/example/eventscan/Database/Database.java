@@ -50,8 +50,11 @@ public class Database {
     protected CollectionReference qrLinkCollection;
     protected StorageReference posterStorageCollection;
 
+    protected CollectionReference adminCollection;
+
     public AttendeeOperations attendees;
     public EventOperations events;
+    public AdminOperations admins;
     public QRCodeOperations qr_codes;
     public PosterOperations posters;
 
@@ -74,6 +77,10 @@ public class Database {
         posterStorageCollection = FirebaseStorage.getInstance().getReference()
                         .child("prod")
                         .child("posters");
+        adminCollection = FirebaseFirestore.getInstance()
+                        .collection("prod")
+                        .document("admins")
+                        .collection("admins");
         setupChildren();
     }
 
@@ -89,6 +96,9 @@ public class Database {
         this.events = new EventOperations(this);
         this.posters = new PosterOperations(this);
         this.qr_codes = new QRCodeOperations(this);
+
+        this.admins = new AdminOperations(this);
+
     }
     public static Database getInstance(){
         return instance;
@@ -243,14 +253,16 @@ public class Database {
                     }));
                 }
                 // organizer gets added
-                tasks.add(owner.attendees.get(eventDatabaseRepresentation.getOrganizerID())
-                        .addOnCompleteListener(task1 -> {
-                            Attendee attendee = task1.getResult();
-                            event.setOrganizer((Organizer) attendee);
-                        }));
+                if(eventDatabaseRepresentation.getOrganizerID() != null) {
+                    tasks.add(owner.attendees.get(eventDatabaseRepresentation.getOrganizerID())
+                            .addOnCompleteListener(task1 -> {
+                                Attendee attendee = task1.getResult();
+                                event.setOrganizer((Organizer) attendee);
+                            }));
+                }
                 // TODO fetch poster
                 return Tasks.whenAllComplete(tasks).continueWith(task1 -> {
-                    return event;
+                     return event;
                 });
             });
         }
@@ -402,6 +414,34 @@ public class Database {
             return owner.posterStorageCollection
                     .child(posterID)
                     .putFile(posterUri);
+        }
+    }
+
+    public class AdminOperations {
+        private Database owner;
+        private AdminOperations(Database owner) {this.owner = owner;}
+
+        /**
+         * Check if this username password combo is a valid administrator
+         * @param username username to check
+         * @param password password to check
+         * @return A task that will resolve to true if the credentials are valid
+         */
+        public Task<Boolean> checkCredentials(String username, String password){
+            if(username == null || password == null){
+                return Tasks.forResult(false);
+            }
+            return owner.adminCollection
+                    .whereEqualTo("user", username)
+                    .whereEqualTo("pass", password)
+                    .get()
+                    .continueWith(task -> {
+                       if(!task.isSuccessful()){
+                           throw getTaskException(task);
+                       }
+                       // if result is null, false, otherwise only return true if not empty
+                       return task.getResult() != null && !task.getResult().isEmpty();
+                    });
         }
     }
 
