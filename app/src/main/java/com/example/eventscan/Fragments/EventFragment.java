@@ -138,13 +138,13 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                 Event selectedEvent = ownedEvents.get(position);
                 Log.d("AttendeeView2", userType);
                 switch (userType) {
+                    case "Admin":
                     case "Organizer":
                         openDeleteEventFragment(selectedEvent);
                         break;
-                    case "Admin":
                     case "Attendee":
                         //openEventView(selectedEvent);
-                        openDeleteEventFragment(selectedEvent);
+                        openEventView(selectedEvent);
                         break;
                 }
             }
