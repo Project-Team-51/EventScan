@@ -10,19 +10,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.eventscan.Database.Database;
 import com.example.eventscan.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 /*
  * This activity handles the logging in of an admin. Prompts the user to enter a user and password, and checks the inputted
  * text to the admin credentials stored in Firestore. Has error handling for incorrect credentials and a failure to connect to firestore.
  * Sign up button is unused, and will likely be removed in a future build.
  */
 public class LoginActivity extends AppCompatActivity {
-    private FirebaseFirestore db;
+    private Database db;
 
     /**
      * Called when the activity is created. Initializes Firebase Firestore and sets up
@@ -35,11 +32,8 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.login_activity);
 
-        // firestore initialization
-        db = FirebaseFirestore.getInstance();
-        //use only when you want to make some users DatabaseHelper dbh = new DatabaseHelper();
-        //DO NOT TURN ON THIS IS BROKEN dbh.addSampleEvents();
-        //use only when you want to make some users dbh.addSampleUsers();
+        db = Database.getInstance();
+
 
 
         // UI components
@@ -56,30 +50,19 @@ public class LoginActivity extends AppCompatActivity {
                 String pass = password.getText().toString();
 
                 // Access Firestore, compare user and passwords with inputted details
-                db.collection("admin")
-                        .whereEqualTo("user", user)
-                        .whereEqualTo("pass", pass)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                // If comparison is complete and Firestore data is retrieved
-                                if (task.isSuccessful()) {
-                                    if (task.getResult() != null && !task.getResult().isEmpty()) {
-                                        // Start the admin activity
-                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                        intent.putExtra("userType", "Admin");
-                                        startActivity(intent);
-                                    } else {
-                                        // Display invalid credentials
-                                        result.setText("Invalid Login");
-                                    }
+                db.admins.checkCredentials(user, pass)
+                            .addOnSuccessListener(credentialsAreValid -> {
+                                if(credentialsAreValid){
+                                    // Start the admin activity
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    intent.putExtra("userType", "Admin");
+                                    startActivity(intent);
                                 } else {
-                                    // Display error message
-                                    result.setText("Error");
+                                    result.setText("Invalid Login");
                                 }
-                            }
-                        });
+                            }).addOnFailureListener(e -> {
+                                result.setText("Error");
+                            });
             }
         });
     }
