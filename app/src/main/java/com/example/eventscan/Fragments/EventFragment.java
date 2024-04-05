@@ -43,9 +43,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 /*
  * A fragment subclass that handles the displaying of events in two listviews. As of writing, it displays both attending classes
  * and owned classes as the same thing, which is all the events on the firestore. Clicking on an item in the ownedEvents list
- * brings up a delete dialog.
+ * brings up a delete dialog. hello
  */
-public class EventFragment extends Fragment implements DeleteEvent.DeleteEventListener{
+public class EventFragment extends Fragment implements DeleteEvent.DeleteEventListener, SendNotificationFragment.SendNotificationListener{
     private ListView ownedEventsListView;
     private ListView inEventsListView;
     private ArrayList<Event> ownedEvents;
@@ -55,6 +55,9 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
     private EventArrayAdapter inEventsAdapter;
     private CollectionReference eventsCollection;
     private Database db;
+    private boolean isNotifyMode = false;
+    private boolean isEventsMode = true;
+    private boolean notified = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -226,6 +229,37 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         });
     }
 
+    private void openSendNotifcationFragment(Event selectedEvent) {
+        SendNotificationFragment sendNoti = new SendNotificationFragment();
+        sendNoti.setSendNotificationListener(this);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("selectedEvent", selectedEvent);
+        sendNoti.setArguments(bundle);
+        sendNoti.show(getParentFragmentManager(), "sendNoti");
+    }
+
+    /**
+     * Handles the sending of announcement
+     *
+     * @param event The event the announcement is for.
+     */
+    public void onSendNotification(Event event) {
+        sendNotification(event);
+    }
+
+    /**
+     * Sends the announcement to relevant people
+     *
+     * @param event The event the announcement is for
+     */
+    public void sendNotification(Event event) {
+        //this needs to be filled
+    }
+
+    public void notificationSent(boolean notified){
+        this.notified = notified;
+    }
+
 // Commented out below code - the functions don't look complete and there are no usages - didn't update the DB calls yet because of the not-finished ambiguity
 //    private void fetchUsersForEvent(String eventId) {
 //        // Assuming you have a CollectionReference for users
@@ -264,6 +298,18 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
     public void setText(String text){
         TextView textView = (TextView) getView().findViewById(R.id.yourEventsText);
         textView.setText(text);
+    }
+
+    public void toggleNotifyMode(boolean isNotifyMode) {
+        this.isNotifyMode = true;
+        this.isEventsMode = false;
+        // Refresh the events list based on the new mode
+    }
+
+    public void toggleEventsMode(boolean isEventsMode) {
+        this.isEventsMode = true;
+        this.isNotifyMode = false;
+        // Refresh the events list based on the new mode
     }
 
 }

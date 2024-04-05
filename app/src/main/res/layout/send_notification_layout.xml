@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <!-- Background for whole fragment -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/fragment_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_gradient">
+
+        <!-- Second bubble container -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bubbleContainer2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="45dp"
+            android:layout_marginBottom="100dp"
+            android:padding="5dp"
+            android:background="@drawable/background_rounded"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/stored_event_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:gravity="center"
+                android:textColor="#D3E2F2"
+                android:textSize="20sp"
+                android:text=""
+                app:layout_constraintTop_toTopOf="@+id/bubbleContainer2"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bubbleContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="95dp"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginBottom="400dp"
+            android:background="@drawable/background_rounded"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            >
+
+            <EditText
+                android:id="@+id/event_announcement"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@null"
+                android:gravity="top|start"
+                android:hint="Enter Announcement Here"
+                android:maxLines="10"
+                android:textColor="#D3E2F2"
+                android:textSize="20sp"
+                android:text=""
+                app:layout_constraintEnd_toEndOf="@id/bubbleContainer"
+                app:layout_constraintStart_toStartOf="@id/bubbleContainer"
+                app:layout_constraintTop_toTopOf="@id/bubbleContainer"
+                />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <Button
+            android:id="@+id/cancel_noti"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/fragment_background"
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="30dp"
+            android:backgroundTint="#414E6E"
+            android:text="Return"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bubbleContainer"/>
+
+        <Button
+            android:id="@+id/send_noti"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_below="@+id/fragment_background"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="end"
+            android:layout_marginRight="30dp"
+            android:backgroundTint="#414E6E"
+            android:text="Send"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/bubbleContainer"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

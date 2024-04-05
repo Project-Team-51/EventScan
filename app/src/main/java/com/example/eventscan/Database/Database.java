@@ -51,6 +51,7 @@ public class Database {
     protected StorageReference posterStorageCollection;
 
     protected CollectionReference adminCollection;
+    protected CollectionReference announcementsCollection;
 
     public AttendeeOperations attendees;
     public EventOperations events;
@@ -81,6 +82,10 @@ public class Database {
                         .collection("prod")
                         .document("admins")
                         .collection("admins");
+        announcementsCollection = FirebaseFirestore.getInstance()
+                .collection("prod")
+                .document("announcements")
+                .collection("announcements");
         setupChildren();
     }
 
