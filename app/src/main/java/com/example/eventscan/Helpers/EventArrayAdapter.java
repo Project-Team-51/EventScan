@@ -11,8 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.eventscan.Entities.Event;
-import com.example.eventscan.Fragments.EventFragment;
-import com.example.eventscan.Fragments.SendNotification;
 import com.example.eventscan.R;
 
 import java.util.ArrayList;
