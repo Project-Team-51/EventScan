@@ -57,17 +57,18 @@ public class DeleteEvent extends DialogFragment {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.fragment_delete_event_admin, null);
 
-        TextView eventNameText = view.findViewById(R.id.stored_event_name);
+        TextView eventNameText = view.findViewById(R.id.event_Name);
         eventNameText.setText(selectedEvent.getName());
 
-        TextView eventDetailsTextView = view.findViewById(R.id.stored_event_desc);
+        TextView eventDetailsTextView = view.findViewById(R.id.EventDescription);
         eventDetailsTextView.setText(selectedEvent.getDesc());
 
         Dialog dialog = new Dialog(requireContext());
+        dialog.setCanceledOnTouchOutside(true);
         dialog.setContentView(view);
 
-        Button delEvent = view.findViewById(R.id.delete_event);
-        Button returnAdmin = view.findViewById(R.id.return_admin);
+        Button delEvent = view.findViewById(R.id.confirmEvent);
+        Button returnAdmin = view.findViewById(R.id.return2);
         Fragment parentFragment = getParentFragment();
         EventFragment eventFragment = (EventFragment) parentFragment;
         delEvent.setOnClickListener(new View.OnClickListener() {
