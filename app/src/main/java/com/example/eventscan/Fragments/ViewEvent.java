@@ -101,17 +101,26 @@ public class ViewEvent extends DialogFragment {
             public void onClick(View v) {
                 if (selfAttendee != null) {
                     String eventID = selectedEvent.getEventID();
-                    db = Database.getInstance();
-                    //db.attendees.addInterestedAttendee(eventID, selfAttendee)
-                    Database.EventOperations eventOperations = db.events;
-                    eventOperations.addInterestedAttendee(eventID, selfAttendee);
-                            .addOnSuccessListener(aVoid -> {
-                                //Toast.makeText(context, "Enrolled successfully", Toast.LENGTH_SHORT).show();
-                                dismiss(); // Dismiss the dialog after successful enrollment
+                    db.events.get(eventID)
+                            .addOnSuccessListener(event -> {
+                                if (event != null) {
+                                    db.events.addInterestedAttendee(event, selfAttendee)
+                                            .addOnSuccessListener(aVoid -> {
+                                                //Toast.makeText(context, "Enrolled successfully", Toast.LENGTH_SHORT).show();
+                                                dismiss(); // Dismiss the dialog after successful enrollment
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                //Log.e(TAG, "Failed to enroll: " + e.getMessage());
+                                                //Toast.makeText(context, "Failed to enroll. Please try again.", Toast.LENGTH_SHORT).show();
+                                            });
+                                } else {
+                                    Log.e(TAG, "Event not found for ID: " + eventID);
+                                    // Handle the case where the event is not found
+                                }
                             })
                             .addOnFailureListener(e -> {
-                                //Log.e(TAG, "Failed to enroll: " + e.getMessage());
-                                //Toast.makeText(context, "Failed to enroll. Please try again.", Toast.LENGTH_SHORT).show();
+                                Log.e(TAG, "Failed to retrieve event: " + e.getMessage());
+                                // Handle the failure to retrieve the event
                             });
                 } else {
                     Log.e(TAG, "Self attendee is null");
