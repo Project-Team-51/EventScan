@@ -151,7 +151,6 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         return view;
     }
 
-
     private void openEventView(Event selectedEvent){
         ViewEvent viewEventFragment = new ViewEvent();
         // Create a Bundle and put the selected Event information
