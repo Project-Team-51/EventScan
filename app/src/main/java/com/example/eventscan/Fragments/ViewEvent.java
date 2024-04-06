@@ -75,7 +75,7 @@ public class ViewEvent extends DialogFragment {
 
         ImageView posterView = view.findViewById(R.id.poster_view);
         Button returnView = view.findViewById(R.id.return_view);
-        Button enrollEvent = view.findViewById(R.id.signup_event);
+        Button SignupEventButton = view.findViewById(R.id.signup_event);
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         db = Database.getInstance();
@@ -104,7 +104,7 @@ public class ViewEvent extends DialogFragment {
             }
         });
 
-        enrollEvent.setOnClickListener(new View.OnClickListener() {
+        SignupEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
