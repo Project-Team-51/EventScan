@@ -6,6 +6,7 @@ import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +22,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.DatabaseHelper;
 import com.example.eventscan.Entities.Attendee;
@@ -63,24 +66,25 @@ public class ViewEvent extends DialogFragment {
         dialog.setCanceledOnTouchOutside(true);
         dialog.setContentView(view);
 
+        ImageView posterView = view.findViewById(R.id.poster_view);
         Button returnView = view.findViewById(R.id.return_view);
         Button enrollEvent = view.findViewById(R.id.enroll_event);
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference().child("poster_pictures");
-        StorageReference fileRef = storageRef.child(selectedEvent.getEventID());
 
-        fileRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(bytes -> {
-            // Decode the byte array into a Bitmap
-            Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
 
-            // Set the Bitmap to the ImageView
-            ImageView posterView = view.findViewById(R.id.poster_view);
-            posterView.setImageBitmap(bitmap);
-        }).addOnFailureListener(exception -> {
-            // Handle any errors
-            Log.e(TAG, "Failed to download image", exception);
-        });
+        StorageReference storageRef = storage.getReference().child("poster_pics");
+        StorageReference posterRef = storageRef.child(selectedEvent.getEventID());
+        Log.d("monkey", selectedEvent.getEventID());
+
+        posterRef.getDownloadUrl()
+                .addOnSuccessListener(uri -> {
+                            // Load the profile picture using an image loading library
+                            Glide.with(this)
+                                    .load(uri)
+                                    .error(R.drawable.profile_icon) // Image to display in case of error
+                                    .into(posterView);
+                });
 
         Fragment parentFragment = getParentFragment();
         EventFragment eventFragment = (EventFragment) parentFragment;
