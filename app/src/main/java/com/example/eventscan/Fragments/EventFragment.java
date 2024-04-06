@@ -136,22 +136,19 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event selectedEvent = ownedEvents.get(position);
-                Log.d("AttendeeView2", userType);
                 switch (userType) {
                     case "Organizer":
                         openDeleteEventFragment(selectedEvent);
                         break;
                     case "Admin":
                     case "Attendee":
-                        //openEventView(selectedEvent);
-                        openDeleteEventFragment(selectedEvent);
+                        openEventView(selectedEvent);
                         break;
                 }
             }
         });
         return view;
     }
-
 
     private void openEventView(Event selectedEvent){
         ViewEvent viewEventFragment = new ViewEvent();
