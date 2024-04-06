@@ -136,55 +136,31 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event selectedEvent = ownedEvents.get(position);
-                if(userType.equals("organizer")){
-                    openEventView(selectedEvent);
-                }
-                else{
-                    openDeleteEventFragment(selectedEvent);
-                }
-            }
-        });
 
-        // Grab user type, organizer or Attendee
-        //TODO ^^ this line needs to be changed to use a helper class that handles the 'self' attendee ID
 
-        db.attendees.get(myDeviceID).addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                Attendee attendee = task.getResult();
-                if(attendee != null){
-                    userType = attendee.getType();
-                    customizeLayout(userType, view);
+                switch (userType) {
+                    case "Admin":
+                    case "Organizer":
+                        openDeleteEventFragment(selectedEvent);
+                        break;
+                    case "Attendee":
+                        openEventView(selectedEvent);
+                        break;
                 }
             }
         });
         return view;
-
     }
 
-    /**
-     * Changes layout based on user type.
-     *
-     * @param userType The user's selected role.
-     * @param view The view to be changed.
-     */
-    @SuppressLint("SetTextI18n")
-    private void customizeLayout(String userType, View view) {
-        TextView yourEventsText = view.findViewById(R.id.yourEventsText);
-        yourEventsText.setText("All Events");
-        if ("attendee".equals(userType)) {
-            yourEventsText.setText("All Events");
-            Log.d("elephant", "customizeLayout: success");
-        }
-    }
 
     private void openEventView(Event selectedEvent){
-        ViewEvent ViewEventFragment = new ViewEvent();
+        ViewEvent viewEventFragment = new ViewEvent();
         // Create a Bundle and put the selected Event information
         Bundle bundle = new Bundle();
         bundle.putSerializable("selectedEvent", selectedEvent);
-        ViewEventFragment.setArguments(bundle);
+        viewEventFragment.setArguments(bundle);
         // Show the DeleteEvent fragment
-        ViewEventFragment.show(getParentFragmentManager(), "ViewEventFragment");
+        viewEventFragment.show(getParentFragmentManager(), "ViewEventFragment");
     }
 
     /**
