@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,11 +20,15 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
+
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.DeviceID;
+import com.bumptech.glide.Glide;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.Objects;
 /*
@@ -50,7 +55,7 @@ public class DeleteEvent extends DialogFragment {
         void onDeleteEvent(Event event);
     }
     private DeleteEventListener deleteEventListener;
-
+    Database db;
     /**
      * Called to create the dialog view.
      *
@@ -86,6 +91,22 @@ public class DeleteEvent extends DialogFragment {
 
         Fragment parentFragment = getParentFragment();
         EventFragment eventFragment = (EventFragment) parentFragment;
+
+        ImageView posterView = view.findViewById(R.id.posterView);
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        db = Database.getInstance();
+
+        StorageReference storageRef = storage.getReference().child("poster_pics");
+        StorageReference posterRef = storageRef.child(selectedEvent.getEventID());
+
+        posterRef.getDownloadUrl()
+                .addOnSuccessListener(uri -> {
+                    // Load the profile picture using an image loading library
+                    Glide.with(this)
+                            .load(uri)
+                            .into(posterView);
+                });
         delEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

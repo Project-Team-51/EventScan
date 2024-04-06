@@ -130,6 +130,7 @@ public class QRAnalyzer{
                         scanner.close();
                     }
             );
+            scanner.close();
         }
     }
 
@@ -160,7 +161,7 @@ public class QRAnalyzer{
                         ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText(event.getDesc());
                         Log.d("QR SCAN","completed, successful");
                         //TODO set the poster
-
+                      
                         // set the onclick of the button to sign you up
                         if(event.getCheckedInAttendeesList().contains(selfAttendee)){
                             ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setText("You've Already signed up");
