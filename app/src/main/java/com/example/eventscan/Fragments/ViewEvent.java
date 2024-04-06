@@ -122,6 +122,7 @@ public class ViewEvent extends DialogFragment {
                                                 db.events.addInterestedAttendee(event, selfAttendee)
                                                         .addOnSuccessListener(aVoid -> {
                                                             Log.d(TAG, "Signed up Successfully: ");
+                                                            Toast.makeText(getContext(), "Sign up Successful", Toast.LENGTH_SHORT).show();
                                                             dismiss(); // Dismiss the dialog after successful enrollment
                                                         })
                                                         .addOnFailureListener(e -> {
