@@ -4,10 +4,10 @@ package com.example.eventscan.Fragments;
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
 import android.app.Dialog;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
+
+
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,11 +22,19 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
+
 import com.bumptech.glide.Glide;
+
+import com.example.eventscan.Database.Database;
+
 import com.bumptech.glide.request.RequestOptions;
+
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.DatabaseHelper;
+
+
 import com.example.eventscan.Entities.Attendee;
+import com.example.eventscan.Entities.DeviceID;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 import com.google.firebase.storage.FirebaseStorage;
@@ -38,14 +46,13 @@ import java.util.Objects;
 public class ViewEvent extends DialogFragment {
 
     Database db;
-    Attendee selfAttendee;
+    Attendee selfAttendee = null;
 
     /**
      * Default constructor for the ViewEvent DialogFragment.
      */
     public ViewEvent() {
         // Required empty public constructor
-        this.selfAttendee = selfAttendee;
     }
 
     @NonNull
@@ -68,9 +75,10 @@ public class ViewEvent extends DialogFragment {
 
         ImageView posterView = view.findViewById(R.id.poster_view);
         Button returnView = view.findViewById(R.id.return_view);
-        Button enrollEvent = view.findViewById(R.id.enroll_event);
+        Button enrollEvent = view.findViewById(R.id.signup_event);
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
+        db = Database.getInstance();
 
 
         StorageReference storageRef = storage.getReference().child("poster_pics");
@@ -99,34 +107,50 @@ public class ViewEvent extends DialogFragment {
         enrollEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selfAttendee != null) {
-                    String eventID = selectedEvent.getEventID();
-                    db.events.get(eventID)
-                            .addOnSuccessListener(event -> {
-                                if (event != null) {
-                                    db.events.addInterestedAttendee(event, selfAttendee)
-                                            .addOnSuccessListener(aVoid -> {
-                                                //Toast.makeText(context, "Enrolled successfully", Toast.LENGTH_SHORT).show();
-                                                dismiss(); // Dismiss the dialog after successful enrollment
-                                            })
-                                            .addOnFailureListener(e -> {
-                                                //Log.e(TAG, "Failed to enroll: " + e.getMessage());
-                                                //Toast.makeText(context, "Failed to enroll. Please try again.", Toast.LENGTH_SHORT).show();
-                                            });
-                                } else {
-                                    Log.e(TAG, "Event not found for ID: " + eventID);
-                                    // Handle the case where the event is not found
-                                }
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.e(TAG, "Failed to retrieve event: " + e.getMessage());
-                                // Handle the failure to retrieve the event
-                            });
-                } else {
-                    Log.e(TAG, "Self attendee is null");
-                    //Toast.makeText(context, "Failed to enroll. Please try again.", Toast.LENGTH_SHORT).show();
-                    dismiss(); // Dismiss the dialog if self attendee is null
-                }
+
+                String deviceID = DeviceID.getDeviceID(requireContext());
+                db.attendees.get(deviceID)
+                        .addOnSuccessListener(attendee -> {
+                            selfAttendee = attendee;
+                            // Check if selfAttendee is fetched successfully
+                            if (selfAttendee != null) {
+                                String eventID = selectedEvent.getEventID();
+                                db.events.get(eventID)
+                                        .addOnSuccessListener(event -> {
+                                            if (event != null) {
+                                                // Add interested attendee to the event
+                                                db.events.addInterestedAttendee(event, selfAttendee)
+                                                        .addOnSuccessListener(aVoid -> {
+                                                            Log.d(TAG, "Signed up Successfully: ");
+                                                            dismiss(); // Dismiss the dialog after successful enrollment
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            Log.e(TAG, "Failed to Sign up: " + e.getMessage());
+                                                            // Display a toast or error message to the user
+                                                            Toast.makeText(getContext(), "Failed to sign up for the event", Toast.LENGTH_SHORT).show();
+                                                        });
+                                            } else {
+                                                Log.e(TAG, "Event not found for ID: " + eventID);
+                                                // Display a toast or error message to the user
+                                                Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e(TAG, "Failed to retrieve event: " + e.getMessage());
+                                            // Display a toast or error message to the user
+                                            Toast.makeText(getContext(), "Failed to retrieve event", Toast.LENGTH_SHORT).show();
+                                        });
+                            } else {
+                                Log.e(TAG, "Self attendee is null");
+                                // Display a toast or error message to the user
+                                Toast.makeText(getContext(), "Failed to fetch attendee information", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("QR SCAN", "couldn't fetch selfAttendee: " + e.toString());
+                            // Display a toast or error message to the user
+                            Toast.makeText(getContext(), "Failed to fetch attendee information", Toast.LENGTH_SHORT).show();
+                        });
             }
         });
 
