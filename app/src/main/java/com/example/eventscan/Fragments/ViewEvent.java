@@ -83,7 +83,6 @@ public class ViewEvent extends DialogFragment {
 
         StorageReference storageRef = storage.getReference().child("poster_pics");
         StorageReference posterRef = storageRef.child(selectedEvent.getEventID());
-        Log.d("monkey", selectedEvent.getEventID());
 
         posterRef.getDownloadUrl()
                 .addOnSuccessListener(uri -> {
