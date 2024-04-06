@@ -4,10 +4,6 @@ package com.example.eventscan.Fragments;
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
 import android.app.Dialog;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-
-import android.media.Image;
 
 
 import android.os.Bundle;
@@ -33,6 +29,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.DatabaseHelper;
+
 
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
@@ -77,7 +74,6 @@ public class ViewEvent extends DialogFragment {
         ImageView posterView = view.findViewById(R.id.poster_view);
         Button returnView = view.findViewById(R.id.return_view);
         Button enrollEvent = view.findViewById(R.id.signup_event);
-
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
