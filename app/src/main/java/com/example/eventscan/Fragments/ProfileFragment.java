@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -108,7 +109,7 @@ public class ProfileFragment extends Fragment {
 
         db = Database.getInstance();
 
-        deviceID = DeviceID.getDeviceID(requireContext());
+        deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
         Log.d("DeviceID", "Device ID: " + deviceID);
         profilePic = view.findViewById(R.id.profileImageView);
         usernameInput = view.findViewById(R.id.nameEditText);
