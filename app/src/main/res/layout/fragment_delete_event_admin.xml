@@ -132,6 +132,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bubbleContainer" />
 
+
     <Button
         android:id="@+id/signup_button"
         android:layout_width="160dp"
@@ -144,6 +145,9 @@
         android:text="SIGNUP"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bubbleContainer" />
+
+
+
 
     <ImageView
         android:id="@+id/posterView"
