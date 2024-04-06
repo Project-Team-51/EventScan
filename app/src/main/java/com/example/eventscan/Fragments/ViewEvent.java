@@ -14,12 +14,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
+import com.example.eventscan.Database.Database;
+import com.example.eventscan.Database.DatabaseHelper;
+import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 import com.google.firebase.storage.FirebaseStorage;
@@ -30,11 +34,15 @@ import java.util.Objects;
 
 public class ViewEvent extends DialogFragment {
 
+    Database db;
+    Attendee selfAttendee;
+
     /**
      * Default constructor for the ViewEvent DialogFragment.
      */
     public ViewEvent() {
         // Required empty public constructor
+        this.selfAttendee = selfAttendee;
     }
 
     @NonNull
@@ -56,6 +64,7 @@ public class ViewEvent extends DialogFragment {
         dialog.setContentView(view);
 
         Button returnView = view.findViewById(R.id.return_view);
+        Button enrollEvent = view.findViewById(R.id.enroll_event);
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageRef = storage.getReference().child("poster_pictures");
@@ -80,6 +89,40 @@ public class ViewEvent extends DialogFragment {
             @Override
             public void onClick(View v) {
                 dismiss();
+            }
+        });
+
+        enrollEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selfAttendee != null) {
+                    String eventID = selectedEvent.getEventID();
+                    db.events.get(eventID)
+                            .addOnSuccessListener(event -> {
+                                if (event != null) {
+                                    db.events.addInterestedAttendee(event, selfAttendee)
+                                            .addOnSuccessListener(aVoid -> {
+                                                //Toast.makeText(context, "Enrolled successfully", Toast.LENGTH_SHORT).show();
+                                                dismiss(); // Dismiss the dialog after successful enrollment
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                //Log.e(TAG, "Failed to enroll: " + e.getMessage());
+                                                //Toast.makeText(context, "Failed to enroll. Please try again.", Toast.LENGTH_SHORT).show();
+                                            });
+                                } else {
+                                    Log.e(TAG, "Event not found for ID: " + eventID);
+                                    // Handle the case where the event is not found
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to retrieve event: " + e.getMessage());
+                                // Handle the failure to retrieve the event
+                            });
+                } else {
+                    Log.e(TAG, "Self attendee is null");
+                    //Toast.makeText(context, "Failed to enroll. Please try again.", Toast.LENGTH_SHORT).show();
+                    dismiss(); // Dismiss the dialog if self attendee is null
+                }
             }
         });
 
