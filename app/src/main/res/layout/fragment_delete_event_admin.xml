@@ -139,16 +139,12 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/bubbleContainer"
         android:layout_alignParentLeft="true"
-        android:layout_marginTop="15dp"
         android:layout_marginLeft="30dp"
         android:backgroundTint="#414E6E"
         android:text="SIGNUP"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bubbleContainer" />
-
-
-
-
+        app:layout_constraintTop_toBottomOf="@+id/attendeeLimit" />
+    
     <ImageView
         android:id="@+id/posterView"
         android:layout_width="168dp"
