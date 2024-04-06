@@ -105,8 +105,8 @@
         android:layout_marginLeft="30dp"
         android:backgroundTint="#414E6E"
         android:text="Delete Event"
-        app:layout_constraintTop_toBottomOf="@+id/generate_QRCode_check_in"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/generate_QRCode_check_in" />
 
     <Button
         android:id="@+id/generate_QRCode_check_in"
@@ -125,8 +125,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/bubbleContainer"
         android:layout_alignParentLeft="true"
-        android:layout_marginTop="15dp"
         android:layout_marginLeft="30dp"
+        android:layout_marginTop="15dp"
         android:backgroundTint="#414E6E"
         android:text="Get Details QR"
         app:layout_constraintStart_toStartOf="parent"
@@ -139,28 +139,27 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/bubbleContainer"
         android:layout_alignParentLeft="true"
-        android:layout_marginTop="15dp"
         android:layout_marginLeft="30dp"
+        android:layout_marginTop="15dp"
         android:backgroundTint="#414E6E"
         android:text="SIGNUP"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bubbleContainer" />
 
 
-
-
     <ImageView
         android:id="@+id/posterView"
-        android:layout_width="168dp"
-        android:layout_height="189dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="12dp"
-        android:contentDescription="TODO"
-        android:scaleType="centerInside"
+        android:layout_width="wrap_content"
+        android:layout_height="174dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="center_horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toEndOf="@+id/confirmEvent"
         app:layout_constraintTop_toBottomOf="@+id/return2"
-        app:layout_constraintStart_toEndOf="@id/generate_QRCode_check_in"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintVertical_bias="0.043" />
 
     <Switch
         android:id="@+id/attendeeLimit"
@@ -178,5 +177,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/confirmEvent"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
