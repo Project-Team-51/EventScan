@@ -30,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.example.eventscan.Database.Database;
 
 import com.bumptech.glide.request.RequestOptions;
+
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.DatabaseHelper;
 
@@ -109,6 +110,7 @@ public class ViewEvent extends DialogFragment {
             public void onClick(View v) {
                 if (selfAttendee != null) {
                     String eventID = selectedEvent.getEventID();
+
                     db.events.get(eventID)
                             .addOnSuccessListener(event -> {
                                 if (event != null) {
@@ -126,6 +128,7 @@ public class ViewEvent extends DialogFragment {
                             })
                             .addOnFailureListener(e -> {
                                 Log.e(TAG, "Failed to retrieve event: " + e.getMessage());
+
                             });
                 } else {
                     Log.e(TAG, "Self attendee is null");
