@@ -55,7 +55,7 @@ public class DeleteEvent extends DialogFragment {
         void onDeleteEvent(Event event);
     }
     private DeleteEventListener deleteEventListener;
-    Database db;
+
     /**
      * Called to create the dialog view.
      *
