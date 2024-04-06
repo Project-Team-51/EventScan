@@ -108,14 +108,12 @@ public class ViewEvent extends DialogFragment {
             @Override
             public void onClick(View v) {
 
-                // Fetch selfAttendee asynchronously
                 String deviceID = DeviceID.getDeviceID(requireContext());
                 db.attendees.get(deviceID)
                         .addOnSuccessListener(attendee -> {
                             selfAttendee = attendee;
                             // Check if selfAttendee is fetched successfully
                             if (selfAttendee != null) {
-                                // Fetch event asynchronously
                                 String eventID = selectedEvent.getEventID();
                                 db.events.get(eventID)
                                         .addOnSuccessListener(event -> {
