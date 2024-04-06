@@ -237,9 +237,9 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 //        attendeesListView.setAdapter(attendeeAdapter);
 //    }
 
+
     public void setText(String text){
         TextView textView = (TextView) getView().findViewById(R.id.yourEventsText);
         textView.setText(text);
     }
-
 }
