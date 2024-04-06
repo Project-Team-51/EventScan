@@ -34,6 +34,7 @@ import com.example.eventscan.Database.DatabaseHelper;
 
 
 import com.example.eventscan.Entities.Attendee;
+import com.example.eventscan.Entities.DeviceID;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 import com.google.firebase.storage.FirebaseStorage;
@@ -108,7 +109,7 @@ public class ViewEvent extends DialogFragment {
             public void onClick(View v) {
 
                 // Fetch selfAttendee asynchronously
-                String deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+                String deviceID = DeviceID.getDeviceID(requireContext());
                 db.attendees.get(deviceID)
                         .addOnSuccessListener(attendee -> {
                             selfAttendee = attendee;

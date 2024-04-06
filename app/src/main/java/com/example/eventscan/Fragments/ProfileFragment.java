@@ -109,7 +109,7 @@ public class ProfileFragment extends Fragment {
 
         db = Database.getInstance();
 
-        deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
+        deviceID = DeviceID.getDeviceID(requireContext());
         Log.d("DeviceID", "Device ID: " + deviceID);
         profilePic = view.findViewById(R.id.profileImageView);
         usernameInput = view.findViewById(R.id.nameEditText);
