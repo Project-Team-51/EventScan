@@ -6,7 +6,9 @@ import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+
 import android.media.Image;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +26,7 @@ import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.DatabaseHelper;
 import com.example.eventscan.Entities.Attendee;
