@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -46,7 +47,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import android.provider.Settings.Secure;
-import android.widget.ToggleButton;
+import android.widget.Switch;
 
 import java.util.Random;
 
@@ -69,7 +70,7 @@ public class ProfileFragment extends Fragment {
     EditText bioInput;
     Button saveProfileBtn;
     Button deleteProfilePicBtn;
-    ToggleButton locationToggle;
+    Switch locationToggle;
     ActivityResultLauncher<Intent> imagePickLauncher;
     Uri selectedImageUri;
     public String attendeeName;
@@ -234,6 +235,11 @@ public class ProfileFragment extends Fragment {
         saveProfileBtn = view.findViewById(R.id.saveButton);
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
         locationToggle = view.findViewById(R.id.locationToggle);
+        boolean isLocationEnabled = GeolocationHandler.isLocationEnabled(requireContext());
+        if (isLocationEnabled) {
+            GeolocationHandler.enableLocationUpdates(getContext());
+        }
+        locationToggle.setChecked(isLocationEnabled);
     }
     private void setClickListeners() {
         saveProfileBtn.setOnClickListener(new View.OnClickListener() {
@@ -294,10 +300,12 @@ public class ProfileFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     GeolocationHandler.enableLocationUpdates(getContext());
+                    GeolocationHandler.setLocationEnabled(getContext(),true);
 
                 } else {
                     // User disabled location services
                     GeolocationHandler.disableLocationUpdates();
+                    GeolocationHandler.setLocationEnabled(getContext(),false);
                 }
             }
         });

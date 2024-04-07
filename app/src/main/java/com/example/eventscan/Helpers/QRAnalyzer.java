@@ -180,7 +180,15 @@ public class QRAnalyzer{
                         // set the onclick of the button to sign you up
                         dialogButton.setOnClickListener(v -> {
                             event.checkInAttendee(selfAttendee);
-                            db.events.checkInAttendee(event, selfAttendee).addOnCompleteListener(task1 -> {
+                            Task<?> checkInTask;
+                            Log.d("GeolocationHandler", String.valueOf(GeolocationHandler.getLocationEnabled()));
+                            if(GeolocationHandler.getLocationEnabled()){
+                                checkInTask = db.events.checkInAttendee(event, selfAttendee, GeolocationHandler.getGeoPoint());
+                            } else {
+                                checkInTask = db.events.checkInAttendee(event, selfAttendee);
+                            }
+
+                            checkInTask.addOnCompleteListener(task1 -> {
                                 // check-in is done, make sure it was successful
                                 if(task1.isSuccessful()){
                                     dialogDescription.setText("Check-in Successful!\n You can now safely go to another screen");

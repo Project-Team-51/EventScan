@@ -160,14 +160,13 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         return view;
     }
 
-
     private void openEventView(Event selectedEvent){
         ViewEvent viewEventFragment = new ViewEvent();
         // Create a Bundle and put the selected Event information
         Bundle bundle = new Bundle();
         bundle.putSerializable("selectedEvent", selectedEvent);
         viewEventFragment.setArguments(bundle);
-        // Show the DeleteEvent fragment
+        // Show ViewEvent fragment
         viewEventFragment.show(getParentFragmentManager(), "ViewEventFragment");
     }
 
