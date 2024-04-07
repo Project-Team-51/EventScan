@@ -122,6 +122,7 @@ public class DatabaseTest extends Database {
                 null, // TODO add to test once functionality is done
                 eventIDTest
         );
+        event1.setAttendeeLimit(15);
         db.attendees.set(organizer1);
         Attendee attendee = new Attendee();
         attendee.setName("Event added test Attendee");
@@ -147,6 +148,7 @@ public class DatabaseTest extends Database {
         assertEquals(event1Modified, returnedEvent);
         assertEquals(returnedEvent, event1Modified);
         assertNotNull(returnedEvent.getOrganizer());
+        assertEquals(returnedEvent.getAttendeeLimit(), Integer.valueOf(15));
     }
 
     @Test
