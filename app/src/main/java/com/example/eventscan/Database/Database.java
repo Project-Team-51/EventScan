@@ -172,7 +172,28 @@ public class Database {
          * @return the list of events that `attendee` is interested in
          */
         public Task<ArrayList<Event>> getInterestedEvents(Attendee attendee){
-            throw new NotImplementedError();
+            return owner.eventsCollection.whereArrayContains("interestedAttendeeIDs", attendee.getDeviceID())
+                    .get().continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Task<Event>> eventFetchTasks = new ArrayList<>();
+                        for(DocumentSnapshot documentSnapshot: task.getResult().getDocuments()){
+                            eventFetchTasks.add(owner.events.get((String) documentSnapshot.get("eventID")));
+                        }
+                        return Tasks.whenAllComplete(eventFetchTasks);
+                    }).continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Event> finalOutput = new ArrayList<>();
+                        for(Task<?> eventTask: task.getResult()){
+                            if(eventTask.isSuccessful()){
+                                finalOutput.add((Event) eventTask.getResult());
+                            }
+                        }
+                        return Tasks.forResult(finalOutput);
+                    });
         }
 
         /**
@@ -182,7 +203,35 @@ public class Database {
          * @return the list of events that `attendee` has checked into
          */
         public Task<ArrayList<Event>> getCheckedInEvents(Attendee attendee){
-            throw new NotImplementedError(); // TODO delete if not needed
+            // Microsoft Bing Chat 2024-04-07
+            // "Please help me write a firebase query in java android. I have documents that contain the field "checkedInAttendeeIDs" which is a hashmap from String to int. I need to find documents where the string S is contained within the hashmap keys"
+            // -> provided information about collection.whereEqualTo("field.hashMapKey", true) would return those
+            // -> questioned a new instance of bing chat: "What will this query do in firestore android java? collection.whereEqualTo("checkedInAttendeeIDs."+attendee.getDeviceID(), true) where collection is a CollectionReference, and attendee.getDeviceID() is a string"
+            // -> modified query to use whereGreaterThanOrEqualTo, as the `true` doesn't make sense in our use case
+            // -> aside from basis of query, implementation written by me
+
+            return owner.eventsCollection.whereGreaterThanOrEqualTo("checkedInAttendeeIDs."+attendee.getDeviceID(), 1)
+                    .get().continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Task<Event>> eventFetchTasks = new ArrayList<>();
+                        for(DocumentSnapshot documentSnapshot : task.getResult().getDocuments()){
+                            eventFetchTasks.add(owner.events.get((String) documentSnapshot.get("eventID")));
+                        }
+                        return Tasks.whenAllComplete(eventFetchTasks);
+                    }).continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Event> finalOutput = new ArrayList<>();
+                        for(Task<?> eventTask: task.getResult()){
+                            if(eventTask.isSuccessful()){
+                                finalOutput.add((Event) eventTask.getResult());
+                            }
+                        }
+                        return Tasks.forResult(finalOutput);
+                    });
         }
 
         /**
