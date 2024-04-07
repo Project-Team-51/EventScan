@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
+import com.example.eventscan.Entities.Announcement;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Entities.Organizer;
@@ -24,6 +25,8 @@ import org.osmdroid.util.GeoPoint;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -647,6 +650,49 @@ public class Database {
                 }
                 return Tasks.forResult((ArrayList<GeoPoint>)(task.getResult().getData().get("check_in_pings")));
             });
+        }
+    }
+
+    public class AnnouncementOperations {
+        private Database owner;
+        private AnnouncementOperations(Database owner){
+            this.owner = owner;
+        }
+
+        public Task<Void> saveNotification(Event event, Announcement announcement){
+            return owner.announcementsCollection.document(event.getEventID()).get().continueWithTask(task -> {
+                if(!task.isSuccessful()){
+                    return Tasks.forException(getTaskException(task));
+                }
+                if(task.getResult().exists()){
+                    HashMap<Long,Announcement> fetchedAnnouncements = (HashMap<Long,Announcement>)task.getResult().get("announcements");
+                    Long newAnnouncementIndex = fetchedAnnouncements.keySet().size()-1L;
+                    return owner.announcementsCollection.document(event.getEventID()).update(
+                            FieldPath.of("announcements",String.valueOf(newAnnouncementIndex)),
+                            announcement);
+                }
+                // create a new one
+                HashMap<String, HashMap<Long,Announcement>> newDocument = new HashMap<>();
+                HashMap<Long,Announcement> newDocumentAnnouncements = new HashMap<>();
+                newDocumentAnnouncements.put(0L, announcement);
+                newDocument.put("announcements", newDocumentAnnouncements);
+                return owner.announcementsCollection.document(event.getEventID()).set(newDocument);
+            });
+        }
+
+        public Task<ArrayList<Announcement>> getNotifications(Event event){
+            return owner.announcementsCollection.document(event.getEventID())
+                    .get().continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        HashMap<Long,Announcement> fetchedAnnouncements = (HashMap<Long, Announcement>)task.getResult().get("announcements");
+                        ArrayList<Announcement> toReturnAnnouncements = new ArrayList<>();
+                        for(long i=0L; i<fetchedAnnouncements.keySet().size(); i++){
+                            toReturnAnnouncements.add(fetchedAnnouncements.get(i));
+                        }
+                        return Tasks.forResult(toReturnAnnouncements);
+                    });
         }
     }
 
