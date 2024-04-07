@@ -25,6 +25,7 @@ import org.osmdroid.util.GeoPoint;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -591,15 +592,28 @@ public class Database {
         }
 
         private Task<Void> savePointToEvent(GeoPoint geoPoint, Event event){
-            return geolocationStorageCollection.document(event.getEventID()).update("check_in_pings",FieldValue.arrayUnion(geoPoint));
-        }
-
-        public Task<ArrayList<GeoPoint>> getEventCheckinPoints(Event event){
             return geolocationStorageCollection.document(event.getEventID()).get().continueWithTask(task -> {
                 if(!task.isSuccessful()){
                     return Tasks.forException(getTaskException(task));
                 }
-                return Tasks.forResult((ArrayList<GeoPoint>)(task.getResult().getData().get("check_in_pings")));
+                if(task.getResult().exists()){
+                    return geolocationStorageCollection.document(event.getEventID()).update("check_in_pings",FieldValue.arrayUnion(geoPoint));
+                }
+                // else it doesn't exist, we need to make it and set it
+                HashMap<String, ArrayList<GeoPoint>> newDocument = new HashMap<>();
+                ArrayList<GeoPoint> thisPing = new ArrayList<>();
+                thisPing.add(geoPoint);
+                newDocument.put("check_in_pings", thisPing);
+                return geolocationStorageCollection.document(event.getEventID()).set(newDocument);
+            })
+        }
+
+        public Task<ArrayList<GeoPoint>> getEventCheckinPoints(Event event) {
+            return geolocationStorageCollection.document(event.getEventID()).get().continueWithTask(task1 -> {
+                if (!task1.isSuccessful()) {
+                    return Tasks.forException(getTaskException(task1));
+                }
+                return Tasks.forResult((ArrayList<GeoPoint>) (task1.getResult().getData().get("check_in_pings")));
             });
         }
     }
