@@ -25,7 +25,6 @@ import com.example.eventscan.R;
 import com.google.android.datatransport.backend.cct.BuildConfig;
 import com.google.firebase.storage.FirebaseStorage;
 
-import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
