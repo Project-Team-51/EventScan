@@ -27,6 +27,7 @@ import com.google.firebase.storage.FirebaseStorage;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
@@ -72,6 +73,7 @@ public class ViewMap extends DialogFragment {
 
         // Add some GeoPoints to the ArrayList (example)
         db.geolocation.getEventCheckinPoints(selectedEvent).addOnSuccessListener(points1 -> {
+            ArrayList<Marker> markers = new ArrayList<>(); // Create an ArrayList to hold markers
             double avgLatitude = 0;
             double avgLongitude = 0;
             points = points1;
@@ -84,17 +86,26 @@ public class ViewMap extends DialogFragment {
                 marker.setPosition(geoPoint);
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 mapView.getOverlays().add(marker);
+                markers.add(marker); // Add marker to the list
                 Log.d("GeoLocation", String.valueOf(geoPoint));
             }
-            avgLatitude = avgLatitude/points.size();
-            avgLongitude = avgLongitude/points.size();
-            GeoPoint center = new GeoPoint(avgLatitude,avgLongitude);
-            mapView.getController().setCenter(center);
+            avgLatitude = avgLatitude / points.size();
+            avgLongitude = avgLongitude / points.size();
+            GeoPoint center = new GeoPoint(avgLatitude, avgLongitude);
+            BoundingBox boundingBox = getBoundingBoxForMarkers(points); // Calculate bounding box
+            if (boundingBox != null) {
+                mapView.zoomToBoundingBox(boundingBox, true); // Zoom to the bounding box
+            } else {
+                mapView.getController().setCenter(center);
+                mapView.getController().setZoom(12.0); // Set a default zoom level if bounding box is null
+            }
         }).addOnFailureListener(e -> {
             Log.d("GeolocationHandler", e.toString());
         });
 
-        mapView.getController().setZoom(12.0);
+
+
+
         //GeoPoint
         returnView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,5 +115,27 @@ public class ViewMap extends DialogFragment {
         });
 
         return dialog;
+    }
+    private BoundingBox getBoundingBoxForMarkers(ArrayList<GeoPoint> points) {
+        if (points == null || points.isEmpty()) {
+            return null;
+        }
+
+        double minLat = Double.MAX_VALUE;
+        double maxLat = -Double.MAX_VALUE;
+        double minLon = Double.MAX_VALUE;
+        double maxLon = -Double.MAX_VALUE;
+
+        for (GeoPoint point : points) {
+            double lat = point.getLatitude();
+            double lon = point.getLongitude();
+
+            minLat = Math.min(minLat, lat);
+            maxLat = Math.max(maxLat, lat);
+            minLon = Math.min(minLon, lon);
+            maxLon = Math.max(maxLon, lon);
+        }
+
+        return new BoundingBox(maxLat+1.5, maxLon+1.5, minLat-1.5, minLon-1.5);
     }
 }
