@@ -582,7 +582,7 @@ public class Database {
             this.owner = owner;
         }
 
-        public Task<Void> savePointToEvent(GeoPoint geoPoint, Event event){
+        private Task<Void> savePointToEvent(GeoPoint geoPoint, Event event){
             return geolocationStorageCollection.document(event.getEventID()).update("check_in_pings",FieldValue.arrayUnion(geoPoint));
         }
 
