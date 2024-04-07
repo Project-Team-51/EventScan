@@ -38,6 +38,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /*
@@ -108,6 +109,19 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                     inEvents.clear();
                     ArrayList<Task<Event>> updateTasks = new ArrayList<>();
                     AtomicInteger failed_fetches_amount = new AtomicInteger(); // AtomicInteger suggested by android studio
+                    if (Objects.equals(userType, "Attendee") || Objects.equals(userType, "Administrator")){
+                        db.attendees.get(myDeviceID).continueWithTask(task -> {
+                            if(!task.isSuccessful()){
+                                return Tasks.forException(task.getException());
+                            }
+                            return db.attendees.getInterestedEvents(task.getResult());
+                        }).addOnSuccessListener(eventList -> {
+                            for (Event event : eventList) {
+                                inEventsAdapter.add(event);
+                            }
+                        });
+                    }
+
                     for (QueryDocumentSnapshot doc : querySnapshots) { // turn every stored "Event" into an event class, add to adapters
                         Task<Event> fetchEventTask = db.events.get(doc);
                         fetchEventTask.addOnCompleteListener(task -> {
@@ -117,7 +131,6 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                             }
                             Event event = task.getResult();
                             ownedEventsAdapter.add(event);
-                            inEventsAdapter.add(event);
                         });
                         updateTasks.add(fetchEventTask);
                     }

@@ -195,33 +195,11 @@ public class DeleteEvent extends DialogFragment {
         signupsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Inflate signups_list.xml layout
-                View signupsListView = getLayoutInflater().inflate(R.layout.signups_list, null);
-
-                // Find the ListView inside signups_list.xml
-                ListView attendeesListView = signupsListView.findViewById(R.id.attendeesList);
-
-                // Fetch signed-up attendees and populate the ListView here...
-                fillSignedUpAttendeesList(selectedEvent.getEventID(), attendeesListView); // Pass selectedEvent.getEventID() here
-
-                // Create and show AlertDialog containing signupsListView
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                builder.setView(signupsListView);
-                builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
+                String eventId = selectedEvent.getEventID();
+                SignupsListFragment fragment = SignupsListFragment.newInstance(eventId);
+                fragment.show(getParentFragmentManager(), "SignupsListFragment");
             }
         });
-
-
-
-
-
 
         Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
