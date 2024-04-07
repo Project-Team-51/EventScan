@@ -59,7 +59,7 @@ public class PicGen {
         return Color.rgb(random.nextInt(256), random.nextInt(256), random.nextInt(256));
     }
 
-    private static final String PROFILE_PIC_FILENAME = "profile_pic.jpg";
+    public static final String PROFILE_PIC_FILENAME = "profile_pic.jpg";
 
     /**
      * Save the profile picture bitmap to internal storage.
@@ -97,12 +97,18 @@ public class PicGen {
         File file = new File(context.getFilesDir(), PROFILE_PIC_FILENAME);
         return file.exists();
     }
-    public static void regenerateProfilePicture(Context context, String name) {
-        Bitmap existingProfileBitmap = loadProfilePicture(context);
-        if (existingProfileBitmap != null) {
-            existingProfileBitmap.recycle();
+
+    public static void deleteProfilePicture(Context context) {
+        File file = new File(context.getFilesDir(), PROFILE_PIC_FILENAME);
+        if (file.exists()) {
+            boolean deleted = file.delete();
+            if (deleted) {
+                Log.d("ProfilePictureManager", "Profile picture deleted successfully");
+            } else {
+                Log.e("ProfilePictureManager", "Failed to delete profile picture");
+            }
+        } else {
+            Log.d("ProfilePictureManager", "Profile picture does not exist");
         }
-        Bitmap newProfileBitmap = generateProfilePicture(name, 200);
-        saveProfilePicture(context, newProfileBitmap);
     }
 }

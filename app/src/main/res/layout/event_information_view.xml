@@ -90,8 +90,9 @@
             android:text="Return"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/bubbleContainer2"/>
+
         <Button
-            android:id="@+id/enroll_event"
+            android:id="@+id/signup_event"
             android:layout_width="160dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -100,8 +101,9 @@
             android:layout_gravity="end"
             android:layout_marginRight="30dp"
             android:backgroundTint="#414E6E"
-            android:text="DELETE"
+            android:text="SIGNUP"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/return_view"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
