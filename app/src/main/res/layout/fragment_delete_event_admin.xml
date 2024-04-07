@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/transparent">
-
     <Button
         android:id="@+id/return2"
         android:layout_width="160dp"
@@ -17,7 +16,7 @@
         android:backgroundTint="#414E6E"
         android:text="RETURN"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bubbleContainer" />
+        app:layout_constraintTop_toBottomOf="@id/attendeeLimit" />
 
     <TextView
         android:id="@+id/create_event"
@@ -37,7 +36,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bubbleContainer"
         android:layout_width="347dp"
-        android:layout_height="254dp"
+        android:layout_height="150dp"
         android:layout_marginHorizontal="30dp"
         android:layout_marginTop="15dp"
         android:layout_marginBottom="100dp"
@@ -126,15 +125,26 @@
         android:layout_below="@id/bubbleContainer"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="30dp"
-        android:layout_marginTop="15dp"
         android:backgroundTint="#414E6E"
         android:text="Get Details QR"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bubbleContainer" />
+        app:layout_constraintTop_toBottomOf="@+id/signups_button" />
 
 
     <Button
         android:id="@+id/signup_button"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="30dp"
+
+        android:backgroundTint="#414E6E"
+        android:text="enroll"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/showmap_button" />
+
+    <Button
+        android:id="@+id/signups_button"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/bubbleContainer"
@@ -142,9 +152,23 @@
         android:layout_marginLeft="30dp"
         android:layout_marginTop="15dp"
         android:backgroundTint="#414E6E"
-        android:text="SIGNUP"
+        android:text="SIGNUPS"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/attendeeLimit" />
+        app:layout_constraintTop_toBottomOf="@+id/bubbleContainer"
+        />
+
+    <Button
+        android:id="@+id/showmap_button"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bubbleContainer"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="30dp"
+        android:backgroundTint="#414E6E"
+        android:text="SHOW MAP"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/confirmEvent"
+        />
     
     <ImageView
         android:id="@+id/posterView"
@@ -166,15 +190,15 @@
         android:layout_height="33dp"
         android:layout_below="@+id/generate_QRCode_see_details"
         android:layout_alignEnd="@+id/confirmEvent"
-        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
         android:layout_marginTop="15dp"
         android:backgroundTint="#D3E2F2"
         android:text="Set Limit:"
         android:textColor="#D3E2F2"
         android:textColorHint="#D3E2F2"
         android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/confirmEvent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bubbleContainer"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
 

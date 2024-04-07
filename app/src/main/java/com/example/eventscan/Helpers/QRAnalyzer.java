@@ -163,6 +163,11 @@ public class QRAnalyzer{
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Event event = task.getResult();
+                        if (event.getAttendeeLimit() == event.getCheckedInAttendeesList().size()) {
+                            // Event is full, show a toast message and return
+                            Toast.makeText(context, "Event is full. No more attendees can be checked in.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         TextView dialogTitle = eventSignIn.findViewById(R.id.sign_in_event_name);
                         TextView dialogDescription = eventSignIn.findViewById(R.id.sign_in_event_description);
                         Button dialogButton = eventSignIn.findViewById(R.id.sign_in_sign_in_button);

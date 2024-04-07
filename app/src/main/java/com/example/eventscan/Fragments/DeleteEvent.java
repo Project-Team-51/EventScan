@@ -10,8 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +31,11 @@ import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.example.eventscan.Helpers.UserArrayAdapter;
 
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 /*
  * A simple dialogfragment that displays some basic info about the Event that is passed into it, and gives
@@ -40,6 +46,9 @@ public class DeleteEvent extends DialogFragment {
     Database db;
     Attendee selfAttendee = null;
     private String userType;
+    private ListView attendeesListView;
+    private UserArrayAdapter adapter;
+    private List<Attendee> attendeesList;
 
     /**
      * Default constructor for the DeleteEvent DialogFragment.
@@ -70,7 +79,12 @@ public class DeleteEvent extends DialogFragment {
 
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.fragment_delete_event_admin, null);
-
+/**
+        attendeesListView = view.findViewById(R.id.attendeesList);
+        attendeesList = new ArrayList<>();
+        adapter = new UserArrayAdapter(requireContext(), attendeesList);
+        attendeesListView.setAdapter(adapter);
+**/
         TextView eventNameText = view.findViewById(R.id.event_Name);
         eventNameText.setText(selectedEvent.getName());
 
@@ -84,6 +98,7 @@ public class DeleteEvent extends DialogFragment {
         Button delEvent = view.findViewById(R.id.confirmEvent);
         Button returnAdmin = view.findViewById(R.id.return2);
         Button signupButton = view.findViewById(R.id.signup_button);
+        Button signupsButton = view.findViewById(R.id.signups_button);
 
         db = Database.getInstance();
 
@@ -177,6 +192,37 @@ public class DeleteEvent extends DialogFragment {
             }
         });
 
+        signupsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Inflate signups_list.xml layout
+                View signupsListView = getLayoutInflater().inflate(R.layout.signups_list, null);
+
+                // Find the ListView inside signups_list.xml
+                ListView attendeesListView = signupsListView.findViewById(R.id.attendeesList);
+
+                // Fetch signed-up attendees and populate the ListView here...
+                fillSignedUpAttendeesList(selectedEvent.getEventID(), attendeesListView); // Pass selectedEvent.getEventID() here
+
+                // Create and show AlertDialog containing signupsListView
+                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                builder.setView(signupsListView);
+                builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+            }
+        });
+
+
+
+
+
+
         Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
         return dialog;
@@ -191,4 +237,56 @@ public class DeleteEvent extends DialogFragment {
     public void setDeleteEventListener(DeleteEventListener listener) {
         this.deleteEventListener = listener;
     }
+
+    private void fillSignedUpAttendeesList(String eventId, ListView attendeesListView) {
+        db.events.get(eventId)
+                .addOnSuccessListener(event -> {
+                    ArrayList<Attendee> attendeesList = event.getInterestedAttendees();
+                    if (attendeesList != null && !attendeesList.isEmpty()) {
+                        // Create a list to hold attendee names
+                        ArrayList<String> attendeeNames = new ArrayList<>();
+                        // Retrieve names for each attendee ID
+                        for (Attendee attendee : attendeesList) {
+                            db.attendees.get(attendee.getDeviceID())
+                                    .addOnSuccessListener(att -> {
+                                        // Add attendee name to the list
+                                        attendeeNames.add(att.getName());
+                                        // If names for all attendees are retrieved, update the list view
+                                        if (attendeeNames.size() == attendeesList.size()) {
+                                            // Create an adapter with attendee names
+                                            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.signups_list_item, attendeeNames);
+                                            attendeesListView.setAdapter(adapter);
+                                            Toast.makeText(requireContext(), "Signed-up attendees retrieved successfully", Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Handle failure for retrieving attendee name
+                                        Log.e("Database", "Error getting attendee: " + e.getMessage());
+                                        Toast.makeText(requireContext(), "Failed to retrieve attendee name", Toast.LENGTH_SHORT).show();
+                                        // If retrieving name fails, remove this attendee from the list
+                                        attendeesList.remove(attendee);
+                                        // If names for all attendees are retrieved or failed, update the list view
+                                        if (attendeeNames.size() + attendeesList.size() == attendeesList.size()) {
+                                            // Create an adapter with attendee names
+                                            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.signups_list_item, attendeeNames);
+                                            attendeesListView.setAdapter(adapter);
+                                            Toast.makeText(requireContext(), "Failed to retrieve names for some attendees", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
+                    } else {
+                        Toast.makeText(requireContext(), "No signed-up attendees found for this event", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Handle errors that occur while retrieving the event
+                    Log.e("Database", "Error getting event: " + e.getMessage());
+                    Toast.makeText(requireContext(), "Failed to retrieve signed-up attendees", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
+
+
+
 }

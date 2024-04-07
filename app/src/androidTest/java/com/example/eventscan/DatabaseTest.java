@@ -122,6 +122,7 @@ public class DatabaseTest extends Database {
                 null, // TODO add to test once functionality is done
                 eventIDTest
         );
+        event1.setAttendeeLimit(15);
         db.attendees.set(organizer1);
         Attendee attendee = new Attendee();
         attendee.setName("Event added test Attendee");
@@ -147,6 +148,7 @@ public class DatabaseTest extends Database {
         assertEquals(event1Modified, returnedEvent);
         assertEquals(returnedEvent, event1Modified);
         assertNotNull(returnedEvent.getOrganizer());
+        assertEquals(returnedEvent.getAttendeeLimit(), Integer.valueOf(15));
     }
 
     @Test
@@ -250,5 +252,58 @@ public class DatabaseTest extends Database {
         assertNotEquals(addedInterestEventTask.getResult(), event1);
 
     }
+
+//    @Test
+//    public void attendee_limit_test() throws ExecutionException, InterruptedException {
+//        Database db = DatabaseTest.getInstance();
+//        String eventIDTest = "207894213";
+//        Organizer organizer1 = new Organizer();
+//        organizer1.setDeviceID("12908ash98e2");
+//        organizer1.setPhoneNum("1029384");
+//        organizer1.setEmail("interested_test@abc.com");
+//        organizer1.setName("Interested Test Organizer");
+//        organizer1.setBio("Test Bio");
+//        organizer1.setProfilePictureID("123");
+//        Event event1 = new Event(
+//                "Test Eventfor Interested Attendee",
+//                "Test Description",
+//                organizer1,
+//                null, // TODO add to test once functionality is done
+//                eventIDTest
+//        );
+//        event1.setAttendeeLimit(2);
+//        Tasks.await(db.attendees.set(organizer1));
+//        Attendee attendee = new Attendee();
+//        attendee.setName("Interested Test Attendee");
+//        attendee.setBio("Interested Test bio");
+//        attendee.setDeviceID("12309865");
+//        Attendee attendee2 = new Attendee();
+//        attendee2.setName("Interested Test Attendee2");
+//        attendee2.setBio("Interested Test bio 2");
+//        attendee2.setDeviceID("123098652");
+//        // add it to the DB
+//        Task<Event> potentiallyUpdatedEvent = db.events.create(event1);
+//        Tasks.await(potentiallyUpdatedEvent);
+//        event1 = potentiallyUpdatedEvent.getResult();
+//        Tasks.await(db.attendees.set(attendee));
+//        Tasks.await(db.attendees.set(attendee2));
+//        // now add an interested attendee both here and there
+//        event1.addInterestedAttendee(attendee);
+//        event1.addInterestedAttendee(attendee2);
+//
+//        // Mark event as full
+//        event1.checkInAttendee(attendee);
+//        //event1.checkInAttendee(attendee2);
+//        //assertEquals(a);
+//        // Attempt to add another interested attendee
+//        try {
+//            event1.checkInAttendee(attendee2);
+//            fail("Should have thrown an exception");
+//        } catch (RuntimeException e) {
+//            // Verify if the exception message contains the expected message
+//            assertEquals("Event is full. No more attendees can be checked in.", e.getMessage());
+//        }
+//    }
+
 
 }
