@@ -2,6 +2,7 @@ package com.example.eventscan.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -16,6 +17,9 @@ import com.example.eventscan.Fragments.EventFragment;
 import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.Fragments.QrScannerFragment;
 import com.example.eventscan.R;
+
+import java.util.Observable;
+import java.util.Observer;
 
 
 

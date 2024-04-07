@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text=""
+        android:text="Loading..."
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:textSize="20sp"
@@ -45,9 +45,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Sign in"
         android:backgroundTint="#414E6E"
+        android:text="Check in"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sign_in_event_poster" />
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_event_poster"
+        tools:visibility="invisible" />
 </androidx.constraintlayout.widget.ConstraintLayout>
