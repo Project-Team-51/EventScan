@@ -671,14 +671,26 @@ public class Database {
                 if (!task1.isSuccessful()) {
                     return Tasks.forException(getTaskException(task1));
                 }
-                ArrayList<HashMap<String, Double>> fetchedData = (ArrayList<HashMap<String, Double>>) task1.getResult().get("check_in_pings");
+                ArrayList<HashMap<String, ?>> fetchedData = (ArrayList<HashMap<String, ?>>) task1.getResult().get("check_in_pings");
                 ArrayList<GeoPoint> output = new ArrayList<>();
                 if(fetchedData == null){
                     return Tasks.forResult(output);
                 }
-                for(HashMap<String, Double> entry: fetchedData){
+                for(HashMap<String, ?> entry: fetchedData){
+                    Double latitude;
+                    Double longitude;
+                    if(entry.get("latitude") != null && entry.get("latitude") instanceof Double){
+                        latitude = (Double) entry.get("latitude");
+                    } else {
+                        latitude = 0.;
+                    }
+                    if(entry.get("longitude") != null && entry.get("longitude") instanceof Double){
+                        longitude = (Double) entry.get("longitude");
+                    } else {
+                        longitude = 0.;
+                    }
                     if(entry.get("latitude") != null && entry.get("longitude") != null) {
-                        output.add(new GeoPoint(entry.get("latitude"), entry.get("longitude")));
+                        output.add(new GeoPoint(latitude, longitude));
                     }
                 }
                 return Tasks.forResult(output);
