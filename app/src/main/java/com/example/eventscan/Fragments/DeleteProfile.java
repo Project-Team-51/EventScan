@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -54,20 +55,35 @@ public class DeleteProfile extends DialogFragment {
         assert getArguments() != null;
         User selectedUser = (User) getArguments().getSerializable("selectedProfile");
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.fragment_profile, null);
+        View view = inflater.inflate(R.layout.fragment_browse_profile, null);
+
         TextView profileNameText = view.findViewById(R.id.nameEditText);
         profileNameText.setText(selectedUser.getName());
 
+        Button deleteButton = view.findViewById(R.id.deleteProfile);
+        deleteButton.setOnClickListener(v -> {
+            if (deleteProfileListener != null) {
+                deleteProfileListener.onDeleteProfile(selectedUser);
+            }
+            dismiss();
+        });
+
         Dialog dialog = new Dialog(requireContext());
         dialog.setContentView(view);
-        Fragment parentFragment = getParentFragment();
-        ProfileFragment profileFragment = (ProfileFragment) parentFragment;
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        WindowManager.LayoutParams layoutParams = dialog.getWindow().getAttributes();
+        layoutParams.dimAmount = 0.7f; // Adjust this value as needed
+        dialog.getWindow().setAttributes(layoutParams);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
-        Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
+        Button returnButton = view.findViewById(R.id.saveButton);
+        // Set OnClickListener to collapse the fragment
+        returnButton.setOnClickListener(v -> dismiss());
 
         return dialog;
     }
+
+
 
     /**
      * Sets the profile listener for profile deletion.
