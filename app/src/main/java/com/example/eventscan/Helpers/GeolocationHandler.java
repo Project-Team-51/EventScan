@@ -138,7 +138,6 @@ public class GeolocationHandler {
                 Log.d("GeolocationHandler", "Latitude: " + latitude + ", Longitude: " + longitude);
 
                 // Stop listening for location updates after receiving the first update
-                locationManager.removeUpdates(locationListener);
             }
 
             @Override
