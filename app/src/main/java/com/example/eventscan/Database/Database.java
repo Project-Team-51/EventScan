@@ -658,12 +658,6 @@ public class Database {
             });
         }
 
-        private class GeoPointsFetcher implements Serializable {
-            ArrayList<GeoPoint> check_in_pings;
-            private GeoPointsFetcher(){};
-
-        }
-
         public Task<ArrayList<GeoPoint>> getEventCheckinPoints(Event event) {
 
             return geolocationStorageCollection.document(event.getEventID()).get().continueWithTask(task1 -> {
