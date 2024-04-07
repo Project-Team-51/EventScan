@@ -24,6 +24,8 @@ public class EventDatabaseRepresentation {
     private String posterID;
     private String eventID;
 
+    private int attendeeLimit;
+
     public EventDatabaseRepresentation(){}
     public EventDatabaseRepresentation(Event event){
         location = event.getLocation();
@@ -31,6 +33,7 @@ public class EventDatabaseRepresentation {
         interestedAttendeeIDs = new ArrayList<>();
         checkedInAttendeeIDs = new HashMap<>();
         name = event.getName();
+        attendeeLimit = event.getAttendeeLimit();
         for(Map.Entry<Attendee, Integer> entry : event.getCheckedInAttendees().entrySet()){
             checkedInAttendeeIDs.put(
                     entry.getKey().getDeviceID(),
@@ -56,6 +59,7 @@ public class EventDatabaseRepresentation {
         event.setDesc(this.getDesc());
         event.setName(this.name);
         event.setEventID(this.eventID);
+        event.setAttendeeLimit(this.attendeeLimit);
 
         return event;
     }
@@ -81,5 +85,13 @@ public class EventDatabaseRepresentation {
 
     public String getOrganizerID(){
         return organizerID;
+    }
+
+    public int getAttendeeLimit() {
+        return attendeeLimit;
+    }
+
+    public void setAttendeeLimit(int attendeeLimit) {
+        this.attendeeLimit = attendeeLimit;
     }
 }

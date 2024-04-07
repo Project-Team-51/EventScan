@@ -1,7 +1,6 @@
 package com.example.eventscan.Database;
 
 import android.net.Uri;
-import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
@@ -15,17 +14,17 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import kotlin.NotImplementedError;
@@ -50,6 +49,8 @@ public class Database {
     protected CollectionReference qrLinkCollection;
     protected StorageReference posterStorageCollection;
 
+    protected CollectionReference geolocationStorageCollection;
+
     protected CollectionReference adminCollection;
     protected CollectionReference announcementsCollection;
 
@@ -58,6 +59,7 @@ public class Database {
     public AdminOperations admins;
     public QRCodeOperations qr_codes;
     public PosterOperations posters;
+    public GeolocationOperations geolocation;
 
 
     private static final Database instance = new Database();
@@ -86,6 +88,10 @@ public class Database {
                 .collection("prod")
                 .document("announcements")
                 .collection("announcements");
+        geolocationStorageCollection = FirebaseFirestore.getInstance()
+                        .collection("prod")
+                        .document("geolocations")
+                        .collection("geolocations");
         setupChildren();
     }
 
@@ -102,6 +108,8 @@ public class Database {
         this.posters = new PosterOperations(this);
         this.qr_codes = new QRCodeOperations(this);
         this.admins = new AdminOperations(this);
+        this.geolocation = new GeolocationOperations(this);
+
     }
     public static Database getInstance(){
         return instance;
@@ -169,7 +177,28 @@ public class Database {
          * @return the list of events that `attendee` is interested in
          */
         public Task<ArrayList<Event>> getInterestedEvents(Attendee attendee){
-            throw new NotImplementedError();
+            return owner.eventsCollection.whereArrayContains("interestedAttendeeIDs", attendee.getDeviceID())
+                    .get().continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Task<Event>> eventFetchTasks = new ArrayList<>();
+                        for(DocumentSnapshot documentSnapshot: task.getResult().getDocuments()){
+                            eventFetchTasks.add(owner.events.get((String) documentSnapshot.get("eventID")));
+                        }
+                        return Tasks.whenAllComplete(eventFetchTasks);
+                    }).continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Event> finalOutput = new ArrayList<>();
+                        for(Task<?> eventTask: task.getResult()){
+                            if(eventTask.isSuccessful()){
+                                finalOutput.add((Event) eventTask.getResult());
+                            }
+                        }
+                        return Tasks.forResult(finalOutput);
+                    });
         }
 
         /**
@@ -179,7 +208,35 @@ public class Database {
          * @return the list of events that `attendee` has checked into
          */
         public Task<ArrayList<Event>> getCheckedInEvents(Attendee attendee){
-            throw new NotImplementedError(); // TODO delete if not needed
+            // Microsoft Bing Chat 2024-04-07
+            // "Please help me write a firebase query in java android. I have documents that contain the field "checkedInAttendeeIDs" which is a hashmap from String to int. I need to find documents where the string S is contained within the hashmap keys"
+            // -> provided information about collection.whereEqualTo("field.hashMapKey", true) would return those
+            // -> questioned a new instance of bing chat: "What will this query do in firestore android java? collection.whereEqualTo("checkedInAttendeeIDs."+attendee.getDeviceID(), true) where collection is a CollectionReference, and attendee.getDeviceID() is a string"
+            // -> modified query to use whereGreaterThanOrEqualTo, as the `true` doesn't make sense in our use case
+            // -> aside from basis of query, implementation written by me
+
+            return owner.eventsCollection.whereGreaterThanOrEqualTo("checkedInAttendeeIDs."+attendee.getDeviceID(), 1)
+                    .get().continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Task<Event>> eventFetchTasks = new ArrayList<>();
+                        for(DocumentSnapshot documentSnapshot : task.getResult().getDocuments()){
+                            eventFetchTasks.add(owner.events.get((String) documentSnapshot.get("eventID")));
+                        }
+                        return Tasks.whenAllComplete(eventFetchTasks);
+                    }).continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Event> finalOutput = new ArrayList<>();
+                        for(Task<?> eventTask: task.getResult()){
+                            if(eventTask.isSuccessful()){
+                                finalOutput.add((Event) eventTask.getResult());
+                            }
+                        }
+                        return Tasks.forResult(finalOutput);
+                    });
         }
 
         /**
@@ -303,7 +360,7 @@ public class Database {
 
 
         /**
-         * Add an attendee to an event if they aren't already on it
+         * Check an attendee into an event
          * @param event the event to add to
          * @param attendee the attendee to be added
          * @return a task that will be resolved when the adding finishes
@@ -313,6 +370,20 @@ public class Database {
             return eventsCollection
                     .document(event.getEventID())
                     .update(FieldPath.of("checkedInAttendeeIDs",attendee.getDeviceID()),FieldValue.increment(1));
+        }
+
+        /**
+         * Check an attendee into an event, with a GeoPoint location
+         * @param event the event to add to
+         * @param attendee the attendee to be added
+         * @param geoPoint the location of the attendee
+         * @return a task that will be resolved when the adding finishes
+         */
+        public Task<List<Task<?>>> checkInAttendee(@NonNull Event event, @NonNull Attendee attendee, @NonNull GeoPoint geoPoint) {
+            ArrayList<Task<Void>> allTasks = new ArrayList<>();
+            allTasks.add(checkInAttendee(event, attendee));
+            allTasks.add(owner.geolocation.savePointToEvent(geoPoint,event));
+            return Tasks.whenAllComplete(allTasks);
         }
 
         /**
@@ -555,6 +626,27 @@ public class Database {
                         return Tasks.forResult(results);
                     });
 
+        }
+    }
+
+    public class GeolocationOperations {
+        private Database owner;
+
+        private GeolocationOperations(Database owner){
+            this.owner = owner;
+        }
+
+        private Task<Void> savePointToEvent(GeoPoint geoPoint, Event event){
+            return geolocationStorageCollection.document(event.getEventID()).update("check_in_pings",FieldValue.arrayUnion(geoPoint));
+        }
+
+        public Task<ArrayList<GeoPoint>> getEventCheckinPoints(Event event){
+            return geolocationStorageCollection.document(event.getEventID()).get().continueWithTask(task -> {
+                if(!task.isSuccessful()){
+                    return Tasks.forException(getTaskException(task));
+                }
+                return Tasks.forResult((ArrayList<GeoPoint>)(task.getResult().getData().get("check_in_pings")));
+            });
         }
     }
 
