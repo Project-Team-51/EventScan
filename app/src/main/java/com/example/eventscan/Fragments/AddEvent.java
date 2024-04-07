@@ -3,6 +3,7 @@ package com.example.eventscan.Fragments;
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -25,6 +26,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.eventscan.Activities.MainActivity;
@@ -41,6 +43,7 @@ import com.example.eventscan.R;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -119,6 +122,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
         Button generateQRCodeDetailsButton = view.findViewById(R.id.generate_QRCode_see_details);
         Button confirmEventButton = view.findViewById(R.id.confirmEvent);
         Button uploadPoster = view.findViewById(R.id.upload_poster);
+        Button ShareQR = view.findViewById(R.id.buttonShareQRCode);
         Switch attendeeLimitSwitch = view.findViewById(R.id.attendeeLimit);
         imageView = view.findViewById(R.id.posterView);
 
@@ -142,6 +146,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
             Task<Bitmap> getQRTask = QrCodec.createOrGetQR(event, linkType, false);
             getQRTask.addOnSuccessListener(bitmap -> {
                 imageViewDialog.setImageBitmap(bitmap);
+
             });
             // rest of fragment setup
             // Create and show the dialog
@@ -164,12 +169,42 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
             View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
             ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
             Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
+            Button buttonShareQR = dialogView.findViewById(R.id.buttonShareQRCode);
             int linkType = QRDatabaseEventLink.DIRECT_SEE_DETAILS;
 
             // setup the task to run as early as possible
             Task<Bitmap> getQRTask = QrCodec.createOrGetQR(event, linkType, false);
             getQRTask.addOnSuccessListener(bitmap -> {
                 imageViewDialog.setImageBitmap(bitmap);
+
+                buttonShareQR.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("image/jpeg");
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        byte[] qrImageBytes = byteArrayOutputStream.toByteArray();
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, qrImageBytes);
+                        startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
+                    }
+                });
+
+//                        File qrImageFile = new File(getActivity().getExternalCacheDir(), "qrcode.jpg");
+//                        try {
+//                            FileOutputStream fileOutputStream = new FileOutputStream(qrImageFile);
+//                            fileOutputStream.write(byteArrayOutputStream.toByteArray());
+//                            fileOutputStream.flush();
+//                            fileOutputStream.close();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                        Uri qrImageURI = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName() + ".provider", qrImageFile);
+//                        shareIntent.putExtra(Intent.EXTRA_STREAM, qrImageURI);
+//                        startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
+//                        dialog.dismiss();
+//                    }
+//                });
             });
             // rest of fragment setup
             // Create and show the dialog
@@ -340,6 +375,8 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
         // For example, set it to the event object
         event.setAttendeeLimit(attendeeLimit);
     }
+
+
 
 
 }
