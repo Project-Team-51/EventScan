@@ -13,12 +13,11 @@ import android.location.LocationListener;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.Range;
+import android.content.Context;
+import android.content.SharedPreferences;
 
-import org.osmdroid.config.Configuration;
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.MapView;
+
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -33,6 +32,8 @@ public class GeolocationHandler {
 
     private static LocationManager locationManager;
     private static LocationListener locationListener;
+    private static final String LOCATION_PREFS = "location_prefs";
+    private static final String LOCATION_ENABLED_KEY = "location_enabled";
     private static boolean isEnabled;
     private static double latitude;
     private static double longitude;
@@ -171,5 +172,16 @@ public class GeolocationHandler {
     public static boolean getLocationEnabled(){
         return isEnabled;
     }
+    public static void setLocationEnabled(Context context, boolean isEnabled) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(LOCATION_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(LOCATION_ENABLED_KEY, isEnabled);
+        editor.apply();
+    }
 
+    // Retrieve the state of the location setting
+    public static boolean isLocationEnabled(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(LOCATION_PREFS, Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean(LOCATION_ENABLED_KEY, false); // Default value is false
+    }
 }

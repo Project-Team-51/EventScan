@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -234,6 +235,8 @@ public class ProfileFragment extends Fragment {
         saveProfileBtn = view.findViewById(R.id.saveButton);
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
         locationToggle = view.findViewById(R.id.locationToggle);
+        boolean isLocationEnabled = GeolocationHandler.isLocationEnabled(requireContext());
+        locationToggle.setChecked(isLocationEnabled);
     }
     private void setClickListeners() {
         saveProfileBtn.setOnClickListener(new View.OnClickListener() {
@@ -294,10 +297,12 @@ public class ProfileFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     GeolocationHandler.enableLocationUpdates(getContext());
+                    GeolocationHandler.setLocationEnabled(getContext(),true);
 
                 } else {
                     // User disabled location services
                     GeolocationHandler.disableLocationUpdates();
+                    GeolocationHandler.setLocationEnabled(getContext(),false);
                 }
             }
         });
