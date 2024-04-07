@@ -5,8 +5,8 @@ import static android.view.View.GONE;
 import android.app.Dialog;
 import android.content.Context;
 import android.media.Image;
-import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,9 +21,9 @@ import androidx.camera.core.UseCase;
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.QRDatabaseEventLink;
 import com.example.eventscan.Entities.Attendee;
+import com.example.eventscan.Entities.DeviceID;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.mlkit.vision.barcode.BarcodeScanner;
@@ -34,9 +34,11 @@ import com.google.mlkit.vision.common.InputImage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Observer;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 /*
 This class handles the opening of the camera, as well as scanning the QR Code and retrieving the relevant information
@@ -48,8 +50,9 @@ public class QRAnalyzer{
     BarcodeScanner scanner;
     Context context;
     Database db;
+    Task<Attendee> selfAttendeeTask = null;
     Attendee selfAttendee = null;
-    boolean attendeeFetchCompleted; // this will be removed later, just for forcing synchronous code
+
     public QRAnalyzer(Context context){
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
@@ -57,14 +60,11 @@ public class QRAnalyzer{
         scanner = BarcodeScanning.getClient(options);
         this.context = context;
         db = Database.getInstance();
-
-        // TODO replace this with a databaseHelper style static method call
-        String deviceID = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        db.attendees.get(deviceID).addOnSuccessListener(attendee -> {
+        String deviceID = DeviceID.getDeviceID(context);
+        selfAttendeeTask = db.attendees.get(deviceID).addOnSuccessListener(attendee -> {
             selfAttendee = attendee;
         }).addOnFailureListener(e -> {
             Log.e("QR SCAN", "couldn't fetch selfAttendee: "+e.toString());
-            attendeeFetchCompleted = true;
         });
     }
 
@@ -129,8 +129,9 @@ public class QRAnalyzer{
                         });
                         scanner.close();
                     }
-            );
-            scanner.close();
+            ).addOnFailureListener(e -> {
+                Log.e("QR", e.toString());
+            });
         }
     }
 
@@ -139,56 +140,62 @@ public class QRAnalyzer{
             case QRDatabaseEventLink.DIRECT_CHECK_IN:
                 //TODO
             case QRDatabaseEventLink.DIRECT_SEE_DETAILS:
-                createSignInDialog(link.getDirectedEventID());
+                createCheckInDialog(link.getDirectedEventID());
         }
     }
 
     /**
-     * Creates a sign-in dialog for the event.
+     * Creates a check-in dialog for the event.
      *
      * @param eventID       The ID of the event.
      */
-    private void createSignInDialog(String eventID){
+    private void createCheckInDialog(String eventID){
         Dialog eventSignIn = new Dialog(context);
         eventSignIn.setContentView(R.layout.fragment_event_sign_in);
         eventSignIn.setCancelable(true);
-        Log.d("QR SCAN", eventID);
+        Log.d("QR Analyzer", "creating Checkin dialog for event " + eventID);
+        if(selfAttendee == null){
+            // a little bit goofy
+            selfAttendee = new Attendee();
+            selfAttendee.setDeviceID(DeviceID.getDeviceID(context));
+        }
         Database.getInstance().events.get(eventID)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Event event = task.getResult();
-                        ((TextView) eventSignIn.findViewById(R.id.sign_in_event_name)).setText(event.getName());
-                        ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText(event.getDesc());
+                        TextView dialogTitle = eventSignIn.findViewById(R.id.sign_in_event_name);
+                        TextView dialogDescription = eventSignIn.findViewById(R.id.sign_in_event_description);
+                        Button dialogButton = eventSignIn.findViewById(R.id.sign_in_sign_in_button);
+                        dialogTitle.setText(event.getName());
+                        dialogDescription.setText(event.getDesc());
                         Log.d("QR SCAN","completed, successful");
                         //TODO set the poster
-                      
+
+                        dialogButton.setVisibility(View.VISIBLE);
                         // set the onclick of the button to sign you up
-                        if(event.getCheckedInAttendeesList().contains(selfAttendee)){
-                            ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setText("You've Already signed up");
-                        } else {
-                            ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setOnClickListener(v -> {
-                                // make sure the selfAttendee has been returned, quick and dirty code, this will be changed
-                                while(!attendeeFetchCompleted){
-                                    try {
-                                        Thread.sleep(20);
-                                    } catch (InterruptedException e) {
-                                        throw new RuntimeException(e);
-                                    }
+                        dialogButton.setOnClickListener(v -> {
+                            event.checkInAttendee(selfAttendee);
+                            db.events.checkInAttendee(event, selfAttendee).addOnCompleteListener(task1 -> {
+                                // check-in is done, make sure it was successful
+                                if(task1.isSuccessful()){
+                                    dialogDescription.setText("Check-in Successful!\n You can now safely go to another screen");
+                                    dialogButton.setVisibility(GONE);
+                                } else {
+                                    Log.e("QR SCAN", Database.getTaskException(task1).toString());
+                                    dialogDescription.setText("Check-in Failed\nPlease relaunch the app and try again");
+                                    dialogButton.setText("Exit");
+                                    dialogButton.setOnClickListener(v1 -> {
+                                        // https://stackoverflow.com/questions/17719634/how-to-exit-an-android-app-programmatically
+                                        System.exit(1);
+                                    });
                                 }
-                                if(selfAttendee == null){
-                                    throw new RuntimeException("Attendee fetch failed :( This will be gracefully handled in the future");
-                                }
-                                event.checkInAttendee(selfAttendee);
-                                db.events.checkInAttendee(event, selfAttendee);
-                                eventSignIn.cancel();
                             });
-                        }
+                        });
                     } else {
                         Log.e("QR SCAN", "Event "+eventID+" not found in firebase");
-                        Log.e("QR_SCAN", task.getException().toString());
+                        Log.e("QR SCAN", Database.getTaskException(task).toString());
                         ((TextView) eventSignIn.findViewById(R.id.sign_in_event_name)).setText("Event "+eventID);
                         ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText("Not found\n(you may be offline)");
-                        ((Button) eventSignIn.findViewById(R.id.sign_in_sign_in_button)).setVisibility(GONE);
                     }
                 });
 

@@ -34,8 +34,6 @@ public class LoginActivity extends AppCompatActivity {
 
         db = Database.getInstance();
 
-
-
         // UI components
         EditText username = findViewById(R.id.editTextUsername);
         EditText password = findViewById(R.id.editTextPassword);
