@@ -28,6 +28,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.eventscan.Activities.MainActivity;
+
+import com.example.eventscan.Activities.UserSelection;
+
+
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.QRDatabaseEventLink;
 import com.example.eventscan.Entities.Event;
@@ -36,6 +40,8 @@ import com.example.eventscan.Entities.Organizer;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,7 +55,7 @@ import java.util.Random;
  * A dialog fragment that allows us to add a new event. The organizer who makes the event is designated the event owner,
  * and the new event is pushed to the Firestore where every users all events list will promptly update and add it.
  */
-public class AddEvent extends DialogFragment {
+public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragment.AttendeeLimitListener {
 
     private Event event;
     private Organizer organizer;
@@ -217,7 +223,7 @@ public class AddEvent extends DialogFragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    showAttendeeLimitDialog();
+                    showAttendeeLimitDialog(event);
                 }
             }
         });
@@ -320,14 +326,24 @@ public class AddEvent extends DialogFragment {
                         posterUri = result;
                         imageView.setImageURI(result);
                         posterUriString = posterUri.toString();
+                        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+                        StorageReference profilePicRef = storageRef.child("poster_pics").child(deviceID);
+                        profilePicRef.putFile(posterUri);
                     }
 
                 }
             });
 
-    private void showAttendeeLimitDialog() {
+    private void showAttendeeLimitDialog(Event event) {
         AttendeeLimitDialogFragment dialogFragment = new AttendeeLimitDialogFragment();
+        dialogFragment.setAttendeeLimitListener(this); // Set the listener
         dialogFragment.show(getChildFragmentManager(), "attendee_limit_dialog");
+    }
+
+    public void onAttendeeLimitSet(int attendeeLimit) {
+        // Handle the attendee limit set by the user here
+        // For example, set it to the event object
+        event.setAttendeeLimit(attendeeLimit);
     }
 
 

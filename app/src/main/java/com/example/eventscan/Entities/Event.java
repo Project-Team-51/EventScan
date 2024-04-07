@@ -24,9 +24,15 @@ public class Event implements Serializable {
     private Organizer organizer;
     private String poster;
     private String eventID;
+    public Integer attendeeLimit = -1;
+    public Integer getAttendeeLimit() {
+        return attendeeLimit;
+    }
 
-  
-  
+    public void setAttendeeLimit(Integer attendeeLimit) {
+        this.attendeeLimit = attendeeLimit;
+    }
+
     // empty constructor so it works with firestore
     public Event() {
         this.checkedInAttendees = new HashMap<>();
