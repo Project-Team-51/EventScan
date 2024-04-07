@@ -1,5 +1,7 @@
 package com.example.eventscan.Fragments;
 
+import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -11,14 +13,18 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
-import com.bumptech.glide.Glide;
+
 import com.example.eventscan.Database.Database;
+import com.example.eventscan.Entities.Attendee;
+import com.example.eventscan.Entities.DeviceID;
+import com.bumptech.glide.Glide;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 import com.google.firebase.storage.FirebaseStorage;
@@ -31,6 +37,9 @@ import java.util.Objects;
  */
 public class DeleteEvent extends DialogFragment {
 
+    Database db;
+    Attendee selfAttendee = null;
+    private String userType;
 
     /**
      * Default constructor for the DeleteEvent DialogFragment.
@@ -46,7 +55,7 @@ public class DeleteEvent extends DialogFragment {
         void onDeleteEvent(Event event);
     }
     private DeleteEventListener deleteEventListener;
-    Database db;
+
     /**
      * Called to create the dialog view.
      *
@@ -74,6 +83,15 @@ public class DeleteEvent extends DialogFragment {
 
         Button delEvent = view.findViewById(R.id.confirmEvent);
         Button returnAdmin = view.findViewById(R.id.return2);
+        Button signupButton = view.findViewById(R.id.signup_button);
+
+        db = Database.getInstance();
+
+        userType = DeviceID.getUserType(requireContext());
+        if (userType.equals("Organizer")) {
+            signupButton.setVisibility(View.GONE);
+        }
+
         Fragment parentFragment = getParentFragment();
         EventFragment eventFragment = (EventFragment) parentFragment;
 
@@ -105,6 +123,57 @@ public class DeleteEvent extends DialogFragment {
             @Override
             public void onClick(View v) {
                 dismiss();
+            }
+        });
+
+        signupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String deviceID = DeviceID.getDeviceID(requireContext());
+                db.attendees.get(deviceID)  // Needs to be changed to reflect admins
+                        .addOnSuccessListener(attendee -> {
+                            selfAttendee = attendee;
+                            // Check if selfAttendee is fetched successfully
+                            if (selfAttendee != null) {
+                                String eventID = selectedEvent.getEventID();
+                                db.events.get(eventID)
+                                        .addOnSuccessListener(event -> {
+                                            if (event != null) {
+                                                // Add interested attendee to the event
+                                                db.events.addInterestedAttendee(event, selfAttendee)
+                                                        .addOnSuccessListener(aVoid -> {
+                                                            Log.d(TAG, "Signed up Successfully: ");
+                                                            Toast.makeText(getContext(), "Sign up Successful", Toast.LENGTH_SHORT).show();
+                                                            dismiss(); // Dismiss the dialog after successful enrollment
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            Log.e(TAG, "Failed to Sign up: " + e.getMessage());
+                                                            // Display a toast or error message to the user
+                                                            Toast.makeText(getContext(), "Failed to sign up for the event", Toast.LENGTH_SHORT).show();
+                                                        });
+                                            } else {
+                                                Log.e(TAG, "Event not found for ID: " + eventID);
+                                                // Display a toast or error message to the user
+                                                Toast.makeText(getContext(), "Event not found", Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e(TAG, "Failed to retrieve event: " + e.getMessage());
+                                            // Display a toast or error message to the user
+                                            Toast.makeText(getContext(), "Failed to retrieve event", Toast.LENGTH_SHORT).show();
+                                        });
+                            } else {
+                                Log.e(TAG, "Self attendee is null");
+                                // Display a toast or error message to the user
+                                Toast.makeText(getContext(), "Failed to fetch attendee information", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("QR SCAN", "couldn't fetch selfAttendee: " + e.toString());
+                            // Display a toast or error message to the user
+                            Toast.makeText(getContext(), "Failed to fetch attendee information", Toast.LENGTH_SHORT).show();
+                        });
             }
         });
 

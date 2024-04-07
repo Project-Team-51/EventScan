@@ -75,7 +75,7 @@ public class ViewEvent extends DialogFragment {
 
         ImageView posterView = view.findViewById(R.id.poster_view);
         Button returnView = view.findViewById(R.id.return_view);
-        Button enrollEvent = view.findViewById(R.id.signup_event);
+        Button SignupEventButton = view.findViewById(R.id.signup_event);
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         db = Database.getInstance();
@@ -103,7 +103,7 @@ public class ViewEvent extends DialogFragment {
             }
         });
 
-        enrollEvent.setOnClickListener(new View.OnClickListener() {
+        SignupEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -121,6 +121,7 @@ public class ViewEvent extends DialogFragment {
                                                 db.events.addInterestedAttendee(event, selfAttendee)
                                                         .addOnSuccessListener(aVoid -> {
                                                             Log.d(TAG, "Signed up Successfully: ");
+                                                            Toast.makeText(getContext(), "Sign up Successful", Toast.LENGTH_SHORT).show();
                                                             dismiss(); // Dismiss the dialog after successful enrollment
                                                         })
                                                         .addOnFailureListener(e -> {
