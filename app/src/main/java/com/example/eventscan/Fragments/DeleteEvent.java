@@ -149,7 +149,7 @@ public class DeleteEvent extends DialogFragment {
         showMap.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 // ENTER ARRAY LIST HERE
-                openMapView(points);
+                openMapView(selectedEvent);
             }
         });
         signupButton.setOnClickListener(new View.OnClickListener() {
@@ -239,10 +239,11 @@ public class DeleteEvent extends DialogFragment {
         return dialog;
     }
 
-    private void openMapView(){
+    private void openMapView(Event selectedEvent){
         ViewMap viewMapFragment = new ViewMap();
         // Create a Bundle and put the selected Event information
         Bundle bundle = new Bundle();
+        bundle.putSerializable("selectedEvent", selectedEvent);
         viewMapFragment.setArguments(bundle);
         // Show the ViewMap fragment
         viewMapFragment.show(getParentFragmentManager(), "ViewMapFragment");
