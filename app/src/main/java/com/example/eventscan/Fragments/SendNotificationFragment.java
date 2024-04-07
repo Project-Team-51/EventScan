@@ -1,5 +1,7 @@
 package com.example.eventscan.Fragments;
 
+import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
+
 import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,10 +16,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.eventscan.Database.Database;
+import com.example.eventscan.Entities.Announcement;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Objects;
@@ -31,11 +36,10 @@ public class SendNotificationFragment extends DialogFragment {
     }
     private SendNotificationListener sendNotificationListener;
     private String eventAnnouncement;
-    private FirebaseFirestore db;
+    private Database db;
 
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        db = FirebaseFirestore.getInstance();
-        assert getArguments() != null;
+
         Event selectedEvent = (Event) getArguments().getSerializable("selectedEvent");
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.send_notification_layout, null);
@@ -47,7 +51,7 @@ public class SendNotificationFragment extends DialogFragment {
         eventNameText.setText(selectedEvent.getName());
 
         EditText announcementEditText = view.findViewById(R.id.event_announcement);
-        String eventAnnouncement = announcementEditText.getText().toString();
+
 
         Button cancelNoti = view.findViewById(R.id.send_noti);
         Button sendNoti = view.findViewById(R.id.cancel_noti);
@@ -56,30 +60,32 @@ public class SendNotificationFragment extends DialogFragment {
         sendNoti.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dismiss();
-                // this needs to be fixed
-//                db.collection("events").document(selectedEvent.getEventID())
-//                        .update("eventAnnouncement", eventAnnouncement)
-//                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                // Notify listeners if needed
-//                                if (sendNotificationListener != null) {
-//                                    sendNotificationListener.onSendNotification(selectedEvent);
-//                                }
-//                                // Dismiss the dialog
-//                                dismiss();
-//                            }
-//                        })
-//                        .addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                // Handle any errors
-//                                Log.e("Firebase", "Error updating document", e);
-//                                // You might want to notify the user or retry the operation
-//                            }
-//                        });
+                String eventAnnouncement = announcementEditText.getText().toString();
+                Announcement announcement = new Announcement(eventAnnouncement);
+                Task<Void> eventNotification = db.announcements.saveNotification(selectedEvent, announcement);
 
+                // Call the saveNotification method
+                eventNotification
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "Announcement successfully added to Firestore");
+                                // Notify listeners if needed
+                                if (sendNotificationListener != null) {
+                                    sendNotificationListener.onSendNotification(selectedEvent);
+                                }
+                                // Dismiss the dialog
+                                dismiss();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                // Handle any errors
+                                Log.e("Firebase", "Error saving announcement", e);
+                                // You might want to notify the user or retry the operation
+                            }
+                        });
             }
         });
 
@@ -105,3 +111,26 @@ public class SendNotificationFragment extends DialogFragment {
         this.sendNotificationListener = listener;
     }
 }
+
+// this needs to be fixed
+//                db.collection("events").document(selectedEvent.getEventID())
+//                        .update("eventAnnouncement", eventAnnouncement)
+//                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                                // Notify listeners if needed
+//                                if (sendNotificationListener != null) {
+//                                    sendNotificationListener.onSendNotification(selectedEvent);
+//                                }
+//                                // Dismiss the dialog
+//                                dismiss();
+//                            }
+//                        })
+//                        .addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                // Handle any errors
+//                                Log.e("Firebase", "Error updating document", e);
+//                                // You might want to notify the user or retry the operation
+//                            }
+//                        });
