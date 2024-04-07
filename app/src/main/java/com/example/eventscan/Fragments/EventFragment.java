@@ -80,7 +80,6 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                 break;
         }
 
-
         ownedEvents = new ArrayList<>();
         inEvents = new ArrayList<>();
 
