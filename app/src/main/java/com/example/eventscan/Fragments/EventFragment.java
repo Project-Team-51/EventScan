@@ -1,51 +1,52 @@
-package com.example.eventscan.Fragments;
 
-import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
+        package com.example.eventscan.Fragments;
 
-import android.widget.TextView;
+        import android.annotation.SuppressLint;
+        import android.content.SharedPreferences;
+        import android.os.Bundle;
+        import android.provider.Settings;
+        import android.util.Log;
+        import android.view.LayoutInflater;
+        import android.view.View;
+        import android.view.ViewGroup;
+        import android.widget.AdapterView;
+        import android.widget.ListView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+        import android.widget.TextView;
 
-import com.example.eventscan.Database.Database;
-import com.example.eventscan.Entities.Attendee;
-import com.example.eventscan.Entities.DeviceID;
-import com.example.eventscan.Entities.Event;
+        import androidx.annotation.NonNull;
+        import androidx.annotation.Nullable;
+        import androidx.fragment.app.Fragment;
 
-import com.example.eventscan.Entities.User;
+        import com.example.eventscan.Database.Database;
+        import com.example.eventscan.Entities.Attendee;
+        import com.example.eventscan.Entities.DeviceID;
+        import com.example.eventscan.Entities.Event;
 
-import com.example.eventscan.Helpers.EventArrayAdapter;
-import com.example.eventscan.Helpers.UserArrayAdapter;
-import com.example.eventscan.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+        import com.example.eventscan.Entities.User;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+        import com.example.eventscan.Helpers.EventArrayAdapter;
+        import com.example.eventscan.Helpers.UserArrayAdapter;
+        import com.example.eventscan.R;
+        import com.google.android.gms.tasks.OnCompleteListener;
+        import com.google.android.gms.tasks.Task;
+        import com.google.android.gms.tasks.Tasks;
+        import com.google.firebase.firestore.CollectionReference;
+        import com.google.firebase.firestore.EventListener;
+        import com.google.firebase.firestore.FirebaseFirestoreException;
+        import com.google.firebase.firestore.QueryDocumentSnapshot;
+        import com.google.firebase.firestore.QuerySnapshot;
+
+        import java.util.ArrayList;
+        import java.util.List;
+        import java.util.concurrent.atomic.AtomicInteger;
 
 /*
  * A fragment subclass that handles the displaying of events in two listviews. As of writing, it displays both attending classes
  * and owned classes as the same thing, which is all the events on the firestore. Clicking on an item in the ownedEvents list
  * brings up a delete dialog.
  */
-public class EventFragment extends Fragment implements DeleteEvent.DeleteEventListener, SendNotificationFragment.SendNotificationListener {
+public class EventFragment extends Fragment implements DeleteEvent.DeleteEventListener, SendNotificationFragment.SendNotificationListener{
     private ListView ownedEventsListView;
     private ListView inEventsListView;
     private ArrayList<Event> ownedEvents;
@@ -64,6 +65,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         View view = inflater.inflate(R.layout.admin_observer_fragment, container, false);
         Bundle bundle = this.getArguments();
         TextView textView = (TextView) view.findViewById(R.id.yourEventsText);
+        TextView textView2 = (TextView) view.findViewById(R.id.atEventsText);
 
         String myDeviceID = DeviceID.getDeviceID(requireContext());
         Log.d("DeviceID", "Device ID: " + myDeviceID);
@@ -75,7 +77,12 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         userType = DeviceID.getUserType(requireContext());
         switch (userType) {
             case "Organizer":
-                textView.setText("Your Events");
+                if (isNotifyMode){
+                    textView.setText("Select Event");
+                    textView2.setText("Event Announcements");
+                } else {
+                    textView.setText("Your Events");
+                }
                 break;
             case "Admin":
             case "Attendee":
@@ -139,56 +146,29 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event selectedEvent = ownedEvents.get(position);
-                if(userType.equals("organizer")){
-                    openEventView(selectedEvent);
-                }
-                else{
+
+                if(userType.equals("Organizer") && isNotifyMode){
+                    openSendNotifcationFragment(selectedEvent);
+                } else if(userType.equals("Organizer") || userType.equals("Admin") ){
                     openDeleteEventFragment(selectedEvent);
                 }
-            }
-        });
-
-        // Grab user type, organizer or Attendee
-        String deviceID = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
-        //TODO ^^ this line needs to be changed to use a helper class that handles the 'self' attendee ID
-
-        db.attendees.get(myDeviceID).addOnCompleteListener(task -> {
-            if(task.isSuccessful()){
-                Attendee attendee = task.getResult();
-                if(attendee != null){
-                    userType = attendee.getType();
-                    customizeLayout(userType, view);
+                else{
+                    openEventView(selectedEvent);
                 }
             }
         });
         return view;
-
     }
 
-    /**
-     * Changes layout based on user type.
-     *
-     * @param userType The user's selected role.
-     * @param view The view to be changed.
-     */
-    @SuppressLint("SetTextI18n")
-    private void customizeLayout(String userType, View view) {
-        TextView yourEventsText = view.findViewById(R.id.yourEventsText);
-        yourEventsText.setText("All Events");
-        if ("attendee".equals(userType)) {
-            yourEventsText.setText("All Events");
-            Log.d("elephant", "customizeLayout: success");
-        }
-    }
 
     private void openEventView(Event selectedEvent){
-        ViewEvent ViewEventFragment = new ViewEvent();
+        ViewEvent viewEventFragment = new ViewEvent();
         // Create a Bundle and put the selected Event information
         Bundle bundle = new Bundle();
         bundle.putSerializable("selectedEvent", selectedEvent);
-        ViewEventFragment.setArguments(bundle);
+        viewEventFragment.setArguments(bundle);
         // Show the DeleteEvent fragment
-        ViewEventFragment.show(getParentFragmentManager(), "ViewEventFragment");
+        viewEventFragment.show(getParentFragmentManager(), "ViewEventFragment");
     }
 
     /**
@@ -299,10 +279,12 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 //        attendeesListView.setAdapter(attendeeAdapter);
 //    }
 
+
     public void setText(String text){
         TextView textView = (TextView) getView().findViewById(R.id.yourEventsText);
         textView.setText(text);
     }
+
 
     public void toggleNotifyMode(boolean isNotifyMode) {
         this.isNotifyMode = true;
@@ -388,3 +370,6 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 //                }
 //            }
 //        });
+
+
+

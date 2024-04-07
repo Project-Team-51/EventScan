@@ -59,6 +59,7 @@
                 android:layout_height="match_parent"
                 android:background="@null"
                 android:gravity="top|start"
+                android:textColorHint="#D3E2F2"
                 android:hint="Enter Announcement Here"
                 android:maxLines="10"
                 android:textColor="#D3E2F2"

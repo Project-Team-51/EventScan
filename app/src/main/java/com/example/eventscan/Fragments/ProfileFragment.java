@@ -5,6 +5,8 @@ import static android.content.ContentValues.TAG;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +34,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.DeviceID;
+import com.example.eventscan.Entities.PicGen;
 import com.example.eventscan.Helpers.GeolocationHandler;
 import com.example.eventscan.Helpers.ImageUploader;
 import com.example.eventscan.R;
@@ -42,6 +47,8 @@ import com.google.firebase.storage.StorageReference;
 
 import android.provider.Settings.Secure;
 import android.widget.ToggleButton;
+
+import java.util.Random;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
@@ -65,6 +72,7 @@ public class ProfileFragment extends Fragment {
     ToggleButton locationToggle;
     ActivityResultLauncher<Intent> imagePickLauncher;
     Uri selectedImageUri;
+    public String attendeeName;
     public String deviceID;
     private static final int defaultProfileIcon = R.drawable.profile_icon;
 
@@ -102,7 +110,122 @@ public class ProfileFragment extends Fragment {
         db = Database.getInstance();
 
         deviceID = DeviceID.getDeviceID(requireContext());
-        Log.d("DeviceID", "Device ID: " + deviceID);
+
+        initializeViews(view);
+
+        loadProfileInfo();
+        setClickListeners();
+
+        return view;
+    }
+
+    /**
+     * Saves the attendee's profile information to Firestore.
+     * If a profile picture is selected, uploads it to Firebase Storage.
+     *
+     * @param attendee The Attendee object containing profile information.
+     */
+    private void saveAttendeeProfile(Attendee attendee) {
+        db.attendees.set(attendee).addOnSuccessListener(voidReturn -> {
+            Log.d(TAG, "Profile saved successfully");
+        }).addOnFailureListener(e -> {
+            Log.d(TAG, "Error saving profile");
+        });
+
+        //TODO replace with DB call
+        if(selectedImageUri !=null){
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+            StorageReference profilePicRef = storageRef.child("profile_pics").child(deviceID);
+            profilePicRef.putFile(selectedImageUri);
+
+        }
+    }
+
+    /**
+     * Checks if a profile picture is uploaded.
+     *
+     * @return True if a profile picture is uploaded, false otherwise.
+     */
+    private boolean isProfilePictureUploaded() {
+        return selectedImageUri != null;
+    }
+
+    /**
+     * Deletes the profile picture from Firebase Storage and updates the UI.
+     */
+    private void deleteProfilePicture() {
+        // Delete the profile picture from Firebase Storage
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference profilePicRef = storageRef.child("profile_pics").child(deviceID);
+        PicGen.deleteProfilePicture(requireContext());
+        profilePicRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                // File deleted successfully
+                Drawable drawableDefaultProfileIcon = ContextCompat.getDrawable(requireContext(), defaultProfileIcon);
+                profilePic.setImageDrawable(drawableDefaultProfileIcon);
+                selectedImageUri = null; // Clear the selected image URI
+
+                deleteProfilePicBtn.setVisibility(View.GONE);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Error occurred while deleting the file
+                Log.e(TAG, "Error deleting profile picture", e);
+            }
+        });
+    }
+
+    /**
+     * Loads the user's profile information from Firestore and updates the UI.
+     */
+    private void loadProfileInfo() {
+        db.attendees.get(deviceID)
+                .addOnSuccessListener(attendee -> {
+                    // Update UI with profile information
+                    updateUIWithProfileInfo(attendee);
+                    // Generate or load profile picture
+                    loadProfilePicture(attendee.getName());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error retrieving profile information", e);
+                });
+    }
+
+    /**
+     * Updates the UI with the provided Attendee's profile information.
+     *
+     * @param attendee The Attendee object containing the profile information to display.
+     */
+    private void updateUIWithProfileInfo(Attendee attendee) {
+        if (attendee != null) {
+            // Update UI elements with profile information
+            usernameInput.setText(attendee.getName());
+            phoneInput.setText(attendee.getPhoneNum());
+            emailInput.setText(attendee.getEmail());
+            bioInput.setText(attendee.getBio());
+        }
+    }
+    private void loadProfilePicture(String name) {
+        if (PicGen.isProfilePictureExists(requireContext())) {
+            Bitmap profileBitmap = PicGen.loadProfilePicture(requireContext());
+            profilePic.setImageBitmap(profileBitmap);
+        } else {
+            String nameToUse = TextUtils.isEmpty(name) ? getRandomLetter() : name;
+            Bitmap profileBitmap = PicGen.generateProfilePicture(nameToUse, 200); // Adjust size as needed
+            profilePic.setImageBitmap(profileBitmap);
+            PicGen.saveProfilePicture(requireContext(), profileBitmap);
+        }
+    }
+
+    private String getRandomLetter() {
+        Random random = new Random();
+        char randomChar = (char) (random.nextInt(26) + 'a');
+        return String.valueOf(randomChar).toUpperCase(); // Convert to uppercase to match the profile picture generator
+    }
+    private void initializeViews(View view) {
+        // Initialize UI components
         profilePic = view.findViewById(R.id.profileImageView);
         usernameInput = view.findViewById(R.id.nameEditText);
         phoneInput = view.findViewById(R.id.phoneEditText);
@@ -111,11 +234,8 @@ public class ProfileFragment extends Fragment {
         saveProfileBtn = view.findViewById(R.id.saveButton);
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
         locationToggle = view.findViewById(R.id.locationToggle);
-
-        deleteProfilePicBtn.setVisibility(isProfilePictureUploaded() ? View.VISIBLE : View.GONE);
-
-        loadProfileInfo();
-
+    }
+    private void setClickListeners() {
         saveProfileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -159,14 +279,18 @@ public class ProfileFragment extends Fragment {
             public void onClick(View view) {
                 // Calls a method to delete the profile picture
                 deleteProfilePicture();
+
+                // Updates UI to display the default profile picture
+                profilePic.setImageResource(defaultProfileIcon);
+
+                // Hides the delete profile pic button
+                deleteProfilePicBtn.setVisibility(View.GONE);
             }
         });
 
         // Geolocation Handling
         locationToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
             @Override
-
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     GeolocationHandler.enableLocationUpdates(getContext());
@@ -177,127 +301,5 @@ public class ProfileFragment extends Fragment {
                 }
             }
         });
-
-        return view;
     }
-
-    /**
-     * Saves the attendee's profile information to Firestore.
-     * If a profile picture is selected, uploads it to Firebase Storage.
-     *
-     * @param attendee The Attendee object containing profile information.
-     */
-    private void saveAttendeeProfile(Attendee attendee) {
-        db.attendees.set(attendee).addOnSuccessListener(voidReturn -> {
-            Log.d(TAG, "Profile saved successfully");
-        }).addOnFailureListener(e -> {
-            Log.d(TAG, "Error saving profile");
-        });
-
-        //TODO replace with DB call
-        if(selectedImageUri !=null){
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-            StorageReference profilePicRef = storageRef.child("profile_pics").child(deviceID);
-
-            profilePicRef.putFile(selectedImageUri);
-
-        }
-    }
-
-    /**
-     * Checks if a profile picture is uploaded.
-     *
-     * @return True if a profile picture is uploaded, false otherwise.
-     */
-    private boolean isProfilePictureUploaded() {
-        return selectedImageUri != null;
-    }
-
-    /**
-     * Deletes the profile picture from Firebase Storage and updates the UI.
-     */
-    private void deleteProfilePicture() {
-        // Delete the profile picture from Firebase Storage
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-        StorageReference profilePicRef = storageRef.child("profile_pics").child(deviceID);
-
-        profilePicRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                // File deleted successfully
-                // Update the UI or perform any other necessary actions
-                Drawable drawableDefaultProfileIcon = ContextCompat.getDrawable(requireContext(), defaultProfileIcon);
-                profilePic.setImageDrawable(drawableDefaultProfileIcon);
-                selectedImageUri = null; // Clear the selected image URI
-
-                deleteProfilePicBtn.setVisibility(View.GONE);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                // Error occurred while deleting the file
-                Log.e(TAG, "Error deleting profile picture", e);
-                // You can display an error message to the user if needed
-            }
-        });
-    }
-
-    /**
-     * Loads the user's profile information from Firestore and updates the UI.
-     */
-    private void loadProfileInfo() {
-        db.attendees.get(deviceID)
-                .addOnSuccessListener(attendee -> {
-                        updateUIWithProfileInfo(attendee);
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Error retrieving profile information", e);
-                });
-    }
-
-    /**
-     * Updates the UI with the provided Attendee's profile information.
-     *
-     * @param attendee The Attendee object containing the profile information to display.
-     */
-    private void updateUIWithProfileInfo(Attendee attendee) {
-        // Update UI elements with profile information
-        if (attendee != null) {
-            // Assuming that you have getters in the Attendee class
-            usernameInput.setText(attendee.getName());
-            phoneInput.setText(attendee.getPhoneNum());
-            emailInput.setText(attendee.getEmail());
-            bioInput.setText(attendee.getBio());
-
-
-            // Load profile picture using Glide or Picasso (or any image loading library)
-            if (attendee.getProfilePictureID() != null) {
-                // TODO replace with DB call
-                StorageReference profilePicRef = FirebaseStorage.getInstance()
-                        .getReference()
-                        .child("profile_pics")
-                        .child(deviceID);
-
-                profilePicRef.getDownloadUrl()
-                        .addOnSuccessListener(uri -> {
-                            // Load the profile picture using an image loading library
-                            Glide.with(this)
-                                    .load(uri)
-                                    .apply(RequestOptions.circleCropTransform())
-                                    .placeholder(R.drawable.profile_icon) // Placeholder image while loading
-                                    .error(R.drawable.profile_icon) // Image to display in case of error
-                                    .into(profilePic);
-
-
-                            profilePic.setBackgroundResource(R.drawable.circular_background);
-
-                            deleteProfilePicBtn.setVisibility(View.VISIBLE);
-                        })
-                        .addOnFailureListener(e -> {
-                            Log.e(TAG, "Error loading profile picture", e);
-                        });
-            }
-        }
-    }
-
 }

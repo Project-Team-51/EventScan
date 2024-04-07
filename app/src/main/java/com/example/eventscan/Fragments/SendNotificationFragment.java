@@ -56,28 +56,29 @@ public class SendNotificationFragment extends DialogFragment {
         sendNoti.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dismiss();
                 // this needs to be fixed
-                db.collection("events").document(selectedEvent.getEventID())
-                        .update("eventAnnouncement", eventAnnouncement)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                // Notify listeners if needed
-                                if (sendNotificationListener != null) {
-                                    sendNotificationListener.onSendNotification(selectedEvent);
-                                }
-                                // Dismiss the dialog
-                                dismiss();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                // Handle any errors
-                                Log.e("Firebase", "Error updating document", e);
-                                // You might want to notify the user or retry the operation
-                            }
-                        });
+//                db.collection("events").document(selectedEvent.getEventID())
+//                        .update("eventAnnouncement", eventAnnouncement)
+//                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                                // Notify listeners if needed
+//                                if (sendNotificationListener != null) {
+//                                    sendNotificationListener.onSendNotification(selectedEvent);
+//                                }
+//                                // Dismiss the dialog
+//                                dismiss();
+//                            }
+//                        })
+//                        .addOnFailureListener(new OnFailureListener() {
+//                            @Override
+//                            public void onFailure(@NonNull Exception e) {
+//                                // Handle any errors
+//                                Log.e("Firebase", "Error updating document", e);
+//                                // You might want to notify the user or retry the operation
+//                            }
+//                        });
 
             }
         });

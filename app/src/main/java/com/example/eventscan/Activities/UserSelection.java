@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Attendee;
+import com.example.eventscan.Entities.DeviceID;
 import com.example.eventscan.Entities.Organizer;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -33,12 +35,13 @@ public class UserSelection extends AppCompatActivity {
         setContentView(R.layout.userselection);
         db = Database.getInstance();
 
+
+
         String installationId = getInstallationId();
 
         if (installationId == null) {
             // Installation ID not found, generate a new one and create user
-            installationId = generateInstallationId();
-            saveInstallationId(installationId);
+            saveInstallationId(generateInstallationId());
             showUserTypeSelection();
         } else {
             // Installation ID found, check user type
@@ -100,8 +103,9 @@ public class UserSelection extends AppCompatActivity {
 
     // creates an attendee user in the database and navigates to AttendeeEventsView activity
     private void createAttendeeUser() {
-        String installationId = getInstallationId();
+        String deviceID = DeviceID.getDeviceID(getApplicationContext());
         Attendee attendee = new Attendee();
+        attendee.setDeviceID(deviceID);
         db.attendees.set(attendee)
             .addOnSuccessListener(voidReturn -> {
                 Intent intent = new Intent(UserSelection.this, MainActivity.class);
@@ -113,8 +117,11 @@ public class UserSelection extends AppCompatActivity {
 
     // creates an organizer user in Firestore and navigates to OrganizerEventsView activity
     private void createOrganizerUser() {
-        String installationId = getInstallationId();
+        String deviceID = DeviceID.getDeviceID(getApplicationContext());
+        Log.d("UserSelection", "Device ID: " + deviceID);
         Organizer organizer = new Organizer();
+        organizer.setDeviceID(deviceID);
+        Log.d("UserSelection", "Organizer's Device ID: " + organizer.getDeviceID());
         db.attendees.set(organizer)
             .addOnSuccessListener(voidReturn -> {
                 Intent intent = new Intent(UserSelection.this, MainActivity.class);

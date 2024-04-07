@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,8 +27,9 @@ import com.example.eventscan.Helpers.QRAnalyzer;
 import com.example.eventscan.R;
 import com.google.common.util.concurrent.ListenableFuture;
 
-import java.util.Objects;
+import java.util.Observer;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 
 public class QrScannerFragment extends Fragment {
     //https://developer.android.com/media/camera/camerax/preview
@@ -37,10 +37,11 @@ public class QrScannerFragment extends Fragment {
     private PreviewView previewView;
     private QRAnalyzer analyzer;
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        analyzer = new QRAnalyzer(getContext());
+        analyzer = new QRAnalyzer(requireContext());
         cameraProviderFuture = ProcessCameraProvider.getInstance(this.requireContext());
         View view = getLayoutInflater().inflate(R.layout.scan_qr_layout, container, false);
         previewView = view.findViewById(R.id.CameraPreview);
