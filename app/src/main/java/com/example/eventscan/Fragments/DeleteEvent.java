@@ -244,11 +244,14 @@ public class DeleteEvent extends DialogFragment {
                     ArrayList<Attendee> attendeesList = event.getInterestedAttendees();
                     ArrayAdapter<Attendee> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, attendeesList);
                     attendeesListView.setAdapter(adapter);
+                    Toast.makeText(requireContext(), "Signed-up attendees retrieved successfully", Toast.LENGTH_SHORT).show();
                 }).addOnFailureListener(e -> {
                     // Handle errors that occur while retrieving the event
                     Log.e("Database", "Error getting event: ", e);
+                    Toast.makeText(requireContext(), "Failed to retrieve signed-up attendees", Toast.LENGTH_SHORT).show();
                 });
     }
+
 
 
 }
