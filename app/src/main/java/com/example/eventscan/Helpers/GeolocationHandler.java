@@ -17,9 +17,11 @@ import androidx.core.content.ContextCompat;
  */
 public class GeolocationHandler {
 
-    private static boolean locationUpdatesEnabled = false;
     private static LocationManager locationManager;
     private static LocationListener locationListener;
+    private static boolean isEnabled;
+    private static double latitude;
+    private static double longitude;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
 
     /**
@@ -31,15 +33,43 @@ public class GeolocationHandler {
         if (locationManager == null) {
             locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
             locationListener = createLocationListener();
+            isEnabled = true;
         }
 
         // Check for location permissions
-        if (checkLocationPermissions(context) && !locationUpdatesEnabled) {
-            // Location permissions granted, enable updates
-            toggleLocationUpdates();
+        if (checkLocationPermissions(context)) {
+            // Location permissions granted, request a single location update
+            Log.d("GeolocationHandler", "Location updates enabled");
+            isEnabled = true;
+            requestSingleLocationUpdate(context);
         } else {
             // Location permissions not granted, request permissions
             requestLocationPermissions((Activity) context);
+        }
+    }
+
+    /**
+     * Requests a single location update.
+     * @param context The context from which this method is called.
+     */
+    public static void requestSingleLocationUpdate(Context context) {
+        try {
+            // Check if GPS provider is enabled
+            boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            if (!isGpsEnabled) {
+                // Handle case where GPS provider is not enabled
+                Log.d("GeolocationHandler", "GPS provider is not enabled");
+                return;
+            }
+            if (isEnabled) {
+                // Request a single location update to get the current location
+                locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, locationListener, null);
+            }
+            else{
+                Log.d("GeolocationHandler", "Geolocation is turned off");
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
         }
     }
 
@@ -50,7 +80,7 @@ public class GeolocationHandler {
         if (locationManager != null && locationListener != null) {
             // Stop location updates
             locationManager.removeUpdates(locationListener);
-            locationUpdatesEnabled = false;
+            isEnabled = false;
             Log.d("GeolocationHandler", "Location updates disabled");
         }
     }
@@ -81,36 +111,6 @@ public class GeolocationHandler {
     }
 
     /**
-     * Toggles location updates based on current state.
-     */
-    private static void toggleLocationUpdates() {
-        if (locationUpdatesEnabled) {
-            // Stop location updates
-            locationManager.removeUpdates(locationListener);
-            locationUpdatesEnabled = false;
-            Log.d("GeolocationHandler", "Location updates disabled");
-        } else {
-            // Start location updates
-            try {
-                // Check if GPS provider is enabled
-                boolean isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-                if (!isGpsEnabled) {
-                    // Handle case where GPS provider is not enabled
-                    Log.d("GeolocationHandler", "GPS provider is not enabled");
-                    return;
-                }
-
-                // Request location updates to get current location
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-                locationUpdatesEnabled = true;
-                Log.d("GeolocationHandler", "Location updates enabled");
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
      * Creates a location listener for handling location updates.
      * @return The created location listener.
      */
@@ -118,11 +118,14 @@ public class GeolocationHandler {
         return new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
+                latitude = location.getLatitude();
+                longitude = location.getLongitude();
 
                 // Print geolocation information to logcat
                 Log.d("GeolocationHandler", "Latitude: " + latitude + ", Longitude: " + longitude);
+
+                // Stop listening for location updates after receiving the first update
+                locationManager.removeUpdates(locationListener);
             }
 
             @Override
@@ -132,5 +135,20 @@ public class GeolocationHandler {
             public void onProviderDisabled(String provider) {}
         };
     }
-}
 
+    /**
+     * Gets the latitude value of the last retrieved location.
+     * @return The latitude value.
+     */
+    public static double getLatitude() {
+        return latitude;
+    }
+
+    /**
+     * Gets the longitude value of the last retrieved location.
+     * @return The longitude value.
+     */
+    public static double getLongitude() {
+        return longitude;
+    }
+}
