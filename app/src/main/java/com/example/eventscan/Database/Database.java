@@ -614,7 +614,13 @@ public class Database {
                 if (!task1.isSuccessful()) {
                     return Tasks.forException(getTaskException(task1));
                 }
-                return Tasks.forResult((ArrayList<GeoPoint>) (task1.getResult().getData().get("check_in_pings")));
+                HashMap<Integer, GeoPoint> fetchedData = (HashMap<Integer, GeoPoint>) (task1.getResult().getData().get("check_in_pings"));
+                ArrayList<GeoPoint> output = new ArrayList<>();
+                if(fetchedData == null){
+                    return Tasks.forResult(output);
+                }
+                output.addAll(fetchedData.values());
+                return Tasks.forResult(output);
             });
         }
     }
