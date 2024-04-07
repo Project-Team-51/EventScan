@@ -1,4 +1,5 @@
 package com.example.eventscan.Helpers;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -6,11 +7,17 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
+
 import android.util.Log;
 
-import androidx.annotation.NonNull;
+import android.content.SharedPreferences;
+
+import org.osmdroid.util.GeoPoint;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import java.util.ArrayList;
 
 /**
  * Helper class for managing location updates.
@@ -19,6 +26,8 @@ public class GeolocationHandler {
 
     private static LocationManager locationManager;
     private static LocationListener locationListener;
+    private static final String LOCATION_PREFS = "location_prefs";
+    private static final String LOCATION_ENABLED_KEY = "location_enabled";
     private static boolean isEnabled;
     private static double latitude;
     private static double longitude;
@@ -120,12 +129,10 @@ public class GeolocationHandler {
             public void onLocationChanged(Location location) {
                 latitude = location.getLatitude();
                 longitude = location.getLongitude();
-
                 // Print geolocation information to logcat
                 Log.d("GeolocationHandler", "Latitude: " + latitude + ", Longitude: " + longitude);
 
                 // Stop listening for location updates after receiving the first update
-                locationManager.removeUpdates(locationListener);
             }
 
             @Override
@@ -151,4 +158,26 @@ public class GeolocationHandler {
     public static double getLongitude() {
         return longitude;
     }
+
+    public static GeoPoint getGeoPoint(){
+        return new GeoPoint(latitude,longitude);
+    }
+
+    public static boolean getLocationEnabled(){
+        return isEnabled;
+    }
+
+    public static void setLocationEnabled(Context context, boolean isEnabled) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(LOCATION_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(LOCATION_ENABLED_KEY, isEnabled);
+        editor.apply();
+    }
+
+    // Retrieve the state of the location setting
+    public static boolean isLocationEnabled(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(LOCATION_PREFS, Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean(LOCATION_ENABLED_KEY, false); // Default value is false
+    }
+
 }
