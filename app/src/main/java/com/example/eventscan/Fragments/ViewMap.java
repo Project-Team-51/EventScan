@@ -11,6 +11,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
+
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -58,6 +61,11 @@ public class ViewMap extends DialogFragment {
         Dialog dialog = new Dialog(requireContext());
         dialog.setCanceledOnTouchOutside(true);
         dialog.setContentView(view);
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        WindowManager.LayoutParams layoutParams = dialog.getWindow().getAttributes();
+        layoutParams.dimAmount = 0.7f; // Adjust this value as needed
+        dialog.getWindow().setAttributes(layoutParams);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
         Button returnView = view.findViewById(R.id.return_button);
         MapView mapView = view.findViewById(R.id.mapView);
