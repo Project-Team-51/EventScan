@@ -358,10 +358,16 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                         imageView.setImageURI(result);
                         posterUriString = posterUri.toString();
                         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-                        StorageReference profilePicRef = storageRef.child("poster_pics");
-                        profilePicRef.putFile(posterUri);
+                        StorageReference profilePicRef = storageRef.child("poster_pics").child(eventID);
+                        profilePicRef.putFile(posterUri).addOnSuccessListener(taskSnapshot -> {
+                                    // Image uploaded successfully
+                                    Log.d("POSTER", "Image uploaded successfully");
+                                })
+                                .addOnFailureListener(exception -> {
+                                    // Handle unsuccessful upload
+                                    Log.e("POSTER", "Failed to upload image: " + exception.getMessage());
+                                });
                     }
-
                 }
             });
 

@@ -1,6 +1,7 @@
 package com.example.eventscan.Database;
 
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -23,7 +24,9 @@ import org.osmdroid.util.GeoPoint;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -378,6 +381,13 @@ public class Database {
             ArrayList<Task<Void>> allTasks = new ArrayList<>();
             allTasks.add(checkInAttendee(event, attendee));
             allTasks.add(owner.geolocation.savePointToEvent(geoPoint,event));
+            allTasks.get(1).addOnCompleteListener(task -> {
+                if(task.isSuccessful()){
+                    Log.d("Geolocation", "monkey :D");
+                } else {
+                    Log.d("GeoLocation", getTaskException(task).toString());
+                }});
+
             return Tasks.whenAllComplete(allTasks);
         }
 
@@ -632,15 +642,51 @@ public class Database {
         }
 
         private Task<Void> savePointToEvent(GeoPoint geoPoint, Event event){
-            return geolocationStorageCollection.document(event.getEventID()).update("check_in_pings",FieldValue.arrayUnion(geoPoint));
-        }
-
-        public Task<ArrayList<GeoPoint>> getEventCheckinPoints(Event event){
             return geolocationStorageCollection.document(event.getEventID()).get().continueWithTask(task -> {
                 if(!task.isSuccessful()){
                     return Tasks.forException(getTaskException(task));
                 }
-                return Tasks.forResult((ArrayList<GeoPoint>)(task.getResult().getData().get("check_in_pings")));
+                if(task.getResult().exists()){
+                    return geolocationStorageCollection.document(event.getEventID()).update("check_in_pings",FieldValue.arrayUnion(geoPoint));
+                }
+                // else it doesn't exist, we need to make it and set it
+                HashMap<String, ArrayList<GeoPoint>> newDocument = new HashMap<>();
+                ArrayList<GeoPoint> thisPing = new ArrayList<>();
+                thisPing.add(geoPoint);
+                newDocument.put("check_in_pings", thisPing);
+                return geolocationStorageCollection.document(event.getEventID()).set(newDocument);
+            });
+        }
+
+        public Task<ArrayList<GeoPoint>> getEventCheckinPoints(Event event) {
+
+            return geolocationStorageCollection.document(event.getEventID()).get().continueWithTask(task1 -> {
+                if (!task1.isSuccessful()) {
+                    return Tasks.forException(getTaskException(task1));
+                }
+                ArrayList<HashMap<String, ?>> fetchedData = (ArrayList<HashMap<String, ?>>) task1.getResult().get("check_in_pings");
+                ArrayList<GeoPoint> output = new ArrayList<>();
+                if(fetchedData == null){
+                    return Tasks.forResult(output);
+                }
+                for(HashMap<String, ?> entry: fetchedData){
+                    Double latitude;
+                    Double longitude;
+                    if(entry.get("latitude") != null && entry.get("latitude") instanceof Double){
+                        latitude = (Double) entry.get("latitude");
+                    } else {
+                        latitude = 0.;
+                    }
+                    if(entry.get("longitude") != null && entry.get("longitude") instanceof Double){
+                        longitude = (Double) entry.get("longitude");
+                    } else {
+                        longitude = 0.;
+                    }
+                    if(entry.get("latitude") != null && entry.get("longitude") != null) {
+                        output.add(new GeoPoint(latitude, longitude));
+                    }
+                }
+                return Tasks.forResult(output);
             });
         }
     }
