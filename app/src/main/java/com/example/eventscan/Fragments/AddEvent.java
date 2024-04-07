@@ -122,7 +122,6 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
         Button generateQRCodeDetailsButton = view.findViewById(R.id.generate_QRCode_see_details);
         Button confirmEventButton = view.findViewById(R.id.confirmEvent);
         Button uploadPoster = view.findViewById(R.id.upload_poster);
-        Button ShareQR = view.findViewById(R.id.buttonShareQRCode);
         Switch attendeeLimitSwitch = view.findViewById(R.id.attendeeLimit);
         imageView = view.findViewById(R.id.posterView);
 
@@ -140,6 +139,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
             View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
             ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
             Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
+            Button buttonShareQR = dialogView.findViewById(R.id.buttonShareQRCode);
             int linkType = QRDatabaseEventLink.DIRECT_CHECK_IN;
 
             // setup the task to run as early as possible
@@ -147,6 +147,18 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
             getQRTask.addOnSuccessListener(bitmap -> {
                 imageViewDialog.setImageBitmap(bitmap);
 
+                buttonShareQR.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("image/jpeg");
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        byte[] qrImageBytes = byteArrayOutputStream.toByteArray();
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, qrImageBytes);
+                        startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
+                    }
+                });
             });
             // rest of fragment setup
             // Create and show the dialog
@@ -160,7 +172,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                 @Override
                 public void onClick(View v) {
                     saveQRCodeToCameraRoll(getQRTask.getResult());
-                    dialog.dismiss(); // Dismiss the dialog after saving
+                    //dialog.dismiss(); // Dismiss the dialog after saving
                 }
             });
         });
@@ -189,22 +201,6 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                         startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
                     }
                 });
-
-//                        File qrImageFile = new File(getActivity().getExternalCacheDir(), "qrcode.jpg");
-//                        try {
-//                            FileOutputStream fileOutputStream = new FileOutputStream(qrImageFile);
-//                            fileOutputStream.write(byteArrayOutputStream.toByteArray());
-//                            fileOutputStream.flush();
-//                            fileOutputStream.close();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                        Uri qrImageURI = FileProvider.getUriForFile(getActivity(), getActivity().getPackageName() + ".provider", qrImageFile);
-//                        shareIntent.putExtra(Intent.EXTRA_STREAM, qrImageURI);
-//                        startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
-//                        dialog.dismiss();
-//                    }
-//                });
             });
             // rest of fragment setup
             // Create and show the dialog
@@ -218,7 +214,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                 @Override
                 public void onClick(View v) {
                     saveQRCodeToCameraRoll(getQRTask.getResult());
-                    dialog.dismiss(); // Dismiss the dialog after saving
+                    //dialog.dismiss(); // Dismiss the dialog after saving
                 }
             });
         });
