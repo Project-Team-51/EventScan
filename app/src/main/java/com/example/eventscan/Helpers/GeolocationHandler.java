@@ -1,4 +1,8 @@
 package com.example.eventscan.Helpers;
+
+import static java.lang.System.in;
+import static java.util.EnumSet.range;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -6,11 +10,21 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
+import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.Range;
+
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.MapView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import java.util.ArrayList;
 
 /**
  * Helper class for managing location updates.
@@ -151,4 +165,6 @@ public class GeolocationHandler {
     public static double getLongitude() {
         return longitude;
     }
+
+
 }
