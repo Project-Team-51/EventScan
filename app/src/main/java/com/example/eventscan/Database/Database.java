@@ -236,8 +236,8 @@ public class Database {
                 Event event = eventDatabaseRepresentation.convertToBarebonesEvent();
                 // Interested attendees get added
                 for(String attendeeID : eventDatabaseRepresentation.getInterestedAttendeeIDs()){
-                    tasks.add(owner.attendees.get(attendeeID).addOnCompleteListener(task1 -> {
-                                event.addInterestedAttendee(task1.getResult());
+                    tasks.add(owner.attendees.get(attendeeID).addOnSuccessListener(attendee -> {
+                                event.addInterestedAttendee(attendee);
                             })
                     );
                 }

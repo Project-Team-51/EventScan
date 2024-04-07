@@ -13,7 +13,7 @@ import java.util.UUID;
 public class DeviceID {
     private static final String PREF_USER_SELECTION = "UserSelection";
     private static final String KEY_SELECTION = "Selection";
-    private static final String PREF_INSTALLATION_ID = "InstallationId";
+    private static String PREF_INSTALLATION_ID = "InstallationId";
 
     public static String getDeviceID(Context context) {
             SharedPreferences sharedPreferences = context.getSharedPreferences(PREF_INSTALLATION_ID, Context.MODE_PRIVATE);

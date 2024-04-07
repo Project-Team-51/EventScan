@@ -2,7 +2,23 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="DatabaseTest">
+      <entry key="ExampleInstrumentedTest">
+        <State>
+          <targetSelectedWithDropDown>
+            <Target>
+              <type value="QUICK_BOOT_TARGET" />
+              <deviceKey>
+                <Key>
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="C:\Users\berna\.android\avd\Pixel_7_API_34.avd" />
+                </Key>
+              </deviceKey>
+            </Target>
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2024-04-06T21:00:00.089322400Z" />
+        </State>
+      </entry>
+      <entry key="PicGenTest">
         <State />
       </entry>
       <entry key="app">
@@ -13,15 +29,15 @@
               <deviceKey>
                 <Key>
                   <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="$USER_HOME$/.android/avd/Pixel_4_API_UpsideDownCakePrivacySandbox.avd" />
+                  <value value="C:\Users\berna\.android\avd\Pixel_7_API_34.avd" />
                 </Key>
               </deviceKey>
             </Target>
           </targetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2024-03-20T23:18:53.102388Z" />
+          <timeTargetWasSelectedWithDropDown value="2024-04-07T01:54:01.804664100Z" />
         </State>
       </entry>
-      <entry key="event_check_in_remove_attendee()">
+      <entry key="loginEspresso">
         <State />
       </entry>
     </value>
