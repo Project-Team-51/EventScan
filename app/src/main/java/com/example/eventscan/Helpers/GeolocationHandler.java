@@ -134,7 +134,6 @@ public class GeolocationHandler {
             public void onLocationChanged(Location location) {
                 latitude = location.getLatitude();
                 longitude = location.getLongitude();
-
                 // Print geolocation information to logcat
                 Log.d("GeolocationHandler", "Latitude: " + latitude + ", Longitude: " + longitude);
 
@@ -166,5 +165,12 @@ public class GeolocationHandler {
         return longitude;
     }
 
+    public static GeoPoint getGeoPoint(){
+        return new GeoPoint(latitude,longitude);
+    }
+
+    public static boolean getLocationEnabled(){
+        return isEnabled;
+    }
 
 }

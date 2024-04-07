@@ -31,7 +31,6 @@ import org.osmdroid.views.overlay.Marker;
 import java.util.ArrayList;
 
 
-
 public class ViewMap extends DialogFragment {
 
     Database db;
@@ -67,20 +66,20 @@ public class ViewMap extends DialogFragment {
         mapView.setMultiTouchControls(true); // Enable multi-touch controls
 
         // Add some GeoPoints to the ArrayList (example)
-        points.add(new GeoPoint(53.468922, -113.599228));
-        points.add(new GeoPoint(53.405300, -113.574860));
-
-        GeoPoint house = new GeoPoint(53.405300, -113.574860);
-        // Iterate over the ArrayList and add markers to the map
-        for (GeoPoint geoPoint : points) {
-            Marker marker = new Marker(mapView);
-            marker.setPosition(geoPoint);
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-            mapView.getOverlays().add(marker);
-        }
+        db.geolocation.getEventCheckinPoints(selectedEvent).addOnSuccessListener(points1 -> {
+            points = points1;
+            // Iterate over the ArrayList and add markers to the map
+            for (GeoPoint geoPoint : points) {
+                Marker marker = new Marker(mapView);
+                marker.setPosition(geoPoint);
+                marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+                mapView.getOverlays().add(marker);
+            }
+        });
 
         mapView.getController().setZoom(12.0);
-        mapView.getController().setCenter(house);
+        //GeoPoint
+        //mapView.getController().setCenter();
         returnView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
