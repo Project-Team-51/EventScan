@@ -1,6 +1,7 @@
 package com.example.eventscan.Database;
 
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
