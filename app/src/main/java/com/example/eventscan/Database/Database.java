@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import kotlin.NotImplementedError;
 
@@ -672,10 +671,17 @@ public class Database {
                 if (!task1.isSuccessful()) {
                     return Tasks.forException(getTaskException(task1));
                 }
-                if (!task1.getResult().exists() || task1.getResult() == null){
-                    return Tasks.forResult(new ArrayList<GeoPoint>());
+                ArrayList<HashMap<String, Double>> fetchedData = (ArrayList<HashMap<String, Double>>) task1.getResult().get("check_in_pings");
+                ArrayList<GeoPoint> output = new ArrayList<>();
+                if(fetchedData == null){
+                    return Tasks.forResult(output);
                 }
-                return Tasks.forResult(Objects.requireNonNull(task1.getResult().toObject(GeoPointsFetcher.class)).check_in_pings);
+                for(HashMap<String, Double> entry: fetchedData){
+                    if(entry.get("latitude") != null && entry.get("longitude") != null) {
+                        output.add(new GeoPoint(entry.get("latitude"), entry.get("longitude")));
+                    }
+                }
+                return Tasks.forResult(output);
             });
         }
     }
