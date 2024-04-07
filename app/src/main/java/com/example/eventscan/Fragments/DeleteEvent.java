@@ -254,7 +254,7 @@ public class DeleteEvent extends DialogFragment {
                                         // If names for all attendees are retrieved, update the list view
                                         if (attendeeNames.size() == attendeesList.size()) {
                                             // Create an adapter with attendee names
-                                            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, attendeeNames);
+                                            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.signups_list_item, attendeeNames);
                                             attendeesListView.setAdapter(adapter);
                                             Toast.makeText(requireContext(), "Signed-up attendees retrieved successfully", Toast.LENGTH_SHORT).show();
                                         }
@@ -268,7 +268,7 @@ public class DeleteEvent extends DialogFragment {
                                         // If names for all attendees are retrieved or failed, update the list view
                                         if (attendeeNames.size() + attendeesList.size() == attendeesList.size()) {
                                             // Create an adapter with attendee names
-                                            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, attendeeNames);
+                                            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.signups_list_item, attendeeNames);
                                             attendeesListView.setAdapter(adapter);
                                             Toast.makeText(requireContext(), "Failed to retrieve names for some attendees", Toast.LENGTH_SHORT).show();
                                         }
