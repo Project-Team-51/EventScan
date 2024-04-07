@@ -201,16 +201,5 @@
         app:layout_constraintTop_toBottomOf="@+id/bubbleContainer"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
-    <Button
-        android:id="@+id/showmap_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="224dp"
-        android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.448"
-        app:layout_constraintStart_toEndOf="@+id/signup_button" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
