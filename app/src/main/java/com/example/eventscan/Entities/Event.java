@@ -213,7 +213,8 @@ public class Event implements Serializable {
                 && Objects.equals(getOrganizer(), event.getOrganizer())
                 && Objects.equals(getPoster(), event.getPoster())
                 && Objects.equals(getEventID(), event.getEventID())
-                && Objects.equals(getInterestedAttendees(), event.getInterestedAttendees());
+                && Objects.equals(getInterestedAttendees(), event.getInterestedAttendees())
+                && Objects.equals(getAttendeeLimit(), event.getAttendeeLimit());
     }
 
     @Override
