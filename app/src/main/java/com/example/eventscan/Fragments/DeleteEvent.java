@@ -202,7 +202,7 @@ public class DeleteEvent extends DialogFragment {
                 ListView attendeesListView = signupsListView.findViewById(R.id.attendeesList);
 
                 // Fetch signed-up attendees and populate the ListView here...
-                populateSignedUpAttendeesList(selectedEvent.getEventID(), attendeesListView); // Pass selectedEvent.getEventID() here
+                fillSignedUpAttendeesList(selectedEvent.getEventID(), attendeesListView); // Pass selectedEvent.getEventID() here
 
                 // Create and show AlertDialog containing signupsListView
                 AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -238,19 +238,54 @@ public class DeleteEvent extends DialogFragment {
         this.deleteEventListener = listener;
     }
 
-    private void populateSignedUpAttendeesList(String eventId, ListView attendeesListView) {
+    private void fillSignedUpAttendeesList(String eventId, ListView attendeesListView) {
         db.events.get(eventId)
                 .addOnSuccessListener(event -> {
                     ArrayList<Attendee> attendeesList = event.getInterestedAttendees();
-                    ArrayAdapter<Attendee> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, attendeesList);
-                    attendeesListView.setAdapter(adapter);
-                    Toast.makeText(requireContext(), "Signed-up attendees retrieved successfully", Toast.LENGTH_SHORT).show();
-                }).addOnFailureListener(e -> {
+                    if (attendeesList != null && !attendeesList.isEmpty()) {
+                        // Create a list to hold attendee names
+                        ArrayList<String> attendeeNames = new ArrayList<>();
+                        // Retrieve names for each attendee ID
+                        for (Attendee attendee : attendeesList) {
+                            db.attendees.get(attendee.getDeviceID())
+                                    .addOnSuccessListener(att -> {
+                                        // Add attendee name to the list
+                                        attendeeNames.add(att.getName());
+                                        // If names for all attendees are retrieved, update the list view
+                                        if (attendeeNames.size() == attendeesList.size()) {
+                                            // Create an adapter with attendee names
+                                            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, attendeeNames);
+                                            attendeesListView.setAdapter(adapter);
+                                            Toast.makeText(requireContext(), "Signed-up attendees retrieved successfully", Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Handle failure for retrieving attendee name
+                                        Log.e("Database", "Error getting attendee: " + e.getMessage());
+                                        Toast.makeText(requireContext(), "Failed to retrieve attendee name", Toast.LENGTH_SHORT).show();
+                                        // If retrieving name fails, remove this attendee from the list
+                                        attendeesList.remove(attendee);
+                                        // If names for all attendees are retrieved or failed, update the list view
+                                        if (attendeeNames.size() + attendeesList.size() == attendeesList.size()) {
+                                            // Create an adapter with attendee names
+                                            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, attendeeNames);
+                                            attendeesListView.setAdapter(adapter);
+                                            Toast.makeText(requireContext(), "Failed to retrieve names for some attendees", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
+                    } else {
+                        Toast.makeText(requireContext(), "No signed-up attendees found for this event", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
                     // Handle errors that occur while retrieving the event
-                    Log.e("Database", "Error getting event: ", e);
+                    Log.e("Database", "Error getting event: " + e.getMessage());
                     Toast.makeText(requireContext(), "Failed to retrieve signed-up attendees", Toast.LENGTH_SHORT).show();
                 });
     }
+
+
 
 
 
