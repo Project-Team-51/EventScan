@@ -1,5 +1,7 @@
 package com.example.eventscan.Fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -87,7 +89,7 @@ public class AttendeeFragment extends Fragment implements DeleteProfile.DeletePr
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 User selectedBook = allUser.get(position);
-                openDeleteProfileFragment(selectedBook);
+                openDeleteProfileDialog(selectedBook);
             }
         });
         return view;
@@ -107,17 +109,21 @@ public class AttendeeFragment extends Fragment implements DeleteProfile.DeletePr
      *
      * @param selectedUser The selected user whose profile deletion is to be confirmed.
      */
-    private void openDeleteProfileFragment(User selectedUser) {
-        DeleteProfile deleteProfileFragment = new DeleteProfile();
-        deleteProfileFragment.setDeleteProfileListener(this);
-
-        // Create a Bundle and put the selected User information
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("selectedProfile", selectedUser);
-        deleteProfileFragment.setArguments(bundle);
-
-        // Show the DeleteProfile fragment
-        deleteProfileFragment.show(getParentFragmentManager(), "DeleteProfileFragment");
+    private void openDeleteProfileDialog(User selectedUser) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Delete Profile")
+                .setMessage("Are you sure you want to delete this profile?")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteProfile(selectedUser);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 
     /**

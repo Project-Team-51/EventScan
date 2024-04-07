@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventscan.Fragments.AddEvent;
+import com.example.eventscan.Fragments.AllPicFrag;
 import com.example.eventscan.Fragments.AttendeeFragment;
 import com.example.eventscan.Fragments.EventFragment;
 import com.example.eventscan.Fragments.ProfileFragment;
@@ -28,7 +29,7 @@ import com.example.eventscan.R;
  */
 
 
-public class MainActivity extends AppCompatActivity implements AddEvent.OnEventAddedListener{
+public class    MainActivity extends AppCompatActivity implements AddEvent.OnEventAddedListener{
     private ImageButton buttonEvents;
     private ImageButton buttonProfile;
     private ImageButton buttonQR;
@@ -118,6 +119,14 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                 // Load the EventFragment
                 AttendeeFragment attendeeFragment = new AttendeeFragment();
                 loadFragment(attendeeFragment);
+            }
+        });
+        buttonAllPic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Load the EventFragment
+                AllPicFrag picFrag = new AllPicFrag();
+                loadFragment(picFrag);
             }
         });
     }
