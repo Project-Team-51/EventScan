@@ -360,15 +360,23 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                 }
             });
 
+    /**
+     * Displays a dialog allowing the user to set the maximum number of attendees for the event.
+     *
+     * @param event The event for which the attendee limit is being set.
+     */
     private void showAttendeeLimitDialog(Event event) {
         AttendeeLimitDialogFragment dialogFragment = new AttendeeLimitDialogFragment();
         dialogFragment.setAttendeeLimitListener(this); // Set the listener
         dialogFragment.show(getChildFragmentManager(), "attendee_limit_dialog");
     }
 
+    /**
+     * Handles the attendee limit set by the user.
+     *
+     * @param attendeeLimit The maximum number of attendees set by the user.
+     */
     public void onAttendeeLimitSet(int attendeeLimit) {
-        // Handle the attendee limit set by the user here
-        // For example, set it to the event object
         event.setAttendeeLimit(attendeeLimit);
     }
 
