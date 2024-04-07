@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.osmdroid.api.IGeoPoint;
 
-import java.util.ArrayList;
 import java.util.Objects;
 /*
  * A simple dialogfragment that displays some basic info about the Event that is passed into it, and gives
