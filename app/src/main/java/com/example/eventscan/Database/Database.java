@@ -236,26 +236,31 @@ public class Database {
                 Event event = eventDatabaseRepresentation.convertToBarebonesEvent();
                 // Interested attendees get added
                 for(String attendeeID : eventDatabaseRepresentation.getInterestedAttendeeIDs()){
-                    tasks.add(owner.attendees.get(attendeeID).addOnCompleteListener(task1 -> {
-                                event.addInterestedAttendee(task1.getResult());
+                    tasks.add(owner.attendees.get(attendeeID).addOnSuccessListener(attendee -> {
+                                event.addInterestedAttendee(attendee);
+                            }).addOnFailureListener(e -> {
+                                event.invalidateFullyFormed();
                             })
                     );
                 }
                 // Checked-in attendees get added
                 for(Map.Entry<String, Integer> entry: eventDatabaseRepresentation.getCheckedInAttendeeIDs().entrySet()){
-                    tasks.add(owner.attendees.get(entry.getKey()).addOnCompleteListener(task1 -> {
+                    tasks.add(owner.attendees.get(entry.getKey()).addOnSuccessListener(attendee -> {
                         event.setAttendeeCheckInCount(
-                                task1.getResult(),
+                                attendee,
                                 entry.getValue()
                         );
+                    }).addOnFailureListener(e -> {
+                        event.invalidateFullyFormed();
                     }));
                 }
                 // organizer gets added
                 if(eventDatabaseRepresentation.getOrganizerID() != null) {
                     tasks.add(owner.attendees.get(eventDatabaseRepresentation.getOrganizerID())
-                            .addOnCompleteListener(task1 -> {
-                                Attendee attendee = task1.getResult();
+                            .addOnSuccessListener(attendee -> {
                                 event.setOrganizer((Organizer) attendee);
+                            }).addOnFailureListener(e -> {
+                                event.invalidateFullyFormed();
                             }));
                 }
                 // TODO fetch poster
