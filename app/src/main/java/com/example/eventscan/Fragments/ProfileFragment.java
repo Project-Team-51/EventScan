@@ -46,7 +46,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import android.provider.Settings.Secure;
-import android.widget.ToggleButton;
+import android.widget.Switch;
 
 import java.util.Random;
 
@@ -69,7 +69,7 @@ public class ProfileFragment extends Fragment {
     EditText bioInput;
     Button saveProfileBtn;
     Button deleteProfilePicBtn;
-    ToggleButton locationToggle;
+    Switch locationToggle;
     ActivityResultLauncher<Intent> imagePickLauncher;
     Uri selectedImageUri;
     public String attendeeName;
