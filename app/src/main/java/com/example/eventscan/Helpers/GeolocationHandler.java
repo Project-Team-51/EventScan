@@ -1,8 +1,5 @@
 package com.example.eventscan.Helpers;
 
-import static java.lang.System.in;
-import static java.util.EnumSet.range;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -10,16 +7,13 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
-import android.preference.PreferenceManager;
+
 import android.util.Log;
-import android.util.Range;
-import android.content.Context;
+
 import android.content.SharedPreferences;
 
 import org.osmdroid.util.GeoPoint;
 
-
-import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -172,6 +166,7 @@ public class GeolocationHandler {
     public static boolean getLocationEnabled(){
         return isEnabled;
     }
+
     public static void setLocationEnabled(Context context, boolean isEnabled) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(LOCATION_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -184,4 +179,5 @@ public class GeolocationHandler {
         SharedPreferences sharedPreferences = context.getSharedPreferences(LOCATION_PREFS, Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean(LOCATION_ENABLED_KEY, false); // Default value is false
     }
+
 }

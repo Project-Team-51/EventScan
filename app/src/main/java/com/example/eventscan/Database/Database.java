@@ -381,7 +381,6 @@ public class Database {
             ArrayList<Task<Void>> allTasks = new ArrayList<>();
             allTasks.add(checkInAttendee(event, attendee));
             allTasks.add(owner.geolocation.savePointToEvent(geoPoint,event));
-
             allTasks.get(1).addOnCompleteListener(task -> {
                 if(task.isSuccessful()){
                     Log.d("Geolocation", "monkey :D");
