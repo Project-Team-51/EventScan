@@ -7,6 +7,7 @@ import android.app.Dialog;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -21,8 +22,10 @@ import com.example.eventscan.Database.Database;
 
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
+import com.google.android.datatransport.backend.cct.BuildConfig;
 import com.google.firebase.storage.FirebaseStorage;
 
+import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
@@ -62,24 +65,37 @@ public class ViewMap extends DialogFragment {
         db = Database.getInstance();
         db.geolocation.getEventCheckinPoints(selectedEvent);
 
+        Configuration.getInstance().setUserAgentValue(BuildConfig.APPLICATION_ID);
+
         mapView.setTileSource(TileSourceFactory.MAPNIK); // Use the default OpenStreetMap tile source
         mapView.setMultiTouchControls(true); // Enable multi-touch controls
 
         // Add some GeoPoints to the ArrayList (example)
         db.geolocation.getEventCheckinPoints(selectedEvent).addOnSuccessListener(points1 -> {
+            double avgLatitude = 0;
+            double avgLongitude = 0;
             points = points1;
+            Log.d("GeolocationHandler3", String.valueOf(points.size()));
             // Iterate over the ArrayList and add markers to the map
             for (GeoPoint geoPoint : points) {
+                avgLatitude += geoPoint.getLatitude();
+                avgLongitude += geoPoint.getLongitude();
                 Marker marker = new Marker(mapView);
                 marker.setPosition(geoPoint);
                 marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
                 mapView.getOverlays().add(marker);
+                Log.d("GeoLocation", String.valueOf(geoPoint));
             }
+            avgLatitude = avgLatitude/points.size();
+            avgLongitude = avgLongitude/points.size();
+            GeoPoint center = new GeoPoint(avgLatitude,avgLongitude);
+            mapView.getController().setCenter(center);
+        }).addOnFailureListener(e -> {
+            Log.d("GeolocationHandler", e.toString());
         });
 
         mapView.getController().setZoom(12.0);
         //GeoPoint
-        //mapView.getController().setCenter();
         returnView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
