@@ -141,7 +141,7 @@
         android:backgroundTint="#414E6E"
         android:text="enroll"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/confirmEvent" />
+        app:layout_constraintTop_toBottomOf="@+id/showmap_button" />
 
     <Button
         android:id="@+id/signups_button"
@@ -155,6 +155,19 @@
         android:text="SIGNUPS"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bubbleContainer"
+        />
+
+    <Button
+        android:id="@+id/showmap_button"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/bubbleContainer"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="30dp"
+        android:backgroundTint="#414E6E"
+        android:text="SHOW MAP"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/confirmEvent"
         />
     
     <ImageView
