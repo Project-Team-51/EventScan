@@ -1,5 +1,6 @@
 package com.example.eventscan.Activities;
 
+import android.app.Notification;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -17,6 +19,7 @@ import com.example.eventscan.Fragments.AttendeeFragment;
 import com.example.eventscan.Fragments.EventFragment;
 import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.Fragments.QrScannerFragment;
+import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 
 import java.util.Observable;
@@ -33,7 +36,7 @@ import java.util.Observer;
  */
 
 
-public class    MainActivity extends AppCompatActivity implements AddEvent.OnEventAddedListener{
+public class MainActivity extends AppCompatActivity implements AddEvent.OnEventAddedListener{
     private ImageButton buttonEvents;
     private ImageButton buttonProfile;
     private ImageButton buttonQR;
@@ -194,4 +197,22 @@ public class    MainActivity extends AppCompatActivity implements AddEvent.OnEve
         EventFragment eventFragment = new EventFragment();
         loadFragment(eventFragment);
     }
+
+//    public void makeNotification(Event event){
+//        String notificationID = "NOTIFICATION_ID";
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), notificationID);
+//        builder.setSmallIcon(R.drawable.notification)
+//                .setContentTitle("EVENT NAME") // event name should go here
+//                .setContentText("EVENT DESCRIPTION")
+//                .setAutoCancel(true)
+//                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+//
+//        Intetn
+//
+//        EventFragment eventFragment = new EventFragment();
+//        loadFragment(eventFragment);
+//
+//    }
+
+
 }

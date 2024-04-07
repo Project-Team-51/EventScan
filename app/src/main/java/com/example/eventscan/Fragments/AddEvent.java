@@ -237,6 +237,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                 organizer = new Organizer();
                 organizer.setDeviceID(deviceID);
                 event.setOrganizer(organizer);
+                //event.setAttendeeLimit(10);
 
                 Task<Event> createEventTask = Database.getInstance().events.create(event);
                 createEventTask.addOnSuccessListener(event1 -> {
@@ -358,7 +359,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                         imageView.setImageURI(result);
                         posterUriString = posterUri.toString();
                         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-                        StorageReference profilePicRef = storageRef.child("poster_pics").child(deviceID);
+                        StorageReference profilePicRef = storageRef.child("poster_pics");
                         profilePicRef.putFile(posterUri);
                     }
 

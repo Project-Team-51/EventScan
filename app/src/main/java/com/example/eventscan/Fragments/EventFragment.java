@@ -1,45 +1,45 @@
 
-        package com.example.eventscan.Fragments;
+package com.example.eventscan.Fragments;
 
-        import android.annotation.SuppressLint;
-        import android.content.SharedPreferences;
-        import android.os.Bundle;
-        import android.provider.Settings;
-        import android.util.Log;
-        import android.view.LayoutInflater;
-        import android.view.View;
-        import android.view.ViewGroup;
-        import android.widget.AdapterView;
-        import android.widget.ListView;
+import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
-        import android.widget.TextView;
+import android.widget.TextView;
 
-        import androidx.annotation.NonNull;
-        import androidx.annotation.Nullable;
-        import androidx.fragment.app.Fragment;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
-        import com.example.eventscan.Database.Database;
-        import com.example.eventscan.Entities.Attendee;
-        import com.example.eventscan.Entities.DeviceID;
-        import com.example.eventscan.Entities.Event;
+import com.example.eventscan.Database.Database;
+import com.example.eventscan.Entities.Attendee;
+import com.example.eventscan.Entities.DeviceID;
+import com.example.eventscan.Entities.Event;
 
-        import com.example.eventscan.Entities.User;
+import com.example.eventscan.Entities.User;
 
-        import com.example.eventscan.Helpers.EventArrayAdapter;
-        import com.example.eventscan.Helpers.UserArrayAdapter;
-        import com.example.eventscan.R;
-        import com.google.android.gms.tasks.OnCompleteListener;
-        import com.google.android.gms.tasks.Task;
-        import com.google.android.gms.tasks.Tasks;
-        import com.google.firebase.firestore.CollectionReference;
-        import com.google.firebase.firestore.EventListener;
-        import com.google.firebase.firestore.FirebaseFirestoreException;
-        import com.google.firebase.firestore.QueryDocumentSnapshot;
-        import com.google.firebase.firestore.QuerySnapshot;
+import com.example.eventscan.Helpers.EventArrayAdapter;
+import com.example.eventscan.Helpers.UserArrayAdapter;
+import com.example.eventscan.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
-        import java.util.ArrayList;
-        import java.util.List;
-        import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /*
  * A fragment subclass that handles the displaying of events in two listviews. As of writing, it displays both attending classes
@@ -129,6 +129,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                             Event event = task.getResult();
                             ownedEventsAdapter.add(event);
                             inEventsAdapter.add(event);
+                            Log.d("EventLimit for " + event.getName(), "Attendee Limit: " + event.getAttendeeLimit());
                         });
                         updateTasks.add(fetchEventTask);
                     }
