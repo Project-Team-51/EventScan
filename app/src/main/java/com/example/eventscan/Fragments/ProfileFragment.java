@@ -236,6 +236,9 @@ public class ProfileFragment extends Fragment {
         deleteProfilePicBtn = view.findViewById(R.id.deleteProfilePicButton);
         locationToggle = view.findViewById(R.id.locationToggle);
         boolean isLocationEnabled = GeolocationHandler.isLocationEnabled(requireContext());
+        if (isLocationEnabled) {
+            GeolocationHandler.enableLocationUpdates(getContext());
+        }
         locationToggle.setChecked(isLocationEnabled);
     }
     private void setClickListeners() {
