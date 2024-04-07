@@ -24,10 +24,12 @@ import org.osmdroid.util.GeoPoint;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import kotlin.NotImplementedError;
 
@@ -655,21 +657,25 @@ public class Database {
                 thisPing.add(geoPoint);
                 newDocument.put("check_in_pings", thisPing);
                 return geolocationStorageCollection.document(event.getEventID()).set(newDocument);
-            })
+            });
+        }
+
+        private class GeoPointsFetcher implements Serializable {
+            ArrayList<GeoPoint> check_in_pings;
+            private GeoPointsFetcher(){};
+
         }
 
         public Task<ArrayList<GeoPoint>> getEventCheckinPoints(Event event) {
+
             return geolocationStorageCollection.document(event.getEventID()).get().continueWithTask(task1 -> {
                 if (!task1.isSuccessful()) {
                     return Tasks.forException(getTaskException(task1));
                 }
-                HashMap<Integer, GeoPoint> fetchedData = (HashMap<Integer, GeoPoint>) (task1.getResult().getData().get("check_in_pings"));
-                ArrayList<GeoPoint> output = new ArrayList<>();
-                if(fetchedData == null){
-                    return Tasks.forResult(output);
+                if (!task1.getResult().exists() || task1.getResult() == null){
+                    return Tasks.forResult(new ArrayList<GeoPoint>());
                 }
-                output.addAll(fetchedData.values());
-                return Tasks.forResult(output);
+                return Tasks.forResult(Objects.requireNonNull(task1.getResult().toObject(GeoPointsFetcher.class)).check_in_pings);
             });
         }
     }
