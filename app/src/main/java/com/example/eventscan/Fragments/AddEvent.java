@@ -42,6 +42,8 @@ import com.example.eventscan.Entities.Organizer;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -355,6 +357,9 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                         posterUri = result;
                         imageView.setImageURI(result);
                         posterUriString = posterUri.toString();
+                        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+                        StorageReference profilePicRef = storageRef.child("poster_pics").child(deviceID);
+                        profilePicRef.putFile(posterUri);
                     }
 
                 }

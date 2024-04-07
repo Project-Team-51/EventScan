@@ -25,6 +25,8 @@ public class Event implements Serializable {
     private String poster;
     private String eventID;
     public Integer attendeeLimit = -1;
+
+    private boolean fullyFormed = true;
     public Integer getAttendeeLimit() {
         return attendeeLimit;
     }
@@ -87,6 +89,7 @@ public class Event implements Serializable {
     public String getName() {
         return name;
     }
+
 
     /**
      * "check in" an attendee, the event keeps track of how many times someone has been checked in
@@ -181,6 +184,21 @@ public class Event implements Serializable {
 
     public EventDatabaseRepresentation convertToDatabaseRepresentation(){
         return new EventDatabaseRepresentation(this);
+    }
+
+    /**
+     * check whether this event was fully recreated by the database
+     * @return true if there were no errors reconstructing this event
+     */
+    public boolean getFullyFormed(){
+        return fullyFormed;
+    }
+
+    /**
+     * use when constructing an event to signify that this event was not fully reformed by the database
+     */
+    public void invalidateFullyFormed(){
+        fullyFormed = false;
     }
 
     @Override
