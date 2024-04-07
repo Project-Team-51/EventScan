@@ -34,9 +34,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.example.eventscan.Helpers.UserArrayAdapter;
 
-
 import java.util.ArrayList;
 import java.util.List;
+
 import org.osmdroid.api.IGeoPoint;
 
 import java.util.ArrayList;
