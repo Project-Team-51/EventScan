@@ -26,8 +26,14 @@
             android:id="@+id/buttonSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save to Cameral Roll"
+            android:text="Save to Camera Roll"
             android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/buttonShareQRCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share QR" />
 
     </LinearLayout>
 </RelativeLayout>

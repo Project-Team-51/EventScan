@@ -3,6 +3,7 @@ package com.example.eventscan.Fragments;
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
@@ -25,6 +26,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.eventscan.Activities.MainActivity;
@@ -43,6 +45,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -138,12 +141,26 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
             View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
             ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
             Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
+            Button buttonShareQR = dialogView.findViewById(R.id.buttonShareQRCode);
             int linkType = QRDatabaseEventLink.DIRECT_CHECK_IN;
 
             // setup the task to run as early as possible
             Task<Bitmap> getQRTask = QrCodec.createOrGetQR(event, linkType, false);
             getQRTask.addOnSuccessListener(bitmap -> {
                 imageViewDialog.setImageBitmap(bitmap);
+
+                buttonShareQR.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("image/jpeg");
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        byte[] qrImageBytes = byteArrayOutputStream.toByteArray();
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, qrImageBytes);
+                        startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
+                    }
+                });
             });
             // rest of fragment setup
             // Create and show the dialog
@@ -157,7 +174,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                 @Override
                 public void onClick(View v) {
                     saveQRCodeToCameraRoll(getQRTask.getResult());
-                    dialog.dismiss(); // Dismiss the dialog after saving
+                    //dialog.dismiss(); // Dismiss the dialog after saving
                 }
             });
         });
@@ -166,12 +183,26 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
             View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
             ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
             Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
+            Button buttonShareQR = dialogView.findViewById(R.id.buttonShareQRCode);
             int linkType = QRDatabaseEventLink.DIRECT_SEE_DETAILS;
 
             // setup the task to run as early as possible
             Task<Bitmap> getQRTask = QrCodec.createOrGetQR(event, linkType, false);
             getQRTask.addOnSuccessListener(bitmap -> {
                 imageViewDialog.setImageBitmap(bitmap);
+
+                buttonShareQR.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("image/jpeg");
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        byte[] qrImageBytes = byteArrayOutputStream.toByteArray();
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, qrImageBytes);
+                        startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
+                    }
+                });
             });
             // rest of fragment setup
             // Create and show the dialog
@@ -185,7 +216,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                 @Override
                 public void onClick(View v) {
                     saveQRCodeToCameraRoll(getQRTask.getResult());
-                    dialog.dismiss(); // Dismiss the dialog after saving
+                    //dialog.dismiss(); // Dismiss the dialog after saving
                 }
             });
         });
@@ -334,17 +365,27 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                 }
             });
 
+    /**
+     * Displays a dialog allowing the user to set the maximum number of attendees for the event.
+     *
+     * @param event The event for which the attendee limit is being set.
+     */
     private void showAttendeeLimitDialog(Event event) {
         AttendeeLimitDialogFragment dialogFragment = new AttendeeLimitDialogFragment();
         dialogFragment.setAttendeeLimitListener(this); // Set the listener
         dialogFragment.show(getChildFragmentManager(), "attendee_limit_dialog");
     }
 
+    /**
+     * Handles the attendee limit set by the user.
+     *
+     * @param attendeeLimit The maximum number of attendees set by the user.
+     */
     public void onAttendeeLimitSet(int attendeeLimit) {
-        // Handle the attendee limit set by the user here
-        // For example, set it to the event object
         event.setAttendeeLimit(attendeeLimit);
     }
+
+
 
 
 }
