@@ -38,7 +38,11 @@ public class organizerAllEvent extends DialogFragment {
     private ArrayList<Event> allEvents;
     private EventArrayAdapter alLEventsAdapter;
     private Database db;
+    public String organizerID;
 
+    public organizerAllEvent(String id){
+        this.organizerID = id;
+    }
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -51,12 +55,14 @@ public class organizerAllEvent extends DialogFragment {
         String myDeviceID = DeviceID.getDeviceID(requireContext());
         Log.d("DeviceID", "Device ID: " + myDeviceID);
         allEvents = new ArrayList<>();
+        ArrayList<Object> ownedEvents = new ArrayList<>();
         ListView allEventsView = view.findViewById(R.id.allUserList);
         alLEventsAdapter = new EventArrayAdapter(getActivity(), R.layout.event_list_content, allEvents); // Initialize the adapter
         allEventsView.setAdapter(alLEventsAdapter); // Set the adapter
         db = Database.getInstance();
 
         // Retrieve events from Firestore
+
         retrieveEventsFromFirestore();
 
         dialog.setContentView(view);
@@ -80,13 +86,16 @@ public class organizerAllEvent extends DialogFragment {
     }
 
     private void retrieveEventsFromFirestore() {
-        db.getEventsCollection().get().addOnSuccessListener(queryDocumentSnapshots -> {
-            allEvents.clear(); // Clear the list before adding new events
-            for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                Event event = documentSnapshot.toObject(Event.class); // Convert document to Event object
-                allEvents.add(event); // Add event to the list
+        db.attendees.get(organizerID).continueWithTask(task -> {
+            if(!task.isSuccessful()){
+                return Tasks.forException(task.getException());
             }
-            alLEventsAdapter.notifyDataSetChanged(); // Notify adapter of data change
+            return db.attendees.getNonOwnedEvents(task.getResult());
+        }).addOnSuccessListener(eventList -> {
+            for (Event event : eventList) {
+                alLEventsAdapter.add(event);
+            }
+            Log.d("Firestore", "This should be working");
         }).addOnFailureListener(e -> {
             Log.e("Firestore", "Error retrieving events: " + e.getMessage());
         });
