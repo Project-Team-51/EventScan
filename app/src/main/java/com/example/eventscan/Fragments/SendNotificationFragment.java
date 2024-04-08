@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.bumptech.glide.load.data.DataRewinder;
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Announcement;
 import com.example.eventscan.Entities.Event;
@@ -36,14 +37,14 @@ public class SendNotificationFragment extends DialogFragment {
     }
     private SendNotificationListener sendNotificationListener;
     private String eventAnnouncement;
-    private Database db;
+    private Database db = Database.getInstance();
 
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
         Event selectedEvent = (Event) getArguments().getSerializable("selectedEvent");
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.send_notification_layout, null);
-
+        //db = Database.getInstance();
         Dialog dialog = new Dialog(requireContext());
         dialog.setContentView(view);
 
@@ -53,16 +54,17 @@ public class SendNotificationFragment extends DialogFragment {
         EditText announcementEditText = view.findViewById(R.id.event_announcement);
 
 
-        Button cancelNoti = view.findViewById(R.id.send_noti);
-        Button sendNoti = view.findViewById(R.id.cancel_noti);
+        Button sendNoti = view.findViewById(R.id.send_noti);
+        Button cancelNoti = view.findViewById(R.id.cancel_noti);
         EventFragment eventFragment = new EventFragment();
         eventFragment.notificationSent(false);
         sendNoti.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String eventAnnouncement = announcementEditText.getText().toString();
+                eventAnnouncement = announcementEditText.getText().toString();
                 Announcement announcement = new Announcement(eventAnnouncement);
-                Task<Void> eventNotification = db.announcements.saveNotification(selectedEvent, announcement);
+//                Task<Void> eventNotification = db.announcements.saveNotification(selectedEvent, announcement);
+                Task<Void> eventNotification = Database.getInstance().announcements.saveNotification(selectedEvent, announcement);
 
                 // Call the saveNotification method
                 eventNotification

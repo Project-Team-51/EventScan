@@ -116,6 +116,7 @@ public class Database {
         this.qr_codes = new QRCodeOperations(this);
         this.admins = new AdminOperations(this);
         this.geolocation = new GeolocationOperations(this);
+        this.announcements = new AnnouncementOperations(this);
 
     }
     public static Database getInstance(){

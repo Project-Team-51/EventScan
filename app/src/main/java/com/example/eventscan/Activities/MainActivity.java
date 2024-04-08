@@ -1,13 +1,21 @@
 package com.example.eventscan.Activities;
 
+import android.Manifest;
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -21,6 +29,9 @@ import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.Fragments.QrScannerFragment;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -49,6 +60,16 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
+
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            if(ContextCompat.checkSelfPermission(MainActivity.this,
+                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
+
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+
         Intent intent = getIntent();
         String userType = intent.getStringExtra("userType");
         if (savedInstanceState == null) {
@@ -198,21 +219,36 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
         loadFragment(eventFragment);
     }
 
-//    public void makeNotification(Event event){
-//        String notificationID = "NOTIFICATION_ID";
-//        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), notificationID);
-//        builder.setSmallIcon(R.drawable.notification)
-//                .setContentTitle("EVENT NAME") // event name should go here
-//                .setContentText("EVENT DESCRIPTION")
-//                .setAutoCancel(true)
-//                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-//
-//        Intetn
-//
-//        EventFragment eventFragment = new EventFragment();
-//        loadFragment(eventFragment);
-//
-//    }
+    public void makeNotification(Event event){
+        String notificationID = "NOTIFICATION_ID";
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), notificationID);
+        builder.setSmallIcon(R.drawable.notification)
+                .setContentTitle(event.getName()) // event name should go here
+                .setContentText("EVENT DESCRIPTION")
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+
+
+        EventFragment eventFragment = new EventFragment();
+        loadFragment(eventFragment);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = notificationManager.getNotificationChannel(notificationID);
+            if (notificationChannel == null){
+                int importance = NotificationManager.IMPORTANCE_HIGH;
+                notificationChannel = new NotificationChannel(notificationID, "description...", importance);
+                notificationChannel.setLightColor(Color.GREEN);
+                notificationChannel.enableVibration(true);
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
+
+        notificationManager.notify(0,builder.build());
+
+
+    }
 
 
 }
