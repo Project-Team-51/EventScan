@@ -40,6 +40,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.DeviceID;
+import com.example.eventscan.Entities.Organizer;
 import com.example.eventscan.Entities.PicGen;
 import com.example.eventscan.Helpers.GeolocationHandler;
 import com.example.eventscan.Helpers.ImageUploader;
@@ -56,6 +57,7 @@ import com.google.firebase.storage.StorageReference;
 import android.provider.Settings.Secure;
 import android.widget.Switch;
 
+import java.util.Objects;
 import java.util.Random;
 
 import kotlin.Unit;
@@ -300,18 +302,32 @@ public class ProfileFragment extends Fragment {
                 String profilePictureID = "exampleProfilePictureID";
 
                 // Creates a new Attendee object with the input values
-                Attendee attendee = new Attendee();
+                if (Objects.equals(DeviceID.getUserType(requireContext()), "Organizer")){
+                    Organizer organizer = new Organizer();
+                    organizer.setName(username);
+                    organizer.setPhoneNum(phone);
+                    organizer.setEmail(email);
+                    organizer.setBio(bio);
+                    organizer.setDeviceID(deviceID);
+                    organizer.setProfilePictureID(profilePictureID);
 
-                // Set attributes using setter methods
-                attendee.setName(username);
-                attendee.setPhoneNum(phone);
-                attendee.setEmail(email);
-                attendee.setBio(bio);
-                attendee.setDeviceID(deviceID);
-                attendee.setProfilePictureID(profilePictureID);
+                    // Saves the attendee's profile to Firestore
+                    saveAttendeeProfile(organizer);
+                }
+                else {
+                    Attendee attendee = new Attendee();
+                    // Set attributes using setter methods
+                    attendee.setName(username);
+                    attendee.setPhoneNum(phone);
+                    attendee.setEmail(email);
+                    attendee.setBio(bio);
+                    attendee.setDeviceID(deviceID);
+                    attendee.setProfilePictureID(profilePictureID);
 
-                // Saves the attendee's profile to Firestore
-                saveAttendeeProfile(attendee);
+                    // Saves the attendee's profile to Firestore
+                    saveAttendeeProfile(attendee);
+                }
+
             }
         });
 
