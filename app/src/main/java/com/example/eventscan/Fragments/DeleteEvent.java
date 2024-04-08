@@ -218,24 +218,27 @@ public class DeleteEvent extends DialogFragment {
         viewAttendeesButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                // Create the view for displaying the checked-in attendees
-                View viewCheckedInAttendees = getLayoutInflater().inflate(R.layout.checkedin_list, null);
-                ListView checkedInAttendeesListView = viewCheckedInAttendees.findViewById(R.id.checkedInList);
-
-                // Call the method to fill the list of checked-in attendees
-                fillCheckedInAttendeesList(selectedEvent.getEventID(), checkedInAttendeesListView);
-
-                // Create and display the AlertDialog containing the populated list of checked-in attendees
-                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-                builder.setView(viewCheckedInAttendees);
-                builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
+//                // Create the view for displaying the checked-in attendees
+//                View viewCheckedInAttendees = getLayoutInflater().inflate(R.layout.checkedin_list, null);
+//                ListView checkedInAttendeesListView = viewCheckedInAttendees.findViewById(R.id.checkedInList);
+//
+//                // Call the method to fill the list of checked-in attendees
+//                fillCheckedInAttendeesList(selectedEvent.getEventID(), checkedInAttendeesListView);
+//
+//                // Create and display the AlertDialog containing the populated list of checked-in attendees
+//                AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+//                builder.setView(viewCheckedInAttendees);
+//                builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                });
+//                AlertDialog alertDialog = builder.create();
+//                alertDialog.show();
+                String eventId = selectedEvent.getEventID();
+                CheckInsListFragment fragment = CheckInsListFragment.newInstance(eventId);
+                fragment.show(getParentFragmentManager(), "CheckedInListFragment");
             }
         });
 
