@@ -140,6 +140,7 @@ public class Attendee extends User {
     }
 
 
+
     @Override
     public boolean equals(Object o) {
         // auto-generated
