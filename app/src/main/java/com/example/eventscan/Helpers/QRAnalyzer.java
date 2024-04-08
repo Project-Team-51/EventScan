@@ -35,11 +35,8 @@ import com.google.mlkit.vision.common.InputImage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observer;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 /*
 This class handles the opening of the camera, as well as scanning the QR Code and retrieving the relevant information
@@ -138,12 +135,26 @@ public class QRAnalyzer{
     }
 
     private void createScanResultDialog(QRDatabaseEventLink link){
+        if(link == null){
+            createFailureFetchDialog();
+            return;
+        }
         switch(link.getDirectionType()){
             case QRDatabaseEventLink.DIRECT_CHECK_IN:
-                //TODO
-            case QRDatabaseEventLink.DIRECT_SEE_DETAILS:
                 createCheckInDialog(link.getDirectedEventID());
+            case QRDatabaseEventLink.DIRECT_SEE_DETAILS:
+                createSignUpInterestDialog(link.getDirectedEventID());
         }
+    }
+
+    private void createFailureFetchDialog(){
+        Dialog failure = new Dialog(context);
+        failure.setContentView(R.layout.fragment_event_sign_in);
+        failure.setCancelable(true);
+        ((TextView) failure.findViewById(R.id.sign_in_event_name)).setText("Error");
+        ((TextView) failure.findViewById(R.id.sign_in_event_description)).setText("This event code doesn't exist in our system. Please ask the organizer of this event for a new code");
+        ((Button) failure.findViewById(R.id.sign_in_sign_in_button)).setVisibility(GONE);
+        failure.show();
     }
 
     /**
@@ -177,7 +188,6 @@ public class QRAnalyzer{
                         dialogTitle.setText(event.getName());
                         dialogDescription.setText(event.getDesc());
                         Log.d("QR SCAN","completed, successful");
-                        //TODO set the poster
 
                         dialogButton.setVisibility(View.VISIBLE);
                         // set the onclick of the button to sign you up
@@ -194,16 +204,17 @@ public class QRAnalyzer{
                             checkInTask.addOnCompleteListener(task1 -> {
                                 // check-in is done, make sure it was successful
                                 if(task1.isSuccessful()){
+
                                     dialogDescription.setText("Check-in Successful!\n You can now safely go to another screen");
                                     dialogButton.setVisibility(GONE);
-                                    if (event.getAttendeeLimit() == event.getCheckedInAttendeesList().size()) {
-                                        // Event is full, i want to send a push notification to organizer that event is full
-                                        return;
-                                    }
+
+                                    dialogButton.setText(R.string.event_sign_up_success);
+                                    dialogButton.setEnabled(false);
+
                                 } else {
                                     Log.e("QR SCAN", Database.getTaskException(task1).toString());
-                                    dialogDescription.setText("Check-in Failed\nPlease relaunch the app and try again");
-                                    dialogButton.setText("Exit");
+                                    dialogDescription.setText(R.string.event_sign_up_failure_description);
+                                    dialogButton.setText(R.string.event_sign_up_failure_exit);
                                     dialogButton.setOnClickListener(v1 -> {
                                         // https://stackoverflow.com/questions/17719634/how-to-exit-an-android-app-programmatically
                                         System.exit(1);
@@ -222,6 +233,54 @@ public class QRAnalyzer{
 
 
         eventSignIn.show();
+    }
+
+    private void createSignUpInterestDialog(String eventID){
+        Dialog interestDialog = new Dialog(context);
+        interestDialog.setContentView(R.layout.fragment_event_sign_in);
+        interestDialog.setCancelable(true);
+        Log.d("QR Analyzer", "creating sign up dialog for "+eventID);
+        if(selfAttendee == null){
+            selfAttendee = new Attendee();
+            selfAttendee.setDeviceID(DeviceID.getDeviceID(context));
+        }
+        Database.getInstance().events.get(eventID)
+                .addOnCompleteListener(task -> {
+                    if(task.isSuccessful()) {
+                        Event event = task.getResult();
+                        TextView dialogTitle = interestDialog.findViewById(R.id.sign_in_event_name);
+                        TextView dialogDescription = interestDialog.findViewById(R.id.sign_in_event_description);
+                        Button dialogButton = interestDialog.findViewById(R.id.sign_in_sign_in_button);
+
+                        dialogTitle.setText("Details of " + event.getName());
+                        dialogDescription.setText(event.getName());
+                        dialogButton.setText(R.string.event_sign_up_interest_button_text);
+                        dialogButton.setVisibility(View.VISIBLE);
+                        dialogButton.setOnClickListener(v -> {
+                            event.addInterestedAttendee(selfAttendee);
+                            db.events.addInterestedAttendee(event, selfAttendee).addOnCompleteListener(task1 -> {
+                                if(task.isSuccessful()) {
+                                    dialogButton.setEnabled(false);
+                                    dialogButton.setText(R.string.event_sign_up_success);
+                                } else {
+                                    Log.e("QR SCAN", Database.getTaskException(task1).toString());
+                                    dialogDescription.setText(R.string.event_sign_up_failure_description);
+                                    dialogButton.setText(R.string.event_sign_up_failure_exit);
+                                    dialogButton.setOnClickListener(v1 -> {
+                                        // https://stackoverflow.com/questions/17719634/how-to-exit-an-android-app-programmatically
+                                        System.exit(1);
+                                    });
+                                }
+                            });
+                        });
+                    } else {
+                        Log.e("QR SCAN", "Event "+eventID+" not found in firebase");
+                        Log.e("QR SCAN", Database.getTaskException(task).toString());
+                        ((TextView) interestDialog.findViewById(R.id.sign_in_event_name)).setText("Event "+eventID);
+                        ((TextView) interestDialog.findViewById(R.id.sign_in_event_description)).setText("Not found\n(you may be offline)");
+                    }
+                });
+        interestDialog.show();
     }
 
     /**

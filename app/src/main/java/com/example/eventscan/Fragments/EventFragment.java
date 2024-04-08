@@ -217,7 +217,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         allEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                organizerAllEvent viewEventFragment = new organizerAllEvent();
+                organizerAllEvent viewEventFragment = new organizerAllEvent(myDeviceID);
                 viewEventFragment.show(getParentFragmentManager(), "ViewEventFragment");
             }
         });
