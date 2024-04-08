@@ -209,15 +209,22 @@ public class ProfileFragment extends Fragment {
         }
     }
     private void loadProfilePicture(String name) {
-        if (PicGen.isProfilePictureExists(requireContext())) {
-            Bitmap profileBitmap = PicGen.loadProfilePicture(requireContext());
-            profilePic.setImageBitmap(profileBitmap);
-        } else {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference profilePicRef = storageRef.child("profile_pics").child(deviceID);
+
+        profilePicRef.getDownloadUrl().addOnSuccessListener(uri -> {
+            // If a profile picture exists in Firebase Storage, load and display it using Glide
+            Glide.with(requireContext())
+                    .load(uri)
+                    .apply(RequestOptions.circleCropTransform())
+                    .into(profilePic);
+        }).addOnFailureListener(exception -> {
+            // If no profile picture exists in Firebase Storage, generate one locally
             String nameToUse = TextUtils.isEmpty(name) ? getRandomLetter() : name;
             Bitmap profileBitmap = PicGen.generateProfilePicture(nameToUse, 200); // Adjust size as needed
             profilePic.setImageBitmap(profileBitmap);
             PicGen.saveProfilePicture(requireContext(), profileBitmap);
-        }
+        });
     }
 
     private String getRandomLetter() {
