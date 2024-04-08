@@ -126,6 +126,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
         Button generateQRCodeDetailsButton = view.findViewById(R.id.generate_QRCode_see_details);
         Button confirmEventButton = view.findViewById(R.id.confirmEvent);
         Button uploadPoster = view.findViewById(R.id.upload_poster);
+        Button viewCheckedInAttendees = view.findViewById(R.id.checked_in_attendees);
         Switch attendeeLimitSwitch = view.findViewById(R.id.attendeeLimit);
         imageView = view.findViewById(R.id.posterView);
 
@@ -261,7 +262,9 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                 }
             }
         });
+
     }
+
 
 
     /**

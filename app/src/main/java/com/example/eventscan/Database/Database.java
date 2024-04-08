@@ -20,9 +20,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
 import org.osmdroid.util.GeoPoint;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
