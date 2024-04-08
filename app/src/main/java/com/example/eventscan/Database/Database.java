@@ -169,7 +169,6 @@ public class Database {
         }
 
         /**
-         * <b>Not yet implemented, but will be</b>
          * Get the list of events that this attendee is interested in
          * @param attendee the attendee to search for
          * @return the list of events that `attendee` is interested in
@@ -200,7 +199,6 @@ public class Database {
         }
 
         /**
-         * <b>May not be implemented in the future, let me know if you need this function</b>
          * Get the list of events that this attendee has checked into
          * @param attendee the attendee to search for
          * @return the list of events that `attendee` has checked into
@@ -234,6 +232,36 @@ public class Database {
                             }
                         }
                         return Tasks.forResult(finalOutput);
+                    });
+        }
+
+        /**
+         * get the list of events that are "owned" by this attendee/organizer
+         * @param organizer the attendee/organizer to search for
+         * @return a task that will resolve to an ArrayList of the owned events
+         */
+        public Task<ArrayList<Event>> getOwnedEvents(Attendee organizer){
+            return eventsCollection.whereEqualTo("organizerID", organizer.getDeviceID()).get()
+                    .continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Task<Event>> toReturnEventTasks = new ArrayList<>();
+                        for(DocumentSnapshot documentSnapshot: task.getResult().getDocuments()){
+                            toReturnEventTasks.add(owner.events.get(documentSnapshot));
+                        }
+                        return Tasks.whenAllComplete(toReturnEventTasks);
+                    }).continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Event> toReturnEvents = new ArrayList<>();
+                        for(Task<?> eventTask : task.getResult()){
+                            if(eventTask.isSuccessful()){
+                                toReturnEvents.add(((Task<Event>) eventTask).getResult());
+                            }
+                        }
+                        return Tasks.forResult(toReturnEvents);
                     });
         }
 

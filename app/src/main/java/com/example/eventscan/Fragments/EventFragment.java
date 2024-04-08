@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import android.widget.TextView;
@@ -37,7 +38,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /*
@@ -61,10 +65,9 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         View view = inflater.inflate(R.layout.admin_observer_fragment, container, false);
         Bundle bundle = this.getArguments();
         TextView textView = (TextView) view.findViewById(R.id.yourEventsText);
-
+        Button allEventButton = view.findViewById(R.id.allEventButton);
         String myDeviceID = DeviceID.getDeviceID(requireContext());
         Log.d("DeviceID", "Device ID: " + myDeviceID);
-
         // Get reference to the TextView
 
 
@@ -77,12 +80,15 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             case "Admin":
             case "Attendee":
                 textView.setText("All Events");
+                allEventButton.setVisibility(View.GONE);
                 break;
         }
 
+
+
         ownedEvents = new ArrayList<>();
         inEvents = new ArrayList<>();
-
+        Map<String, String> eventTypeMap = new HashMap<>();
         ownedEventsAdapter = new EventArrayAdapter(getActivity(), R.layout.event_list_content, ownedEvents);
         inEventsAdapter = new EventArrayAdapter(getActivity(), R.layout.event_list_content, inEvents);
 
@@ -108,6 +114,44 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                     inEvents.clear();
                     ArrayList<Task<Event>> updateTasks = new ArrayList<>();
                     AtomicInteger failed_fetches_amount = new AtomicInteger(); // AtomicInteger suggested by android studio
+
+                    db.attendees.get(myDeviceID).continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(task.getException());
+                        }
+                        return db.attendees.getInterestedEvents(task.getResult());
+                    }).addOnSuccessListener(eventList -> {
+                        for (Event event : eventList) {
+                            eventTypeMap.put(event.getEventID(), "interested");
+                            inEventsAdapter.add(event);
+                        }
+                    });
+
+                    db.attendees.get(myDeviceID).continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(task.getException());
+                        }
+                        return db.attendees.getCheckedInEvents(task.getResult());
+                    }).addOnSuccessListener(eventList -> {
+                        for (Event event : eventList) {
+                            eventTypeMap.put(event.getEventID(), "checked in");
+                            inEventsAdapter.add(event);
+                        }
+                    });
+
+                    if (Objects.equals(userType,"Organizer")){
+                        db.attendees.get(myDeviceID).continueWithTask(task -> {
+                            if(!task.isSuccessful()){
+                                return Tasks.forException(task.getException());
+                            }
+                            return db.attendees.getOwnedEvents(task.getResult());
+                        }).addOnSuccessListener(eventList -> {
+                            for (Event event : eventList) {
+                                ownedEventsAdapter.add(event);
+                            }
+                        });
+                    }
+
                     for (QueryDocumentSnapshot doc : querySnapshots) { // turn every stored "Event" into an event class, add to adapters
                         Task<Event> fetchEventTask = db.events.get(doc);
                         fetchEventTask.addOnCompleteListener(task -> {
@@ -116,8 +160,10 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                                 return;
                             }
                             Event event = task.getResult();
-                            ownedEventsAdapter.add(event);
-                            inEventsAdapter.add(event);
+                            if (!Objects.equals(userType, "Organizer")) {
+                                ownedEventsAdapter.add(event);
+                            }
+
                         });
                         updateTasks.add(fetchEventTask);
                     }
@@ -131,6 +177,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             }
         });
 
+
         ownedEventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -141,6 +188,22 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                 else{
                     openEventView(selectedEvent);
                 }
+            }
+        });
+
+        allEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                organizerAllEvent viewEventFragment = new organizerAllEvent();
+                viewEventFragment.show(getParentFragmentManager(), "ViewEventFragment");
+            }
+        });
+
+        inEventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Event selectedEvent = inEvents.get(position);
+                openAttendingView(selectedEvent, eventTypeMap);
             }
         });
         return view;
@@ -156,6 +219,20 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         viewEventFragment.show(getParentFragmentManager(), "ViewEventFragment");
     }
 
+
+
+
+
+    private void openAttendingView(Event selectedEvent, Map<String, String> eventTypeMap) {
+        AttendingEvent attendingEventFragment = new AttendingEvent(eventTypeMap);
+        // Create a Bundle and put the selected Event information
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("selectedEvent", selectedEvent);
+        // Pass the eventTypeMap to the fragment
+        attendingEventFragment.setArguments(bundle);
+        // Show the AttendingEvent fragment
+        attendingEventFragment.show(getParentFragmentManager(), "AttendingEventFragment");
+    }
     /**
      * Opens the DeleteEvent fragment for the selected event.
      *
