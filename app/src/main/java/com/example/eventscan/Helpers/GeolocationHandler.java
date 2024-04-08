@@ -159,14 +159,27 @@ public class GeolocationHandler {
         return longitude;
     }
 
+    /**
+     * Combines latitude and latitude into a GeoPoint for map use
+     * @return GeoPoint value.
+     */
     public static GeoPoint getGeoPoint(){
         return new GeoPoint(latitude,longitude);
     }
 
+    /**
+     * Returns whether user location is enabled or not
+     * @return boolean isEnabled
+     */
     public static boolean getLocationEnabled(){
         return isEnabled;
     }
 
+    /**
+     * Sets location enabled after an app reboot
+     * @param context The context of the app
+     * @param isEnabled boolean of whether locaiton is enabled
+     */
     public static void setLocationEnabled(Context context, boolean isEnabled) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(LOCATION_PREFS, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -174,7 +187,10 @@ public class GeolocationHandler {
         editor.apply();
     }
 
-    // Retrieve the state of the location setting
+    /**
+     * Retrieve the state of the location setting
+     * @param context The context of the app
+     */
     public static boolean isLocationEnabled(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(LOCATION_PREFS, Context.MODE_PRIVATE);
         return sharedPreferences.getBoolean(LOCATION_ENABLED_KEY, false); // Default value is false

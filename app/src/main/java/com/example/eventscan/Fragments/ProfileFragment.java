@@ -64,7 +64,7 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 
 
-/*
+/**
  * A simple fragment subclass for managing user profiles. Allows us to view our or another users profile, as well as edit some fields
  * if desired.
  */

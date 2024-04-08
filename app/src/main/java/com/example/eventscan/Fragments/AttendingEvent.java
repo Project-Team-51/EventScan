@@ -26,6 +26,9 @@ import com.google.firebase.storage.StorageReference;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * a DialogFragment subclass for displaying event details and attendee information
+ */
 public class AttendingEvent extends DialogFragment {
 
     Database db;

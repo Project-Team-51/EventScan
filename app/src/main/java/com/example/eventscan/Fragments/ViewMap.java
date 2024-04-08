@@ -37,8 +37,12 @@ import org.osmdroid.views.overlay.Marker;
 
 import java.util.ArrayList;
 
-
+/**
+ * This class represents a fragment used to display a map with checked-in attendee markers for
+ * an organizer to see.
+ */
 public class ViewMap extends DialogFragment {
+    // Reference: https://github.com/osmdroid/osmdroid
 
     Database db;
     ArrayList<GeoPoint> points = new ArrayList<>(); // Initialize the ArrayList

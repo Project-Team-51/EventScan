@@ -17,6 +17,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
+/**
+ * This class represents a fragment that displays the list of attendees for a specific event.
+ */
 public class OrganizerViewAttendee extends Fragment {
 
     private Database db;

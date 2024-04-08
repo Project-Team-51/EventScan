@@ -29,7 +29,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-/*
+/**
  * Displays all users in a ListView. Currently only supports the Admin, but can be reworked
  * to fit the Organizer class as well, when clicking on one of their events. Clicking on a list item
  * gives you the option to delete the profile from the app, deleting the user linked to their deviceID

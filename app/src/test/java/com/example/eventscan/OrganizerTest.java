@@ -8,6 +8,9 @@ import com.example.eventscan.Entities.Organizer;
 
 import org.junit.Test;
 
+/**
+ * Testing class for Organizer usertype
+ */
 public class OrganizerTest {
     @Test
     public void organizer_equals(){

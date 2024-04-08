@@ -43,6 +43,9 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.Objects;
 
+/**
+ * This class represents a DialogFragment used to display event details.
+ */
 
 public class ViewEvent extends DialogFragment {
 

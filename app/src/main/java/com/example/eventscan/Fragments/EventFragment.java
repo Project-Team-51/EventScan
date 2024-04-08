@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/*
+/**
  * A fragment subclass that handles the displaying of events in two listviews. As of writing, it displays both attending classes
  * and owned classes as the same thing, which is all the events on the firestore. Clicking on an item in the ownedEvents list
  * brings up a delete dialog.

@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/*
+/**
 This class handles the opening of the camera, as well as scanning the QR Code and retrieving the relevant information
 from it. Will be consolidated with QR Codec in the future.
  */

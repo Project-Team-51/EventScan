@@ -20,7 +20,10 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * Represents a fragment that displays all images stored in Firebase Storage and allows
+ * users to delete them.
+ */
 public class AllPicFrag extends Fragment {
     private RecyclerView recyclerView;
     private ImageAdapter imageAdapter;

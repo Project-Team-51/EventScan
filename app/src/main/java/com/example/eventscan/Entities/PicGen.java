@@ -13,7 +13,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Random;
-
+/**
+ * Provides methods for generating, saving, loading, and deleting profile pictures.
+ */
 public class PicGen {
     public static Bitmap generateProfilePicture(String name, int size) {
         // Generate random color
