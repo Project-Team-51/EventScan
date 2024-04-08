@@ -6,6 +6,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -40,8 +45,10 @@ import com.example.eventscan.Helpers.GeolocationHandler;
 import com.example.eventscan.Helpers.ImageUploader;
 import com.example.eventscan.R;
 import com.github.dhaval2404.imagepicker.ImagePicker;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -212,20 +219,51 @@ public class ProfileFragment extends Fragment {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         StorageReference profilePicRef = storageRef.child("profile_pics").child(deviceID);
 
-        profilePicRef.getDownloadUrl().addOnSuccessListener(uri -> {
-            // If a profile picture exists in Firebase Storage, load and display it using Glide
-            Glide.with(requireContext())
-                    .load(uri)
-                    .apply(RequestOptions.circleCropTransform())
-                    .into(profilePic);
-        }).addOnFailureListener(exception -> {
-            // If no profile picture exists in Firebase Storage, generate one locally
-            String nameToUse = TextUtils.isEmpty(name) ? getRandomLetter() : name;
-            Bitmap profileBitmap = PicGen.generateProfilePicture(nameToUse, 200); // Adjust size as needed
-            profilePic.setImageBitmap(profileBitmap);
-            PicGen.saveProfilePicture(requireContext(), profileBitmap);
+        Task<Uri> task = profilePicRef.getDownloadUrl();
+
+        task.addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    // If a profile picture exists in Firebase Storage, load and display it using Glide
+                    Uri uri = task.getResult();
+                    Glide.with(requireContext())
+                            .load(uri)
+                            .apply(RequestOptions.circleCropTransform())
+                            .into(profilePic);
+                } else {
+                    // If no profile picture exists in Firebase Storage, generate one locally
+                    String nameToUse = TextUtils.isEmpty(name) ? getRandomLetter() : name;
+                    Bitmap profileBitmap = PicGen.generateProfilePicture(nameToUse, 200);
+
+                    // Convert the profileBitmap to circular image using BitmapShader
+                    Bitmap circularBitmap = getCircularBitmap(profileBitmap);
+
+                    // Set the circularBitmap to the ImageView
+                    profilePic.setImageBitmap(circularBitmap);
+
+                    PicGen.saveProfilePicture(requireContext(), profileBitmap);
+                }
+            }
         });
     }
+    private Bitmap getCircularBitmap(Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        Bitmap outputBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(outputBitmap);
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setShader(new BitmapShader(bitmap, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP));
+
+        RectF rect = new RectF(0, 0, width, height);
+        canvas.drawRoundRect(rect, width / 2, height / 2, paint);
+
+        return outputBitmap;
+    }
+
 
     private String getRandomLetter() {
         Random random = new Random();
