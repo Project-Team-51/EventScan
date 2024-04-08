@@ -277,6 +277,30 @@ public class Database {
                         return Tasks.forResult(toReturnEvents);
                     });
         }
+        public Task<ArrayList<Event>> getNonOwnedEvents(Attendee organizer) {
+            return eventsCollection.whereNotEqualTo("organizerID", organizer.getDeviceID()).get()
+                    .continueWithTask(task -> {
+                        if (!task.isSuccessful()) {
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Task<Event>> toReturnEventTasks = new ArrayList<>();
+                        for (DocumentSnapshot documentSnapshot : task.getResult().getDocuments()) {
+                            toReturnEventTasks.add(owner.events.get(documentSnapshot));
+                        }
+                        return Tasks.whenAllComplete(toReturnEventTasks);
+                    }).continueWithTask(task -> {
+                        if (!task.isSuccessful()) {
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        ArrayList<Event> toReturnEvents = new ArrayList<>();
+                        for (Task<?> eventTask : task.getResult()) {
+                            if (eventTask.isSuccessful()) {
+                                toReturnEvents.add(((Task<Event>) eventTask).getResult());
+                            }
+                        }
+                        return Tasks.forResult(toReturnEvents);
+                    });
+        }
 
         /**
          * Create a unique ID for an attendee

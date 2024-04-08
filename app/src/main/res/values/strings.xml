@@ -14,4 +14,8 @@
     <string name="allUsersString">All Users</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="event_sign_up_interest_button_text">I Promise to go!</string>
+    <string name="event_sign_up_success">Success!</string>
+    <string name="event_sign_up_failure_exit">Exit</string>
+    <string name="event_sign_up_failure_description">Check-in Failed\nPlease relaunch the app and try again</string>
 </resources>
