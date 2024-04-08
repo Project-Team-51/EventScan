@@ -106,7 +106,7 @@ public class DeleteEvent extends DialogFragment {
         db = Database.getInstance();
 
         userType = DeviceID.getUserType(requireContext());
-        if (userType.equals("Admin")) {
+        if (userType.equals("Organizer")) {
             signupButton.setVisibility(View.GONE);
         }
 
