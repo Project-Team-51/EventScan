@@ -18,6 +18,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/attendeeLimit" />
 
+
+
     <TextView
         android:id="@+id/create_event"
         android:layout_width="match_parent"
@@ -144,6 +146,19 @@
         app:layout_constraintTop_toBottomOf="@+id/showmap_button" />
 
     <Button
+        android:id="@+id/checked_in_attendees"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/signup_button"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="220dp"
+        android:backgroundTint="#414E6E"
+        android:text="View Attendees"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signup_button" />
+
+    <Button
         android:id="@+id/signups_button"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
@@ -201,6 +216,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bubbleContainer"
         tools:ignore="UseSwitchCompatOrMaterialXml" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
