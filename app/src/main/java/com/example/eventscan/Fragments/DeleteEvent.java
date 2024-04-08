@@ -2,10 +2,13 @@ package com.example.eventscan.Fragments;
 
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,25 +22,36 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 
 import com.example.eventscan.Database.Database;
+import com.example.eventscan.Database.QRDatabaseEventLink;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.DeviceID;
 import com.bumptech.glide.Glide;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Helpers.GeolocationHandler;
+import com.example.eventscan.Helpers.QrCodec;
 import com.example.eventscan.R;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.example.eventscan.Helpers.UserArrayAdapter;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
+import java.util.Locale;
 import java.util.Objects;
 /**
  * A simple dialogfragment that displays some basic info about the Event that is passed into it, and gives
@@ -102,6 +116,8 @@ public class DeleteEvent extends DialogFragment {
         Button signupButton = view.findViewById(R.id.signup_button);
         Button showMap = view.findViewById(R.id.showmap_button);
         Button signupsButton = view.findViewById(R.id.signups_button);
+        Button qrcheckIn = view.findViewById(R.id.generate_QRCode_check_in);
+        Button qrDetails = view.findViewById(R.id.generate_QRCode_see_details);
 
         db = Database.getInstance();
 
@@ -161,6 +177,91 @@ public class DeleteEvent extends DialogFragment {
                 openMapView(selectedEvent);
             }
         });
+
+        qrcheckIn.setOnClickListener(v -> {
+            View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
+            ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
+            Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
+            Button buttonShareQR = dialogView.findViewById(R.id.buttonShareQRCode);
+            int linkType = QRDatabaseEventLink.DIRECT_CHECK_IN;
+
+            // setup the task to run as early as possible
+            Task<Bitmap> getQRTask = QrCodec.createOrGetQR(selectedEvent, linkType, false);
+            getQRTask.addOnSuccessListener(bitmap -> {
+                imageViewDialog.setImageBitmap(bitmap);
+
+                buttonShareQR.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("image/jpeg");
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        byte[] qrImageBytes = byteArrayOutputStream.toByteArray();
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, qrImageBytes);
+                        startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
+                    }
+                });
+            });
+            // rest of fragment setup
+            // Create and show the dialog
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(getActivity());
+            builder.setView(dialogView);
+            AlertDialog dialog2 = builder.create();
+            dialog2.show();
+
+            // Set click listener for the "Save to Camera Roll" button
+            buttonSaveToCamera.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveQRCodeToCameraRoll(getQRTask.getResult());
+                    //dialog.dismiss(); // Dismiss the dialog after saving
+                }
+            });
+        });
+
+        qrDetails.setOnClickListener(v -> {
+            View dialogView = getLayoutInflater().inflate(R.layout.qr_code_dialog, null);
+            ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
+            Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
+            Button buttonShareQR = dialogView.findViewById(R.id.buttonShareQRCode);
+            int linkType = QRDatabaseEventLink.DIRECT_SEE_DETAILS;
+
+            // setup the task to run as early as possible
+            Task<Bitmap> getQRTask = QrCodec.createOrGetQR(selectedEvent, linkType, false);
+            getQRTask.addOnSuccessListener(bitmap -> {
+                imageViewDialog.setImageBitmap(bitmap);
+
+                buttonShareQR.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("image/jpeg");
+                        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                        byte[] qrImageBytes = byteArrayOutputStream.toByteArray();
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, qrImageBytes);
+                        startActivity(Intent.createChooser(shareIntent, "Share QR Code"));
+                    }
+                });
+            });
+            // rest of fragment setup
+            // Create and show the dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setView(dialogView);
+            AlertDialog dialog2 = builder.create();
+            dialog2.show();
+
+            // Set click listener for the "Save to Camera Roll" button
+            buttonSaveToCamera.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveQRCodeToCameraRoll(getQRTask.getResult());
+                    //dialog.dismiss(); // Dismiss the dialog after saving
+                }
+            });
+        });
+
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -244,6 +345,43 @@ public class DeleteEvent extends DialogFragment {
 
     public void setDeleteEventListener(DeleteEventListener listener) {
         this.deleteEventListener = listener;
+    }
+    private void saveQRCodeToCameraRoll(Bitmap qrCodeBitmap) {
+        // Get the current timestamp to generate a unique file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+
+        //  file name
+        String imageFileName = "QRCode_" + timeStamp + ".jpg";
+
+        File storageDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+
+        File imageFile = new File(storageDirectory, imageFileName);
+
+        // Try to save the bitmap to the file
+        try {
+            FileOutputStream outputStream = new FileOutputStream(imageFile);
+
+            qrCodeBitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+
+            outputStream.flush();
+            outputStream.close();
+            // Notify the MediaScanner about the new image so that it appears in the gallery app
+            MediaScannerConnection.scanFile(
+                    getActivity(),
+                    new String[]{imageFile.getAbsolutePath()},
+                    new String[]{"image/jpeg"},
+                    null
+            );
+
+            // Show a toast message indicating successful saving
+            Toast.makeText(getActivity(), "QR code saved to Gallery", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            // Log the error if saving fails
+            Log.e(TAG, "Error saving QR code to Gallery", e);
+
+            // Show a toast message indicating saving failure
+            Toast.makeText(getActivity(), "Failed to save QR code", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void fillSignedUpAttendeesList(String eventId, ListView attendeesListView) {
