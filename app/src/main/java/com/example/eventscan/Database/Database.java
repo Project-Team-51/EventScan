@@ -105,6 +105,7 @@ public class Database {
     }
 
     public CollectionReference getEventsCollection(){return this.eventsCollection;}
+    public CollectionReference getAnnouncementsCollection(){return this.announcementsCollection;}
     public CollectionReference getAttendeeCollection(){return this.attendeeCollection;}
     public CollectionReference getQrLinkCollection(){return this.attendeeCollection;}
 

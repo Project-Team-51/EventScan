@@ -53,11 +53,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class EventFragment extends Fragment implements DeleteEvent.DeleteEventListener, SendNotificationFragment.SendNotificationListener{
     private ListView ownedEventsListView;
     private ListView inEventsListView;
-    private ArrayList<Event> ownedEvents;
+    private ListView notificationsListView;
     private String userType;
+    private ArrayList<Event> ownedEvents;
     private ArrayList<Event> inEvents;
+    private ArrayList<Event> notifications;
     private EventArrayAdapter ownedEventsAdapter;
     private EventArrayAdapter inEventsAdapter;
+    private EventArrayAdapter notificationsAdapter;
+
     private CollectionReference eventsCollection;
     private boolean isNotifyMode = false;
     private boolean isEventsMode = true;
@@ -86,7 +90,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             case "Organizer":
                 if (isNotifyMode){
                     textView.setText("Select Event");
-                    textView2.setText("Event Announcements");
+                    textView2.setText("Notification Center");
                 } else {
                     textView.setText("Your Events");
                 }
@@ -102,12 +106,16 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 
         ownedEvents = new ArrayList<>();
         inEvents = new ArrayList<>();
+        notifications = new ArrayList<>();
+
         Map<String, String> eventTypeMap = new HashMap<>();
         ownedEventsAdapter = new EventArrayAdapter(getActivity(), R.layout.event_list_content, ownedEvents);
         inEventsAdapter = new EventArrayAdapter(getActivity(), R.layout.event_list_content, inEvents);
+        notificationsAdapter = new EventArrayAdapter(getActivity(), R.layout.event_list_content, inEvents);
 
         ownedEventsListView = view.findViewById(R.id.ownedEvents);
         inEventsListView = view.findViewById(R.id.inEvents);
+        notificationsListView = view.findViewById(R.id.inEvents);
 
         ownedEventsListView.setAdapter(ownedEventsAdapter);
         inEventsListView.setAdapter(inEventsAdapter);

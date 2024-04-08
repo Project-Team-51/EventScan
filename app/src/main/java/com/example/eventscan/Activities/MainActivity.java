@@ -6,6 +6,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
@@ -23,6 +24,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.eventscan.Database.Database;
+import com.example.eventscan.Entities.Announcement;
+import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.DeviceID;
 import com.example.eventscan.Fragments.AddEvent;
 import com.example.eventscan.Fragments.AllPicFrag;
@@ -34,21 +37,25 @@ import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
+import com.google.common.reflect.TypeToken;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -71,7 +78,12 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
     private ImageButton buttonAllPic;
     private ImageButton buttonAllProfile;
     private CollectionReference eventsCollection;
+    private CollectionReference annoucementsCollection;
     private Database db;
+    private ArrayList<String> notifiedEvents = new ArrayList<>(); // ArrayList to store IDs of events for which notifications have been sent
+    private SharedPreferences sharedPreferences;
+    private static final String NOTIFIED_EVENTS_KEY = "notified_events";
+
 
 
     @Override
@@ -187,10 +199,15 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
             }
         });
 
-        db = Database.getInstance();
+        sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        String notifiedEventsJson = sharedPreferences.getString(NOTIFIED_EVENTS_KEY, "");
+        if (!notifiedEventsJson.isEmpty()) {
+            notifiedEvents = new Gson().fromJson(notifiedEventsJson, new TypeToken<ArrayList<String>>(){}.getType());
+        }
 
+        db = Database.getInstance();
         eventsCollection = db.getEventsCollection();
-//        try {
+
         eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
@@ -202,19 +219,64 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                     for (QueryDocumentSnapshot doc : querySnapshots) {
                         Event event = doc.toObject(Event.class);
                         String deviceID = DeviceID.getDeviceID(getApplicationContext());
-                        if (event.getAttendeeLimit() == 200) { // test if statement
-                        // below is actual if statement
-                        // if (event.getCheckedInAttendeesList().size() == event.getAttendeeLimit() && event.getOrganizer().getDeviceID() == deviceID) {
-                            makeNotification(event);
+                        ///////////////////////////////////////////////////////////////
+                        // && event.getOrganizer().getDeviceID() == deviceID
+                        if (!notifiedEvents.contains(event.getEventID()) && event.getAttendeeLimit() == 23 ) { // test if statement
+                            Log.d("MainActivity", "Notification sent for event: " + event.getEventID());
+                            // below is actual if statement
+                        //if (event.getInterestedAttendees().size() == event.getAttendeeLimit() && event.getOrganizer().getDeviceID() == deviceID) {
+                            notifiedEvents.add(event.getEventID());// to prevent notification from being sent multiple times
+                            makeNotification(event, "This event has reached its full capacity!");
+                            for (int i = 0; i < notifiedEvents.size(); i++) {
+                                Log.d("MainActivity", "Event ID in notified events: " + notifiedEvents.get(i));
+
+                            }
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString(NOTIFIED_EVENTS_KEY, new Gson().toJson(notifiedEvents));
+                            editor.apply();
+
+
                         }
                     }
                 }
             }
         });
-//        } catch (NullPointerException npe) {
-//            Log.e("Firestore", "ERROR");
-//
-//        }
+
+        db = Database.getInstance();
+        annoucementsCollection = db.getAnnouncementsCollection();
+
+//        announcementsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+//                if (error != null) {
+//                    Log.e("Firestore", error.toString());
+//                    return;
+//                }
+//                if (querySnapshots != null) { // if there is an update then..
+//                    for (QueryDocumentSnapshot doc : querySnapshots) {
+//                        Announcement announcement = doc.toObject(Announcement.class);
+//                        String eventId = doc.getId();
+//                        // Retrieve the event corresponding to this announcement
+//                        owner.events.get(eventId).addOnCompleteListener(eventTask -> {
+//                            if (eventTask.isSuccessful()) {
+//                                Event event = eventTask.getResult();
+//                                // Iterate through checked-in attendees list
+//                                for (Attendee attendee : event.getCheckedInAttendeesList()) {
+//                                    sendNotificationToAttendee(attendee, announcement.getMessage());
+//                                }
+//                                // Iterate through interested attendee list
+//                                for (Attendee attendee : event.getInterestedAttendeesList()) {
+//                                    sendNotificationToAttendee(attendee, announcement.getMessage());
+//                                }
+//                            } else {
+//                                Log.e("Firestore", "Error fetching event: " + eventTask.getException());
+//                            }
+//                        });
+//                    }
+//                }
+//            }
+//        });
+
     }
 
     /**
@@ -264,12 +326,12 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
         loadFragment(eventFragment);
     }
 
-    public void makeNotification(Event event){
+    public void makeNotification(Event event, String description){
         String notificationID = "NOTIFICATION_ID";
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), notificationID);
         builder.setSmallIcon(R.drawable.notification)
                 .setContentTitle(event.getName()) // event name should go here
-                .setContentText("This event has reached full capacity!")
+                .setContentText(description)
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
