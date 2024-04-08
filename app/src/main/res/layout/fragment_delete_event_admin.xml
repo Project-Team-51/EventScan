@@ -126,7 +126,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="30dp"
         android:backgroundTint="#414E6E"
-        android:text="Get Details QR"
+        android:text="Get SIGN-UP QR"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signups_button" />
 
@@ -169,10 +169,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/confirmEvent"
         />
-    
+
     <ImageView
         android:id="@+id/posterView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="174dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
@@ -182,7 +182,8 @@
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toEndOf="@+id/confirmEvent"
         app:layout_constraintTop_toBottomOf="@+id/return2"
-        app:layout_constraintVertical_bias="0.043" />
+        app:layout_constraintVertical_bias="0.043"
+        app:layout_constraintWidth_max="160dp" />
 
     <Switch
         android:id="@+id/attendeeLimit"

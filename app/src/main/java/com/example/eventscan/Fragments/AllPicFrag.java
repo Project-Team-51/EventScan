@@ -30,6 +30,7 @@ public class AllPicFrag extends Fragment {
 
     // Get reference to the directory containing the images
     StorageReference imagesRef = storageRef.child("profile_pics");
+    StorageReference imagesRef2 = storageRef.child("poster_pics");
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_images, container, false);
@@ -52,6 +53,15 @@ public class AllPicFrag extends Fragment {
 
     private void loadImagesFromFirebaseStorage() {
         // Retrieve all images from Firebase Storage
+        imagesRef2.listAll().addOnSuccessListener(listResult -> {
+            for (StorageReference item : listResult.getItems()) {
+                item.getDownloadUrl().addOnSuccessListener(uri -> {
+                    imageList.add(uri);
+                    imageAdapter.notifyDataSetChanged();
+                });
+            }
+        }).addOnFailureListener(e -> {
+        });
         imagesRef.listAll().addOnSuccessListener(listResult -> {
             for (StorageReference item : listResult.getItems()) {
                 item.getDownloadUrl().addOnSuccessListener(uri -> {

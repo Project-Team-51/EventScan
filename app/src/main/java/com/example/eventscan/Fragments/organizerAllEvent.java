@@ -66,11 +66,9 @@ public class organizerAllEvent extends DialogFragment {
         retrieveEventsFromFirestore();
 
         dialog.setContentView(view);
-        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        WindowManager.LayoutParams layoutParams = dialog.getWindow().getAttributes();
-        layoutParams.dimAmount = 0.7f; // Adjust this value as needed
-        dialog.getWindow().setAttributes(layoutParams);
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
 
         returnButton.setOnClickListener(v -> dismiss());
 
