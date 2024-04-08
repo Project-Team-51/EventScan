@@ -5,6 +5,7 @@ import static android.view.View.GONE;
 import android.app.Dialog;
 import android.content.Context;
 import android.media.Image;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -17,12 +18,14 @@ import androidx.camera.core.ExperimentalGetImage;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.UseCase;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.QRDatabaseEventLink;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.DeviceID;
 import com.example.eventscan.Entities.Event;
+import com.example.eventscan.Fragments.ViewEvent;
 import com.example.eventscan.R;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -50,12 +53,15 @@ public class QRAnalyzer{
     Task<Attendee> selfAttendeeTask = null;
     Attendee selfAttendee = null;
 
-    public QRAnalyzer(Context context){
+    FragmentManager parentFragmentManager;
+
+    public QRAnalyzer(Context context, FragmentManager parentFragmentManager){
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                         .setBarcodeFormats(Barcode.FORMAT_QR_CODE).build();
         scanner = BarcodeScanning.getClient(options);
         this.context = context;
+        this.parentFragmentManager = parentFragmentManager;
         db = Database.getInstance();
         String deviceID = DeviceID.getDeviceID(context);
         selfAttendeeTask = db.attendees.get(deviceID).addOnSuccessListener(attendee -> {
@@ -221,51 +227,64 @@ public class QRAnalyzer{
     }
 
     private void createSignUpInterestDialog(String eventID){
-        Dialog interestDialog = new Dialog(context);
-        interestDialog.setContentView(R.layout.fragment_event_sign_in);
-        interestDialog.setCancelable(true);
-        Log.d("QR Analyzer", "creating sign up dialog for "+eventID);
-        if(selfAttendee == null){
-            selfAttendee = new Attendee();
-            selfAttendee.setDeviceID(DeviceID.getDeviceID(context));
-        }
-        Database.getInstance().events.get(eventID)
-                .addOnCompleteListener(task -> {
-                    if(task.isSuccessful()) {
-                        Event event = task.getResult();
-                        TextView dialogTitle = interestDialog.findViewById(R.id.sign_in_event_name);
-                        TextView dialogDescription = interestDialog.findViewById(R.id.sign_in_event_description);
-                        Button dialogButton = interestDialog.findViewById(R.id.sign_in_sign_in_button);
+        db.events.get(eventID).addOnSuccessListener(event -> {
+            ViewEvent viewEventFragment = new ViewEvent();
+            // Create a Bundle and put the selected Event information
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("selectedEvent", event);
+            viewEventFragment.setArguments(bundle);
+            // Show the DeleteEvent fragment
+            viewEventFragment.show(parentFragmentManager, "ViewEventFragment");
 
-                        dialogTitle.setText("Details of " + event.getName());
-                        dialogDescription.setText(event.getName());
-                        dialogButton.setText(R.string.event_sign_up_interest_button_text);
-                        dialogButton.setVisibility(View.VISIBLE);
-                        dialogButton.setOnClickListener(v -> {
-                            event.addInterestedAttendee(selfAttendee);
-                            db.events.addInterestedAttendee(event, selfAttendee).addOnCompleteListener(task1 -> {
-                                if(task.isSuccessful()) {
-                                    dialogButton.setEnabled(false);
-                                    dialogButton.setText(R.string.event_sign_up_success);
-                                } else {
-                                    Log.e("QR SCAN", Database.getTaskException(task1).toString());
-                                    dialogDescription.setText(R.string.event_sign_up_failure_description);
-                                    dialogButton.setText(R.string.event_sign_up_failure_exit);
-                                    dialogButton.setOnClickListener(v1 -> {
-                                        // https://stackoverflow.com/questions/17719634/how-to-exit-an-android-app-programmatically
-                                        System.exit(1);
-                                    });
-                                }
-                            });
-                        });
-                    } else {
-                        Log.e("QR SCAN", "Event "+eventID+" not found in firebase");
-                        Log.e("QR SCAN", Database.getTaskException(task).toString());
-                        ((TextView) interestDialog.findViewById(R.id.sign_in_event_name)).setText("Event "+eventID);
-                        ((TextView) interestDialog.findViewById(R.id.sign_in_event_description)).setText("Not found\n(you may be offline)");
-                    }
-                });
-        interestDialog.show();
+        }).addOnFailureListener(e -> {
+            createFailureFetchDialog();
+        });
+
+//        Dialog interestDialog = new Dialog(context);
+//        interestDialog.setContentView(R.layout.fragment_event_sign_in);
+//        interestDialog.setCancelable(true);
+//        Log.d("QR Analyzer", "creating sign up dialog for "+eventID);
+//        if(selfAttendee == null){
+//            selfAttendee = new Attendee();
+//            selfAttendee.setDeviceID(DeviceID.getDeviceID(context));
+//        }
+//        Database.getInstance().events.get(eventID)
+//                .addOnCompleteListener(task -> {
+//                    if(task.isSuccessful()) {
+//                        Event event = task.getResult();
+//                        TextView dialogTitle = interestDialog.findViewById(R.id.sign_in_event_name);
+//                        TextView dialogDescription = interestDialog.findViewById(R.id.sign_in_event_description);
+//                        Button dialogButton = interestDialog.findViewById(R.id.sign_in_sign_in_button);
+//
+//                        dialogTitle.setText("Details of " + event.getName());
+//                        dialogDescription.setText(event.getName());
+//                        dialogButton.setText(R.string.event_sign_up_interest_button_text);
+//                        dialogButton.setVisibility(View.VISIBLE);
+//                        dialogButton.setOnClickListener(v -> {
+//                            event.addInterestedAttendee(selfAttendee);
+//                            db.events.addInterestedAttendee(event, selfAttendee).addOnCompleteListener(task1 -> {
+//                                if(task.isSuccessful()) {
+//                                    dialogButton.setEnabled(false);
+//                                    dialogButton.setText(R.string.event_sign_up_success);
+//                                } else {
+//                                    Log.e("QR SCAN", Database.getTaskException(task1).toString());
+//                                    dialogDescription.setText(R.string.event_sign_up_failure_description);
+//                                    dialogButton.setText(R.string.event_sign_up_failure_exit);
+//                                    dialogButton.setOnClickListener(v1 -> {
+//                                        // https://stackoverflow.com/questions/17719634/how-to-exit-an-android-app-programmatically
+//                                        System.exit(1);
+//                                    });
+//                                }
+//                            });
+//                        });
+//                    } else {
+//                        Log.e("QR SCAN", "Event "+eventID+" not found in firebase");
+//                        Log.e("QR SCAN", Database.getTaskException(task).toString());
+//                        ((TextView) interestDialog.findViewById(R.id.sign_in_event_name)).setText("Event "+eventID);
+//                        ((TextView) interestDialog.findViewById(R.id.sign_in_event_description)).setText("Not found\n(you may be offline)");
+//                    }
+//                });
+//        interestDialog.show();
     }
 
     /**
