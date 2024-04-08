@@ -88,7 +88,7 @@ public class CheckInsListFragment extends DialogFragment {
                             db.attendees.get(attendeeID)
                                     .addOnSuccessListener(attendee -> {
                                         // Construct attendee information string with name and check-in count
-                                        String attendeeInfo = attendee.getName() + " : Checked In #: " + checkInCount;
+                                        String attendeeInfo = attendee.getName() + " : Checked In " + checkInCount + " times";
                                         // Add attendee information to the list
                                         attendeeInfoList.add(attendeeInfo);
 
