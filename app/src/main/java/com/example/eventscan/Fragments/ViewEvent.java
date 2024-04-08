@@ -80,8 +80,10 @@ public class ViewEvent extends DialogFragment {
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         db = Database.getInstance();
+
         ConstraintLayout constraintLayout = view.findViewById(R.id.status_event_container);
         constraintLayout.setVisibility(View.GONE);
+
 
         StorageReference storageRef = storage.getReference().child("poster_pics");
         StorageReference posterRef = storageRef.child(selectedEvent.getEventID());
@@ -89,6 +91,7 @@ public class ViewEvent extends DialogFragment {
         posterRef.getDownloadUrl()
                 .addOnSuccessListener(uri -> {
                             // Load the profile picture using an image loading library
+                            Log.d("POSTER", selectedEvent.getEventID());
                             Glide.with(this)
                                     .load(uri)
                                     .error(R.drawable.profile_icon) // Image to display in case of error

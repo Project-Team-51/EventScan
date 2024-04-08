@@ -28,14 +28,16 @@ import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.DeviceID;
 import com.bumptech.glide.Glide;
 import com.example.eventscan.Entities.Event;
+import com.example.eventscan.Helpers.GeolocationHandler;
 import com.example.eventscan.R;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.example.eventscan.Helpers.UserArrayAdapter;
 
-
 import java.util.ArrayList;
 import java.util.List;
+
+
 import java.util.Objects;
 /*
  * A simple dialogfragment that displays some basic info about the Event that is passed into it, and gives
@@ -98,12 +100,13 @@ public class DeleteEvent extends DialogFragment {
         Button delEvent = view.findViewById(R.id.confirmEvent);
         Button returnAdmin = view.findViewById(R.id.return2);
         Button signupButton = view.findViewById(R.id.signup_button);
+        Button showMap = view.findViewById(R.id.showmap_button);
         Button signupsButton = view.findViewById(R.id.signups_button);
 
         db = Database.getInstance();
 
         userType = DeviceID.getUserType(requireContext());
-        if (userType.equals("Organizer")) {
+        if (userType.equals("Admin")) {
             signupButton.setVisibility(View.GONE);
         }
 
@@ -141,6 +144,12 @@ public class DeleteEvent extends DialogFragment {
             }
         });
 
+        showMap.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                // ENTER ARRAY LIST HERE
+                openMapView(selectedEvent);
+            }
+        });
         signupButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,7 +158,7 @@ public class DeleteEvent extends DialogFragment {
                 db.attendees.get(deviceID)  // Needs to be changed to reflect admins
                         .addOnSuccessListener(attendee -> {
                             selfAttendee = attendee;
-                            // Check if selfAttendee is fetched successfully
+                            // Check if selfAttendee is retrieved successfully
                             if (selfAttendee != null) {
                                 String eventID = selectedEvent.getEventID();
                                 db.events.get(eventID)
@@ -204,6 +213,16 @@ public class DeleteEvent extends DialogFragment {
         Objects.requireNonNull(dialog.getWindow()).setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
         return dialog;
+    }
+
+    private void openMapView(Event selectedEvent){
+        ViewMap viewMapFragment = new ViewMap();
+        // Create a Bundle and put the selected Event information
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("selectedEvent", selectedEvent);
+        viewMapFragment.setArguments(bundle);
+        // Show the ViewMap fragment
+        viewMapFragment.show(getParentFragmentManager(), "ViewMapFragment");
     }
 
     /**

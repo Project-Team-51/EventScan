@@ -123,7 +123,7 @@ public class DatabaseTest extends Database {
                 eventIDTest
         );
         event1.setAttendeeLimit(15);
-        db.attendees.set(organizer1);
+        Tasks.await(db.attendees.set(organizer1));
         Attendee attendee = new Attendee();
         attendee.setName("Event added test Attendee");
         attendee.setBio("event added test bio");
