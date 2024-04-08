@@ -268,6 +268,7 @@ public class QRAnalyzer{
      */
     public UseCase getUseCase(){
         //https://beakutis.medium.com/using-googles-mlkit-and-camerax-for-lightweight-barcode-scanning-bb2038164cdc
+        //https://developers.google.com/ml-kit/vision/barcode-scanning/android
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
         imageAnalysis.setAnalyzer(
                 Executors.newSingleThreadExecutor(),
