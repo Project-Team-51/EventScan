@@ -637,6 +637,22 @@ public class Database {
         }
 
         /**
+         * Set a QR code's direction type and destination
+         * @param decoded_qr_data the decoded data of the QR code you are setting the link from
+         * @param eventLink eventLink you want to set
+         * @return a Task that contains QR data when completed
+         */
+        public Task<String> set(String decoded_qr_data, QRDatabaseEventLink eventLink){
+            return qrLinkCollection
+                    .document(decoded_qr_data)
+                    .set(eventLink).continueWith(task -> {
+                        return decoded_qr_data;
+                    });
+        }
+
+
+
+        /**
          * delete the link between this QR code and anything it points to
          * @param decoded_qr_data decoded data of the QR code to delete the link from
          * @return a task that will be resolved when the database write is complete or failed

@@ -44,7 +44,7 @@ public class QrScannerFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        analyzer = new QRAnalyzer(requireContext(), getParentFragmentManager());
+        analyzer = new QRAnalyzer(requireContext(), getParentFragmentManager(), false);
         cameraProviderFuture = ProcessCameraProvider.getInstance(this.requireContext());
         View view = getLayoutInflater().inflate(R.layout.scan_qr_layout, container, false);
         previewView = view.findViewById(R.id.CameraPreview);
@@ -75,11 +75,10 @@ public class QrScannerFragment extends Fragment {
 
     /**
      * Checks for camera permissions and requests them if not granted.
-     *
+     * shoudln't be public but needed for a hotfix
      * @param context The context from which permissions are checked and requested.
      */
-
-    private static void checkCameraPermissions(Context context){
+    public static void checkCameraPermissions(Context context){
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             // need to ask for permission
             ActivityCompat.requestPermissions((Activity) context, new String[] {Manifest.permission.CAMERA }, 100);
