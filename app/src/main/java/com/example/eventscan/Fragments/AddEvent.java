@@ -36,6 +36,7 @@ import com.example.eventscan.Activities.UserSelection;
 
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.QRDatabaseEventLink;
+import com.example.eventscan.Entities.DeviceID;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Helpers.QrCodec;
 import com.example.eventscan.Entities.Organizer;
@@ -85,9 +86,10 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (getArguments() != null) {
-            deviceID = getArguments().getString("DEVICE_ID");
-        }
+//        if (getArguments() != null) {
+//            deviceID = getArguments().getString("DEVICE_ID");
+//        }
+        deviceID = DeviceID.getDeviceID(requireContext());
         event = new Event();
         View view = inflater.inflate(R.layout.add_event, container, false);
         EditText eventName = view.findViewById(R.id.add_edit_event_Name);
@@ -233,7 +235,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                 event.setDesc(eventDesc);
                 event.setName(eventName);
                 event.setPoster(posterUriString);
-                // TODO fetch the organizer first just in case
+
                 organizer = new Organizer();
                 organizer.setDeviceID(deviceID);
                 event.setOrganizer(organizer);
