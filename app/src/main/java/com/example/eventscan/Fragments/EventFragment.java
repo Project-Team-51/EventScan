@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import android.widget.TextView;
@@ -64,10 +65,9 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         View view = inflater.inflate(R.layout.admin_observer_fragment, container, false);
         Bundle bundle = this.getArguments();
         TextView textView = (TextView) view.findViewById(R.id.yourEventsText);
-
+        Button allEventButton = view.findViewById(R.id.allEventButton);
         String myDeviceID = DeviceID.getDeviceID(requireContext());
         Log.d("DeviceID", "Device ID: " + myDeviceID);
-
         // Get reference to the TextView
 
 
@@ -80,8 +80,11 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             case "Admin":
             case "Attendee":
                 textView.setText("All Events");
+                allEventButton.setVisibility(View.GONE);
                 break;
         }
+
+
 
         ownedEvents = new ArrayList<>();
         inEvents = new ArrayList<>();
@@ -174,6 +177,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             }
         });
 
+
         ownedEventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -186,6 +190,15 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                 }
             }
         });
+
+        allEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                organizerAllEvent viewEventFragment = new organizerAllEvent();
+                viewEventFragment.show(getParentFragmentManager(), "ViewEventFragment");
+            }
+        });
+
         inEventsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -206,6 +219,10 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         // Show the DeleteEvent fragment
         viewEventFragment.show(getParentFragmentManager(), "ViewEventFragment");
     }
+
+
+
+
 
     private void openAttendingView(Event selectedEvent, Map<String, String> eventTypeMap) {
         AttendingEvent attendingEventFragment = new AttendingEvent(eventTypeMap);

@@ -68,10 +68,10 @@ public class AttendingEvent extends DialogFragment {
         TextView statusTextView = view.findViewById(R.id.status_event);
         switch (eventType) {
             case "interested":
-                statusTextView.setText("Interested");
+                statusTextView.setText("Check in Status:\n Interested");
                 break;
             case "checked_in":
-                statusTextView.setText("Checked In");
+                statusTextView.setText("Check in Status:\n  Checked In");
                 break;
         }
         StorageReference storageRef = storage.getReference().child("poster_pics");
