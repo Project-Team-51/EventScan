@@ -70,7 +70,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
         <ImageView
             android:id="@+id/poster_view"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="174dp"
             android:layout_marginTop="15dp"
             android:layout_alignParentStart="true"
@@ -78,7 +78,9 @@
             android:layout_gravity="center_horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/bubbleContainer2"
-            app:layout_constraintStart_toEndOf="@id/return_view"/>
+            app:layout_constraintStart_toEndOf="@id/return_view"
+            app:layout_constraintWidth_max="160dp"/>
+
     <!-- Buttons -->
         <Button
             android:id="@+id/return_view"
