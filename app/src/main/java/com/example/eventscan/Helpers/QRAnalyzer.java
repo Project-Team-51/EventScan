@@ -136,12 +136,26 @@ public class QRAnalyzer{
     }
 
     private void createScanResultDialog(QRDatabaseEventLink link){
+        if(link == null){
+            createFailureFetchDialog();
+            return;
+        }
         switch(link.getDirectionType()){
             case QRDatabaseEventLink.DIRECT_CHECK_IN:
                 //TODO
             case QRDatabaseEventLink.DIRECT_SEE_DETAILS:
                 createCheckInDialog(link.getDirectedEventID());
         }
+    }
+
+    private void createFailureFetchDialog(){
+        Dialog failure = new Dialog(context);
+        failure.setContentView(R.layout.fragment_event_sign_in);
+        failure.setCancelable(true);
+        ((TextView) failure.findViewById(R.id.sign_in_event_name)).setText("Error");
+        ((TextView) failure.findViewById(R.id.sign_in_event_description)).setText("This event code doesn't exist in our system. Please ask the organizer of this event for a new code");
+        ((Button) failure.findViewById(R.id.sign_in_sign_in_button)).setVisibility(GONE);
+        failure.show();
     }
 
     /**
