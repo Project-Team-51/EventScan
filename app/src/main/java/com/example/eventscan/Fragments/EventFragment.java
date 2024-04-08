@@ -114,6 +114,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                     return;
                 }
                 if (querySnapshots != null) { // if there is an update then..
+
                     ownedEvents.clear();
                     inEvents.clear();
                     ArrayList<Task<Event>> updateTasks = new ArrayList<>();

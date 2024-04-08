@@ -670,12 +670,6 @@ public class Database {
             });
         }
 
-        private class GeoPointsFetcher implements Serializable {
-            ArrayList<GeoPoint> check_in_pings;
-            private GeoPointsFetcher(){};
-
-        }
-
         public Task<ArrayList<GeoPoint>> getEventCheckinPoints(Event event) {
 
             return geolocationStorageCollection.document(event.getEventID()).get().continueWithTask(task1 -> {
@@ -722,7 +716,7 @@ public class Database {
                 }
                 if(task.getResult().exists()){
                     HashMap<String,Announcement> fetchedAnnouncements = (HashMap<String,Announcement>)task.getResult().get("announcements");
-                    Long newAnnouncementIndex = fetchedAnnouncements.keySet().size()-1L;
+                    Long newAnnouncementIndex = (long) fetchedAnnouncements.keySet().size();
                     return owner.announcementsCollection.document(event.getEventID()).update(
                             FieldPath.of("announcements",String.valueOf(newAnnouncementIndex)),
                             announcement);

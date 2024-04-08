@@ -106,7 +106,7 @@ public class DeleteEvent extends DialogFragment {
         db = Database.getInstance();
 
         userType = DeviceID.getUserType(requireContext());
-        if (userType.equals("Organizer")) {
+        if (userType.equals("Admin")) {
             signupButton.setVisibility(View.GONE);
         }
 
@@ -158,7 +158,7 @@ public class DeleteEvent extends DialogFragment {
                 db.attendees.get(deviceID)  // Needs to be changed to reflect admins
                         .addOnSuccessListener(attendee -> {
                             selfAttendee = attendee;
-                            // Check if selfAttendee is fetched successfully
+                            // Check if selfAttendee is retrieved successfully
                             if (selfAttendee != null) {
                                 String eventID = selectedEvent.getEventID();
                                 db.events.get(eventID)

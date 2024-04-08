@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -21,6 +22,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.eventscan.Database.Database;
+import com.example.eventscan.Entities.DeviceID;
 import com.example.eventscan.Fragments.AddEvent;
 import com.example.eventscan.Fragments.AllPicFrag;
 import com.example.eventscan.Fragments.AttendeeFragment;
@@ -29,12 +32,23 @@ import com.example.eventscan.Fragments.ProfileFragment;
 import com.example.eventscan.Fragments.QrScannerFragment;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 
@@ -55,15 +69,18 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
     private ImageButton buttonNotify;
     private ImageButton buttonAllPic;
     private ImageButton buttonAllProfile;
+    private CollectionReference eventsCollection;
+    private Database db;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-            if(ContextCompat.checkSelfPermission(MainActivity.this,
-                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(MainActivity.this,
+                    Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
 
                 ActivityCompat.requestPermissions(MainActivity.this,
                         new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
@@ -168,9 +185,28 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                 loadFragment(picFrag);
             }
         });
+
+        db = Database.getInstance();
+
+        eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                if (querySnapshots != null) { // if there is an update then..
+                    for (QueryDocumentSnapshot doc : querySnapshots) {
+                        Event event = (Event) querySnapshots.toObjects(Event.class);
+                        String deviceID = DeviceID.getDeviceID(getApplicationContext());
+                        if (event.getCheckedInAttendeesList().size() == event.getAttendeeLimit() && event.getOrganizer().getDeviceID() == deviceID) {
+                            makeNotification(event);
+                        }
+                    }
+                }
+            }
+        });
     }
-
-
 
     /**
      * Load the specified fragment into the fragment container view.
@@ -224,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), notificationID);
         builder.setSmallIcon(R.drawable.notification)
                 .setContentTitle(event.getName()) // event name should go here
-                .setContentText("EVENT DESCRIPTION")
+                .setContentText("This event has reached full capacity!")
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
@@ -247,8 +283,11 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
 
         notificationManager.notify(0,builder.build());
 
-
     }
+
+
+
+
 
 
 }

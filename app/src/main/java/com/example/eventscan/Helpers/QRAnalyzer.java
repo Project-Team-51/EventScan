@@ -18,6 +18,7 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.UseCase;
 
+import com.example.eventscan.Activities.MainActivity;
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.QRDatabaseEventLink;
 import com.example.eventscan.Entities.Attendee;
@@ -52,6 +53,7 @@ public class QRAnalyzer{
     Database db;
     Task<Attendee> selfAttendeeTask = null;
     Attendee selfAttendee = null;
+
 
     public QRAnalyzer(Context context){
         BarcodeScannerOptions options =
@@ -150,6 +152,7 @@ public class QRAnalyzer{
      * @param eventID       The ID of the event.
      */
     private void createCheckInDialog(String eventID){
+
         Dialog eventSignIn = new Dialog(context);
         eventSignIn.setContentView(R.layout.fragment_event_sign_in);
         eventSignIn.setCancelable(true);
@@ -193,6 +196,10 @@ public class QRAnalyzer{
                                 if(task1.isSuccessful()){
                                     dialogDescription.setText("Check-in Successful!\n You can now safely go to another screen");
                                     dialogButton.setVisibility(GONE);
+                                    if (event.getAttendeeLimit() == event.getCheckedInAttendeesList().size()) {
+                                        // Event is full, i want to send a push notification to organizer that event is full
+                                        return;
+                                    }
                                 } else {
                                     Log.e("QR SCAN", Database.getTaskException(task1).toString());
                                     dialogDescription.setText("Check-in Failed\nPlease relaunch the app and try again");
@@ -211,6 +218,8 @@ public class QRAnalyzer{
                         ((TextView) eventSignIn.findViewById(R.id.sign_in_event_description)).setText("Not found\n(you may be offline)");
                     }
                 });
+
+
 
         eventSignIn.show();
     }
