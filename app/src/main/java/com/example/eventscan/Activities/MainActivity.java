@@ -250,6 +250,45 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
         db = Database.getInstance();
         announcementsCollection = db.getAnnouncementsCollection();
 
+//        announcementsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+//                if (error != null) {
+//                    Log.e("Firestore", error.toString());
+//                    return;
+//                }
+//                String deviceID = DeviceID.getDeviceID(getApplicationContext());
+//                if (querySnapshots != null) {
+//                    for (QueryDocumentSnapshot doc : querySnapshots) {
+//                        String eventID = doc.getId();
+//                        db.events.get(eventID).addOnSuccessListener(event -> {
+//                            Task<ArrayList<Announcement>> announcementListTask = db.announcements.getNotifications(event);
+//                            announcementListTask.addOnSuccessListener(announcementList -> {
+//                                if (!announcementList.isEmpty()) {
+//                                    Announcement latestAnnouncement = announcementList.get(announcementList.size());
+//
+//                                    for (Attendee attendee : event.getInterestedAttendees()) {
+//                                        Log.d("MainActivity", "Organizer id: " + event.getOrganizer().getDeviceID() + "AND Current id: " + deviceID);
+//                                        if (attendee.getDeviceID().equals(deviceID) || event.getOrganizer().getDeviceID().equals(deviceID)) {
+//                                            Log.d("MainActivity", "Organizer id: " + event.getOrganizer().getDeviceID() + "AND Current id: " + deviceID);
+//                                            makeNotification(event, latestAnnouncement.getMessage());
+//                                        }
+//
+//                                    }
+//                                } else {
+//                                    Log.d("MainActivity",  "FAILING");
+//                                }
+//                            }).addOnFailureListener(e -> {
+//                                Log.e("Firestore", "Failed to fetch announcements: " + e.getMessage());
+//                            });
+//                        }).addOnFailureListener(e -> {
+//                            Log.e("Firestore", "Failed to fetch event: " + e.getMessage());
+//                        });
+//                    }
+//                }
+//            }
+//        });
+
         announcementsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
@@ -262,21 +301,25 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                     for (QueryDocumentSnapshot doc : querySnapshots) {
                         String eventID = doc.getId();
                         db.events.get(eventID).addOnSuccessListener(event -> {
-                            Task<ArrayList<Announcement>> announcementListTask = db.announcements.getNotifications(event);
-                            announcementListTask.addOnSuccessListener(announcementList -> {
-                                if (!announcementList.isEmpty()) {
-                                    Announcement latestAnnouncement = announcementList.get(announcementList.size());
-
-                                    for (Attendee attendee : event.getInterestedAttendees()) {
-                                        Log.d("MainActivity", "Organizer id: " + event.getOrganizer().getDeviceID() + "AND Current id: " + deviceID);
-                                        if (attendee.getDeviceID().equals(deviceID) || event.getOrganizer().getDeviceID().equals(deviceID)) {
-                                            Log.d("MainActivity", "Organizer id: " + event.getOrganizer().getDeviceID() + "AND Current id: " + deviceID);
-                                            makeNotification(event, latestAnnouncement.getMessage());
+                            db.announcements.getNotifications(event).addOnSuccessListener(announcementList -> {
+                                // Check if the document exists and contains the announcements field
+                                if (doc.exists() && doc.contains("announcements")) {
+                                    // Get the announcements HashMap from the document
+                                    HashMap<String, Object> announcementsMap = (HashMap<String, Object>) doc.get("announcements");
+                                    // Iterate over the announcements and create Announcement objects
+                                    for (Map.Entry<String, Object> entry : announcementsMap.entrySet()) {
+                                        String announcementMessage = entry.getValue().toString();
+                                        // Create Announcement object from the message
+                                        Announcement announcement = new Announcement(announcementMessage); // Modify as per your Announcement class
+                                        // Process the announcement further or send notification
+                                        for (Attendee attendee : event.getInterestedAttendees()) {
+                                            if (attendee.getDeviceID().equals(deviceID) || event.getOrganizer().getDeviceID().equals(deviceID)) {
+                                                makeNotification(event, announcement.getMessage());
+                                            }
                                         }
-
                                     }
                                 } else {
-                                    Log.d("MainActivity",  "FAILING");
+                                    Log.d("Firestore", "Announcements field not found or document doesn't exist");
                                 }
                             }).addOnFailureListener(e -> {
                                 Log.e("Firestore", "Failed to fetch announcements: " + e.getMessage());
@@ -288,8 +331,8 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                 }
             }
         });
-//
-//
+
+
     }
 
     /**

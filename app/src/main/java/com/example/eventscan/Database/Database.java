@@ -31,6 +31,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import kotlin.NotImplementedError;
 
@@ -784,8 +785,7 @@ public class Database {
         }
 
         public Task<ArrayList<Announcement>> getNotifications(Event event) {
-            return owner.announcementsCollection
-                    .document(event.getEventID())
+            return owner.announcementsCollection.document(event.getEventID())
                     .collection("announcements")
                     .get()
                     .continueWith(task -> {
@@ -816,6 +816,9 @@ public class Database {
 //                        return Tasks.forResult(toReturnAnnouncements);
 //                    });
 //        }
+
+
+
 
     }
 
