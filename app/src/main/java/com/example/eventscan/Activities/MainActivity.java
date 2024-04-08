@@ -51,8 +51,10 @@ import android.app.NotificationManager;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.Set;
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
     private ImageButton buttonAllPic;
     private ImageButton buttonAllProfile;
     private CollectionReference eventsCollection;
-    private CollectionReference annoucementsCollection;
+    private CollectionReference announcementsCollection;
     private Database db;
     private ArrayList<String> notifiedEvents = new ArrayList<>(); // ArrayList to store IDs of events for which notifications have been sent
     private SharedPreferences sharedPreferences;
@@ -246,40 +248,48 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
         });
 
         db = Database.getInstance();
-        annoucementsCollection = db.getAnnouncementsCollection();
+        announcementsCollection = db.getAnnouncementsCollection();
 
-//        announcementsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
-//            @Override
-//            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
-//                if (error != null) {
-//                    Log.e("Firestore", error.toString());
-//                    return;
-//                }
-//                if (querySnapshots != null) { // if there is an update then..
-//                    for (QueryDocumentSnapshot doc : querySnapshots) {
-//                        Announcement announcement = doc.toObject(Announcement.class);
-//                        String eventId = doc.getId();
-//                        // Retrieve the event corresponding to this announcement
-//                        owner.events.get(eventId).addOnCompleteListener(eventTask -> {
-//                            if (eventTask.isSuccessful()) {
-//                                Event event = eventTask.getResult();
-//                                // Iterate through checked-in attendees list
-//                                for (Attendee attendee : event.getCheckedInAttendeesList()) {
-//                                    sendNotificationToAttendee(attendee, announcement.getMessage());
-//                                }
-//                                // Iterate through interested attendee list
-//                                for (Attendee attendee : event.getInterestedAttendeesList()) {
-//                                    sendNotificationToAttendee(attendee, announcement.getMessage());
-//                                }
-//                            } else {
-//                                Log.e("Firestore", "Error fetching event: " + eventTask.getException());
-//                            }
-//                        });
-//                    }
-//                }
-//            }
-//        });
+        announcementsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+                if (error != null) {
+                    Log.e("Firestore", error.toString());
+                    return;
+                }
+                String deviceID = DeviceID.getDeviceID(getApplicationContext());
+                if (querySnapshots != null) {
+                    for (QueryDocumentSnapshot doc : querySnapshots) {
+                        String eventID = doc.getId();
+                        db.events.get(eventID).addOnSuccessListener(event -> {
+                            Task<ArrayList<Announcement>> announcementListTask = db.announcements.getNotifications(event);
+                            announcementListTask.addOnSuccessListener(announcementList -> {
+                                if (!announcementList.isEmpty()) {
+                                    Announcement latestAnnouncement = announcementList.get(announcementList.size());
 
+                                    for (Attendee attendee : event.getInterestedAttendees()) {
+                                        Log.d("MainActivity", "Organizer id: " + event.getOrganizer().getDeviceID() + "AND Current id: " + deviceID);
+                                        if (attendee.getDeviceID().equals(deviceID) || event.getOrganizer().getDeviceID().equals(deviceID)) {
+                                            Log.d("MainActivity", "Organizer id: " + event.getOrganizer().getDeviceID() + "AND Current id: " + deviceID);
+                                            makeNotification(event, latestAnnouncement.getMessage());
+                                        }
+
+                                    }
+                                } else {
+                                    Log.d("MainActivity",  "FAILING");
+                                }
+                            }).addOnFailureListener(e -> {
+                                Log.e("Firestore", "Failed to fetch announcements: " + e.getMessage());
+                            });
+                        }).addOnFailureListener(e -> {
+                            Log.e("Firestore", "Failed to fetch event: " + e.getMessage());
+                        });
+                    }
+                }
+            }
+        });
+//
+//
     }
 
     /**

@@ -783,20 +783,40 @@ public class Database {
             });
         }
 
-        public Task<ArrayList<Announcement>> getNotifications(Event event){
-            return owner.announcementsCollection.document(event.getEventID())
-                    .get().continueWithTask(task -> {
-                        if(!task.isSuccessful()){
-                            return Tasks.forException(getTaskException(task));
+        public Task<ArrayList<Announcement>> getNotifications(Event event) {
+            return owner.announcementsCollection
+                    .document(event.getEventID())
+                    .collection("announcements")
+                    .get()
+                    .continueWith(task -> {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
                         }
-                        HashMap<String,Announcement> fetchedAnnouncements = (HashMap<String, Announcement>)task.getResult().get("announcements");
-                        ArrayList<Announcement> toReturnAnnouncements = new ArrayList<>();
-                        for(long i=0L; i<fetchedAnnouncements.keySet().size(); i++){
-                            toReturnAnnouncements.add(fetchedAnnouncements.get(String.valueOf(i)));
+
+                        ArrayList<Announcement> announcements = new ArrayList<>();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            Announcement announcement = document.toObject(Announcement.class);
+                            announcements.add(announcement);
                         }
-                        return Tasks.forResult(toReturnAnnouncements);
+                        return announcements;
                     });
         }
+
+//        public Task<ArrayList<Announcement>> getNotifications(Event event){
+//            return owner.announcementsCollection.document(event.getEventID())
+//                    .get().continueWithTask(task -> {
+//                        if(!task.isSuccessful()){
+//                            return Tasks.forException(getTaskException(task));
+//                        }
+//                        HashMap<String,Announcement> fetchedAnnouncements = (HashMap<String, Announcement>)task.getResult().get("announcements");
+//                        ArrayList<Announcement> toReturnAnnouncements = new ArrayList<>();
+//                        for(long i=0L; i<fetchedAnnouncements.keySet().size(); i++){
+//                            toReturnAnnouncements.add(fetchedAnnouncements.get(String.valueOf(i)));
+//                        }
+//                        return Tasks.forResult(toReturnAnnouncements);
+//                    });
+//        }
+
     }
 
     public static Exception getTaskException(Task<?> task){
