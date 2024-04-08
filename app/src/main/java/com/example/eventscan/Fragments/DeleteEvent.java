@@ -133,8 +133,19 @@ public class DeleteEvent extends DialogFragment {
             public void onClick(View v) {
                 if (deleteEventListener != null) {
                     deleteEventListener.onDeleteEvent(selectedEvent);}
+
+                posterRef.delete()
+                        .addOnSuccessListener(aVoid -> {
+                    // Poster image deleted successfully
+                    Log.d("DeletePoster", "Poster image deleted successfully");
+                })
+                        .addOnFailureListener(e -> {
+                            // Failed to delete poster image
+                            Log.e("DeletePoster", "Failed to delete poster image: " + e.getMessage());
+                        });
                 dismiss();
             }
+
         });
 
         returnAdmin.setOnClickListener(new View.OnClickListener() {
