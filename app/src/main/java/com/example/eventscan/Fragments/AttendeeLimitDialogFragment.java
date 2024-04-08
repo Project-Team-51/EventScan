@@ -1,5 +1,6 @@
 package com.example.eventscan.Fragments;
 
+import com.example.eventscan.Database.Database;
 import com.example.eventscan.R;
 
 import android.app.Activity;

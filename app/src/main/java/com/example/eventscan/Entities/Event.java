@@ -24,6 +24,9 @@ public class Event implements Serializable {
     private Organizer organizer;
     private String poster;
     private String eventID;
+
+    public String eventAnnouncement;
+
     public Integer attendeeLimit = -1;
 
     private boolean fullyFormed = true;
@@ -34,6 +37,7 @@ public class Event implements Serializable {
     public void setAttendeeLimit(Integer attendeeLimit) {
         this.attendeeLimit = attendeeLimit;
     }
+
 
     // empty constructor so it works with firestore
     public Event() {
@@ -180,6 +184,13 @@ public class Event implements Serializable {
 
     public void setPoster(String poster) {
         this.poster = poster;
+    }
+
+    public void setEventAnnouncement(String eventAnnouncement) {
+        this.eventAnnouncement = eventAnnouncement;
+    }
+    public String getEventAnnouncement() {
+        return eventAnnouncement;
     }
 
     public EventDatabaseRepresentation convertToDatabaseRepresentation(){

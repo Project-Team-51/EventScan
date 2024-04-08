@@ -1,3 +1,4 @@
+
 package com.example.eventscan.Fragments;
 
 import android.annotation.SuppressLint;
@@ -49,15 +50,22 @@ import java.util.concurrent.atomic.AtomicInteger;
  * and owned classes as the same thing, which is all the events on the firestore. Clicking on an item in the ownedEvents list
  * brings up a delete dialog.
  */
-public class EventFragment extends Fragment implements DeleteEvent.DeleteEventListener{
+public class EventFragment extends Fragment implements DeleteEvent.DeleteEventListener, SendNotificationFragment.SendNotificationListener{
     private ListView ownedEventsListView;
     private ListView inEventsListView;
-    private ArrayList<Event> ownedEvents;
+    private ListView notificationsListView;
     private String userType;
+    private ArrayList<Event> ownedEvents;
     private ArrayList<Event> inEvents;
+    private ArrayList<Event> notifications;
     private EventArrayAdapter ownedEventsAdapter;
     private EventArrayAdapter inEventsAdapter;
+    private EventArrayAdapter notificationsAdapter;
+
     private CollectionReference eventsCollection;
+    private boolean isNotifyMode = false;
+    private boolean isEventsMode = true;
+    private boolean notified = false;
     private Database db;
 
     @Override
@@ -65,7 +73,12 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         View view = inflater.inflate(R.layout.admin_observer_fragment, container, false);
         Bundle bundle = this.getArguments();
         TextView textView = (TextView) view.findViewById(R.id.yourEventsText);
+
+        TextView textView2 = (TextView) view.findViewById(R.id.atEventsText);
+
+
         Button allEventButton = view.findViewById(R.id.allEventButton);
+
         String myDeviceID = DeviceID.getDeviceID(requireContext());
         Log.d("DeviceID", "Device ID: " + myDeviceID);
         // Get reference to the TextView
@@ -75,7 +88,12 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         userType = DeviceID.getUserType(requireContext());
         switch (userType) {
             case "Organizer":
-                textView.setText("Your Events");
+                if (isNotifyMode){
+                    textView.setText("Select Event");
+                    textView2.setText("Notification Center");
+                } else {
+                    textView.setText("Your Events");
+                }
                 break;
             case "Admin":
             case "Attendee":
@@ -88,12 +106,16 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 
         ownedEvents = new ArrayList<>();
         inEvents = new ArrayList<>();
+        notifications = new ArrayList<>();
+
         Map<String, String> eventTypeMap = new HashMap<>();
         ownedEventsAdapter = new EventArrayAdapter(getActivity(), R.layout.event_list_content, ownedEvents);
         inEventsAdapter = new EventArrayAdapter(getActivity(), R.layout.event_list_content, inEvents);
+        notificationsAdapter = new EventArrayAdapter(getActivity(), R.layout.event_list_content, inEvents);
 
         ownedEventsListView = view.findViewById(R.id.ownedEvents);
         inEventsListView = view.findViewById(R.id.inEvents);
+        notificationsListView = view.findViewById(R.id.inEvents);
 
         ownedEventsListView.setAdapter(ownedEventsAdapter);
         inEventsListView.setAdapter(inEventsAdapter);
@@ -110,6 +132,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                     return;
                 }
                 if (querySnapshots != null) { // if there is an update then..
+
                     ownedEvents.clear();
                     inEvents.clear();
                     ArrayList<Task<Event>> updateTasks = new ArrayList<>();
@@ -160,6 +183,11 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                                 return;
                             }
                             Event event = task.getResult();
+
+
+
+                            Log.d("EventLimit for " + event.getName(), "Attendee Limit: " + event.getAttendeeLimit());
+
                             if (!Objects.equals(userType, "Organizer")) {
                                 ownedEventsAdapter.add(event);
                             }
@@ -182,7 +210,10 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event selectedEvent = ownedEvents.get(position);
-                if(userType.equals("Organizer") || userType.equals("Admin") ){
+
+                if(userType.equals("Organizer") && isNotifyMode){
+                    openSendNotifcationFragment(selectedEvent);
+                } else if(userType.equals("Organizer") || userType.equals("Admin") ){
                     openDeleteEventFragment(selectedEvent);
                 }
                 else{
@@ -272,6 +303,40 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         });
     }
 
+
+    private void openSendNotifcationFragment(Event selectedEvent) {
+        SendNotificationFragment sendNoti = new SendNotificationFragment();
+        sendNoti.setSendNotificationListener(this);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("selectedEvent", selectedEvent);
+        sendNoti.setArguments(bundle);
+        sendNoti.show(getParentFragmentManager(), "sendNoti");
+    }
+
+    /**
+     * Handles the sending of announcement
+     *
+     * @param event The event the announcement is for.
+     */
+    public void onSendNotification(Event event) {
+        sendNotification(event);
+    }
+
+
+    /**
+     * Sends the announcement to relevant people
+     *
+     * @param event The event the announcement is for
+     */
+    public void sendNotification(Event event) {
+        //this needs to be filled
+    }
+
+    public void notificationSent(boolean notified){
+        this.notified = notified;
+    }
+
+
 // Commented out below code - the functions don't look complete and there are no usages - didn't update the DB calls yet because of the not-finished ambiguity
 //    private void fetchUsersForEvent(String eventId) {
 //        // Assuming you have a CollectionReference for users
@@ -312,4 +377,92 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
         TextView textView = (TextView) getView().findViewById(R.id.yourEventsText);
         textView.setText(text);
     }
+
+
+    public void toggleNotifyMode(boolean isNotifyMode) {
+        this.isNotifyMode = true;
+        this.isEventsMode = false;
+        // Refresh the events list based on the new mode
+    }
+
+    public boolean getToggleNotifyMode() {
+        return isNotifyMode;
+        // Refresh the events list based on the new mode
+    }
+    public void toggleEventsMode(boolean isEventsMode) {
+        this.isEventsMode = true;
+        this.isNotifyMode = false;
+        // Refresh the events list based on the new mode
+    }
+
 }
+
+
+// update events in real time
+//        eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
+//            @Override
+//            public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
+//                if (error != null) {
+//                    Log.e("Firestore", error.toString());
+//                    return;
+//                }
+//                if (querySnapshots != null) { // if there is an update then..
+//                    //SendNotification sendNoti = new SendNotification();
+//                    ownedEvents.clear();
+//                    inEvents.clear();
+//                    for (QueryDocumentSnapshot doc : querySnapshots) { // turn every stored "Event" into an event class, add to adapters
+//                        Event event = doc.toObject(Event.class);
+//                        Organizer organizer = event.getOrganizer();
+//                       if (organizer != null) {
+//                            String organizerDeviceID = organizer.getDeviceID();
+////                            // display for when notification button is pressed (displays event announcements)
+////                            if(isNotifyMode) {
+////                                if (organizerDeviceID != null) {
+////                                    Log.d("Firestore", "Organizer Device ID in EventFragment notifyMode: " + organizerDeviceID);
+////                                    String currentDeviceID = getDeviceId(getContext());
+////                                    Log.d("Firestore", "Current Device ID: " + currentDeviceID);
+////                                    if (organizerDeviceID.equals(currentDeviceID)) {
+////                                        ownedEventsAdapter.add(event);
+////                                        ownedEventsAdapter.notifyDataSetChanged();
+////                                    }
+////                                    if (notified) {
+////                                        Log.d("Notified", "notifed = true");
+////                                        inEventsAdapter.add(event);
+////                                        inEventsAdapter.notifyDataSetChanged();
+////                                    }
+////                                    event.setDesc(event.getDesc());
+////                                } else {
+////                                    Log.e("Firestore", "Organizer Device ID is null");
+////                                }
+////                                event.setDesc(event.getDesc());
+//                                // display for when events button is pressed (displays owned and in events)
+//                            //if (isEventsMode){
+//                            if (organizerDeviceID != null) {
+//                                Log.d("Firestore", "Organizer Device ID in EventFragment: " + organizerDeviceID);
+//                                String currentDeviceID = getDeviceId(getContext());
+//                                Log.d("Firestore", "Current Device ID: " + currentDeviceID);
+//                                if (organizerDeviceID.equals(currentDeviceID)) {
+//                                    Log.d("OwnedEvents", "Current Device ID: " + currentDeviceID);
+//                                    ownedEventsAdapter.add(event);
+//                                    ownedEventsAdapter.notifyDataSetChanged();
+//                                } else {
+//                                    inEventsAdapter.add(event);
+//                                    inEventsAdapter.notifyDataSetChanged();
+//                                }
+//                            } else {
+//                                Log.e("Firestore", "Organizer Device ID is null");
+//                            }
+//
+//                        } else { // need to add conditionals for admins and attendees
+//                            Log.e("Firestore", "Organizer is null for event: " + event.getEventID());
+//                        }
+//
+//                    }
+//                    ownedEventsAdapter.notifyDataSetChanged(); // update listviews
+//                    inEventsAdapter.notifyDataSetChanged();
+//                }
+//            }
+//        });
+
+
+

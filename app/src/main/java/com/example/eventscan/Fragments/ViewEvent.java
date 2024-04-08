@@ -6,6 +6,7 @@ import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 import android.app.Dialog;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -48,6 +49,7 @@ public class ViewEvent extends DialogFragment {
 
     Database db;
     Attendee selfAttendee = null;
+    Context context;
 
     /**
      * Default constructor for the ViewEvent DialogFragment.
@@ -122,18 +124,23 @@ public class ViewEvent extends DialogFragment {
                                 db.events.get(eventID)
                                         .addOnSuccessListener(event -> {
                                             if (event != null) {
-                                                // Add interested attendee to the event
-                                                db.events.addInterestedAttendee(event, selfAttendee)
-                                                        .addOnSuccessListener(aVoid -> {
-                                                            Log.d(TAG, "Signed up Successfully: ");
-                                                            Toast.makeText(getContext(), "Sign up Successful", Toast.LENGTH_SHORT).show();
-                                                            dismiss(); // Dismiss the dialog after successful enrollment
-                                                        })
-                                                        .addOnFailureListener(e -> {
-                                                            Log.e(TAG, "Failed to Sign up: " + e.getMessage());
-                                                            // Display a toast or error message to the user
-                                                            Toast.makeText(getContext(), "Failed to sign up for the event", Toast.LENGTH_SHORT).show();
-                                                        });
+                                                if (event.getAttendeeLimit().equals(event.getInterestedAttendees().size())) {
+                                                    // Event is full, show a toast message and return
+                                                    Toast.makeText(context, "Event is full. No more attendees can sign up.", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    // Add interested attendee to the event
+                                                    db.events.addInterestedAttendee(event, selfAttendee)
+                                                            .addOnSuccessListener(aVoid -> {
+                                                                Log.d(TAG, "Signed up Successfully: ");
+                                                                Toast.makeText(getContext(), "Sign up Successful", Toast.LENGTH_SHORT).show();
+                                                                dismiss(); // Dismiss the dialog after successful enrollment
+                                                            })
+                                                            .addOnFailureListener(e -> {
+                                                                Log.e(TAG, "Failed to Sign up: " + e.getMessage());
+                                                                // Display a toast or error message to the user
+                                                                Toast.makeText(getContext(), "Failed to sign up for the event", Toast.LENGTH_SHORT).show();
+                                                            });
+                                                }
                                             } else {
                                                 Log.e(TAG, "Event not found for ID: " + eventID);
                                                 // Display a toast or error message to the user

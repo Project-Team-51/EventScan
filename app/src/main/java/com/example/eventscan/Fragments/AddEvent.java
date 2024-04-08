@@ -239,6 +239,7 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                 organizer = new Organizer();
                 organizer.setDeviceID(deviceID);
                 event.setOrganizer(organizer);
+                //event.setAttendeeLimit(10);
 
                 Task<Event> createEventTask = Database.getInstance().events.create(event);
                 createEventTask.addOnSuccessListener(event1 -> {

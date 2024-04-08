@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.eventscan.Entities.Announcement;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.Entities.Event;
 import com.example.eventscan.Entities.Organizer;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +57,7 @@ public class Database {
     protected CollectionReference geolocationStorageCollection;
 
     protected CollectionReference adminCollection;
+    protected CollectionReference announcementsCollection;
 
     public AttendeeOperations attendees;
     public EventOperations events;
@@ -62,6 +65,7 @@ public class Database {
     public QRCodeOperations qr_codes;
     public PosterOperations posters;
     public GeolocationOperations geolocation;
+    public AnnouncementOperations announcements;
 
 
     private static final Database instance = new Database();
@@ -86,14 +90,22 @@ public class Database {
                         .collection("prod")
                         .document("admins")
                         .collection("admins");
+
+        announcementsCollection = FirebaseFirestore.getInstance()
+                .collection("prod")
+                .document("announcements")
+                .collection("announcements");
+
         geolocationStorageCollection = FirebaseFirestore.getInstance()
                         .collection("prod")
                         .document("geolocations")
                         .collection("geolocations");
+
         setupChildren();
     }
 
     public CollectionReference getEventsCollection(){return this.eventsCollection;}
+    public CollectionReference getAnnouncementsCollection(){return this.announcementsCollection;}
     public CollectionReference getAttendeeCollection(){return this.attendeeCollection;}
     public CollectionReference getQrLinkCollection(){return this.attendeeCollection;}
 
@@ -107,6 +119,7 @@ public class Database {
         this.qr_codes = new QRCodeOperations(this);
         this.admins = new AdminOperations(this);
         this.geolocation = new GeolocationOperations(this);
+        this.announcements = new AnnouncementOperations(this);
 
     }
     public static Database getInstance(){
@@ -740,6 +753,49 @@ public class Database {
                 }
                 return Tasks.forResult(output);
             });
+        }
+    }
+
+    public class AnnouncementOperations {
+        private Database owner;
+        private AnnouncementOperations(Database owner){
+            this.owner = owner;
+        }
+
+        public Task<Void> saveNotification(Event event, Announcement announcement){
+            return owner.announcementsCollection.document(event.getEventID()).get().continueWithTask(task -> {
+                if(!task.isSuccessful()){
+                    return Tasks.forException(getTaskException(task));
+                }
+                if(task.getResult().exists()){
+                    HashMap<String,Announcement> fetchedAnnouncements = (HashMap<String,Announcement>)task.getResult().get("announcements");
+                    Long newAnnouncementIndex = (long) fetchedAnnouncements.keySet().size();
+                    return owner.announcementsCollection.document(event.getEventID()).update(
+                            FieldPath.of("announcements",String.valueOf(newAnnouncementIndex)),
+                            announcement);
+                }
+                // create a new one
+                HashMap<String, HashMap<String,Announcement>> newDocument = new HashMap<>();
+                HashMap<String,Announcement> newDocumentAnnouncements = new HashMap<>();
+                newDocumentAnnouncements.put("0", announcement);
+                newDocument.put("announcements", newDocumentAnnouncements);
+                return owner.announcementsCollection.document(event.getEventID()).set(newDocument);
+            });
+        }
+
+        public Task<ArrayList<Announcement>> getNotifications(Event event){
+            return owner.announcementsCollection.document(event.getEventID())
+                    .get().continueWithTask(task -> {
+                        if(!task.isSuccessful()){
+                            return Tasks.forException(getTaskException(task));
+                        }
+                        HashMap<String,Announcement> fetchedAnnouncements = (HashMap<String, Announcement>)task.getResult().get("announcements");
+                        ArrayList<Announcement> toReturnAnnouncements = new ArrayList<>();
+                        for(long i=0L; i<fetchedAnnouncements.keySet().size(); i++){
+                            toReturnAnnouncements.add(fetchedAnnouncements.get(String.valueOf(i)));
+                        }
+                        return Tasks.forResult(toReturnAnnouncements);
+                    });
         }
     }
 
