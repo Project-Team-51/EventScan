@@ -215,28 +215,31 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                     Log.e("Firestore", error.toString());
                     return;
                 }
-                if (querySnapshots != null) { // if there is an update then..
+                if (querySnapshots != null) {
                     for (QueryDocumentSnapshot doc : querySnapshots) {
-                        Event event = doc.toObject(Event.class);
+                        Task<Event> eventTask = db.events.get(doc);
                         String deviceID = DeviceID.getDeviceID(getApplicationContext());
                         ///////////////////////////////////////////////////////////////
                         // && event.getOrganizer().getDeviceID() == deviceID
-                        if (!notifiedEvents.contains(event.getEventID()) && event.getAttendeeLimit() == 23 ) { // test if statement
-                            Log.d("MainActivity", "Notification sent for event: " + event.getEventID());
-                            // below is actual if statement
-                        //if (event.getInterestedAttendees().size() == event.getAttendeeLimit() && event.getOrganizer().getDeviceID() == deviceID) {
-                            notifiedEvents.add(event.getEventID());// to prevent notification from being sent multiple times
-                            makeNotification(event, "This event has reached its full capacity!");
-                            for (int i = 0; i < notifiedEvents.size(); i++) {
-                                Log.d("MainActivity", "Event ID in notified events: " + notifiedEvents.get(i));
+                        eventTask.addOnSuccessListener(event -> {
+                            if (event.getOrganizer() == null) {
+                                Log.e("NULL", "organizer is null");
+                            } else {
 
+                                if (!notifiedEvents.contains(event.getEventID()) && event.getAttendeeLimit().equals(event.getInterestedAttendees().size()) && event.getOrganizer().getDeviceID().equals(deviceID)) {
+//                                    Log.d("MainActivity", "Organizer id: " + event.getOrganizer().getDeviceID() + "AND Current id: " + deviceID);
+//                                    Log.d("MainActivity", "Notification sent for event: " + event.getEventID());
+                                    notifiedEvents.add(event.getEventID());// to prevent notification from being sent multiple times
+                                    makeNotification(event, "This event has reached its full capacity!");
+                                    for (int i = 0; i < notifiedEvents.size(); i++) {
+                                        Log.d("MainActivity", "Event ID in notified events: " + notifiedEvents.get(i));
+                                    }
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString(NOTIFIED_EVENTS_KEY, new Gson().toJson(notifiedEvents));
+                                    editor.apply();
+                                }
                             }
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString(NOTIFIED_EVENTS_KEY, new Gson().toJson(notifiedEvents));
-                            editor.apply();
-
-
-                        }
+                        });
                     }
                 }
             }

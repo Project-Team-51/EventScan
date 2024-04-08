@@ -188,35 +188,40 @@ public class QRAnalyzer{
                         dialogButton.setVisibility(View.VISIBLE);
                         // set the onclick of the button to sign you up
                         dialogButton.setOnClickListener(v -> {
-                            event.checkInAttendee(selfAttendee);
-                            Task<?> checkInTask;
-                            Log.d("GeolocationHandler", String.valueOf(GeolocationHandler.getLocationEnabled()));
-                            if(GeolocationHandler.getLocationEnabled()){
-                                checkInTask = db.events.checkInAttendee(event, selfAttendee, GeolocationHandler.getGeoPoint());
+                            if (event.getAttendeeLimit().equals(event.getCheckedInAttendeesList().size())) {
+                                // Event is full, show a toast message and return
+                                Toast.makeText(context, "Event is full. No more attendees can check in.", Toast.LENGTH_SHORT).show();
                             } else {
-                                checkInTask = db.events.checkInAttendee(event, selfAttendee);
-                            }
-
-                            checkInTask.addOnCompleteListener(task1 -> {
-                                // check-in is done, make sure it was successful
-                                if(task1.isSuccessful()){
-
-                                    dialogDescription.setText("Check-in Successful!\n You can now safely go to another screen");
-                                    dialogButton.setVisibility(GONE);
-
-                                    dialogButton.setText(R.string.event_sign_up_success);
-                                    dialogButton.setEnabled(false);
-
+                                event.checkInAttendee(selfAttendee);
+                                Task<?> checkInTask;
+                                Log.d("GeolocationHandler", String.valueOf(GeolocationHandler.getLocationEnabled()));
+                                if (GeolocationHandler.getLocationEnabled()) {
+                                    checkInTask = db.events.checkInAttendee(event, selfAttendee, GeolocationHandler.getGeoPoint());
                                 } else {
-                                    Log.e("QR SCAN", Database.getTaskException(task1).toString());
-                                    dialogDescription.setText(R.string.event_sign_up_failure_description);
-                                    dialogButton.setText(R.string.event_sign_up_failure_exit);
-                                    dialogButton.setOnClickListener(v1 -> {
-                                        // https://stackoverflow.com/questions/17719634/how-to-exit-an-android-app-programmatically
-                                        System.exit(1);
-                                    });
+                                    checkInTask = db.events.checkInAttendee(event, selfAttendee);
                                 }
-                            });
+
+                                checkInTask.addOnCompleteListener(task1 -> {
+                                    // check-in is done, make sure it was successful
+                                    if (task1.isSuccessful()) {
+
+                                        dialogDescription.setText("Check-in Successful!\n You can now safely go to another screen");
+                                        dialogButton.setVisibility(GONE);
+
+                                        dialogButton.setText(R.string.event_sign_up_success);
+                                        dialogButton.setEnabled(false);
+
+                                    } else {
+                                        Log.e("QR SCAN", Database.getTaskException(task1).toString());
+                                        dialogDescription.setText(R.string.event_sign_up_failure_description);
+                                        dialogButton.setText(R.string.event_sign_up_failure_exit);
+                                        dialogButton.setOnClickListener(v1 -> {
+                                            // https://stackoverflow.com/questions/17719634/how-to-exit-an-android-app-programmatically
+                                            System.exit(1);
+                                        });
+                                    }
+                                });
+                            }
                         });
                     } else {
                         Log.e("QR SCAN", "Event "+eventID+" not found in firebase");

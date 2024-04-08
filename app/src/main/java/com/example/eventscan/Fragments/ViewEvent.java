@@ -124,7 +124,7 @@ public class ViewEvent extends DialogFragment {
                                 db.events.get(eventID)
                                         .addOnSuccessListener(event -> {
                                             if (event != null) {
-                                                if (event.getAttendeeLimit() == event.getInterestedAttendees().size()) {
+                                                if (event.getAttendeeLimit().equals(event.getInterestedAttendees().size())) {
                                                     // Event is full, show a toast message and return
                                                     Toast.makeText(context, "Event is full. No more attendees can sign up.", Toast.LENGTH_SHORT).show();
                                                 } else {
