@@ -83,6 +83,7 @@ public class QRAnalyzer{
             InputImage image = InputImage.fromMediaImage(mediaImage, imageProxy.getImageInfo().getRotationDegrees());
             Task<List<Barcode>> result = scanner.process(image).addOnSuccessListener(
                     barcodes -> {
+                        Log.d("QR Analyzer", "QR scan success "+barcodes.size()+" barcodes found");
                         ArrayList<Task<QRDatabaseEventLink>> fetchQRTasks = new ArrayList<>();
                         ArrayList<QRDatabaseEventLink> fetchedLinks = new ArrayList<>();
                         AtomicBoolean hasError = new AtomicBoolean(false);
@@ -90,7 +91,7 @@ public class QRAnalyzer{
                             if(barcode.getRawValue() == null || !QrCodec.verifyQRStringDecodable(barcode.getRawValue())){
                                 continue;
                             }
-                            // this QR code is most likely from us (fits the encoding scheme)
+                            // else this QR code is most likely from us (fits the encoding scheme)
                             String barcodeContent = QrCodec.decodeQRString(barcode.getRawValue());
                             Task<QRDatabaseEventLink> getQRTask = Database.getInstance().qr_codes.get(barcodeContent);
                             getQRTask.continueWithTask(task -> {
@@ -122,6 +123,7 @@ public class QRAnalyzer{
                             // ideally fetchedLinks is only one, and hasError is false
                             // if we have at least one event, use the first one, otherwise we can display the error if we have one
                             if(!fetchedLinks.isEmpty()){
+                                Log.d("QR Analyzer", "creating a scan result dialog");
                                 createScanResultDialog(fetchedLinks.get(0));
                             }
                             else if(hasError.get()){
@@ -146,9 +148,13 @@ public class QRAnalyzer{
         }
         switch(link.getDirectionType()){
             case QRDatabaseEventLink.DIRECT_CHECK_IN:
+                Log.d("QR Analyzer", "spawning a check in dialog");
                 createCheckInDialog(link.getDirectedEventID());
+                break;
             case QRDatabaseEventLink.DIRECT_SEE_DETAILS:
+                Log.d("QR Analyzer", "spawning a sign up interest dialog");
                 createSignUpInterestDialog(link.getDirectedEventID());
+                break;
         }
     }
 
@@ -191,7 +197,7 @@ public class QRAnalyzer{
                         dialogButton.setVisibility(View.VISIBLE);
                         // set the onclick of the button to sign you up
                         dialogButton.setOnClickListener(v -> {
-                            if (event.getCheckedInAttendeesList().size() >= event.getAttendeeLimit()) {
+                            if (event.getCheckedInAttendeesList().size() >= event.getAttendeeLimit() && event.getAttendeeLimit() != -1) {
                                 // Event is full, show a toast message and return
                                 Toast.makeText(context, "Event is full. No more attendees can check in.", Toast.LENGTH_SHORT).show();
                             } else {
