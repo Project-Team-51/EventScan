@@ -53,6 +53,7 @@ public class QRAnalyzer{
     Database db;
     Task<Attendee> selfAttendeeTask = null;
     Attendee selfAttendee = null;
+    boolean qrScanComplete = false;
 
     FragmentManager parentFragmentManager;
 
@@ -79,6 +80,9 @@ public class QRAnalyzer{
      */
     private void analyze(@NonNull ImageProxy imageProxy) {
         @OptIn(markerClass = ExperimentalGetImage.class) Image mediaImage = imageProxy.getImage();
+        if(qrScanComplete){
+            return;
+        }
         if(mediaImage != null) {
             InputImage image = InputImage.fromMediaImage(mediaImage, imageProxy.getImageInfo().getRotationDegrees());
             Task<List<Barcode>> result = scanner.process(image).addOnSuccessListener(
@@ -88,6 +92,7 @@ public class QRAnalyzer{
                         ArrayList<QRDatabaseEventLink> fetchedLinks = new ArrayList<>();
                         AtomicBoolean hasError = new AtomicBoolean(false);
                         for(Barcode barcode: barcodes){
+                            qrScanComplete = true;
                             if(barcode.getRawValue() == null || !QrCodec.verifyQRStringDecodable(barcode.getRawValue())){
                                 continue;
                             }
@@ -129,15 +134,12 @@ public class QRAnalyzer{
                             else if(hasError.get()){
                                 Toast.makeText(context, "Error scanning one or more QR codes", Toast.LENGTH_SHORT).show();
                             }
-                            else {
-                                Toast.makeText(context, "Unknown error when scanning QR codes", Toast.LENGTH_SHORT).show();
-                            }
                         });
-                        scanner.close();
-                    }
-            ).addOnFailureListener(e -> {
-                Log.e("QR", e.toString());
-            });
+                    }).addOnFailureListener(e -> {
+                        Log.e("QR", e.toString());
+                    }).addOnCompleteListener(task -> {
+                        imageProxy.close();
+                    });
         }
     }
 
@@ -266,7 +268,7 @@ public class QRAnalyzer{
      */
     public UseCase getUseCase(){
         //https://beakutis.medium.com/using-googles-mlkit-and-camerax-for-lightweight-barcode-scanning-bb2038164cdc
-        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().build();
+        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
         imageAnalysis.setAnalyzer(
                 Executors.newSingleThreadExecutor(),
                         (ImageProxy imageProxy) -> analyze(imageProxy)
