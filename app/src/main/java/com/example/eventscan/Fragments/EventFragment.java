@@ -119,6 +119,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
 
         ownedEventsListView.setAdapter(ownedEventsAdapter);
         inEventsListView.setAdapter(inEventsAdapter);
+        notificationsListView.setAdapter(inEventsAdapter);
 
         db = Database.getInstance();
 

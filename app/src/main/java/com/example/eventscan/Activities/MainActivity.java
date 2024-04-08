@@ -288,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
 //                }
 //            }
 //        });
-
+        HashSet<String> sentNotificationMessages = new HashSet<>();
         announcementsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
@@ -315,6 +315,7 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                                         for (Attendee attendee : event.getInterestedAttendees()) {
                                             if (attendee.getDeviceID().equals(deviceID) || event.getOrganizer().getDeviceID().equals(deviceID)) {
                                                 makeNotification(event, announcement.getMessage());
+                                                sentNotificationMessages.add(announcement.getMessage());
                                             }
                                         }
                                     }
