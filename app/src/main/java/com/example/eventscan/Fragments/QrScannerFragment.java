@@ -44,7 +44,7 @@ public class QrScannerFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        analyzer = new QRAnalyzer(requireContext());
+        analyzer = new QRAnalyzer(requireContext(), getParentFragmentManager());
         cameraProviderFuture = ProcessCameraProvider.getInstance(this.requireContext());
         View view = getLayoutInflater().inflate(R.layout.scan_qr_layout, container, false);
         previewView = view.findViewById(R.id.CameraPreview);
