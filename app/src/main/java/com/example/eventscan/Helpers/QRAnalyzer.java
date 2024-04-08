@@ -62,6 +62,7 @@ public class QRAnalyzer{
                         .setBarcodeFormats(Barcode.FORMAT_QR_CODE).build();
         scanner = BarcodeScanning.getClient(options);
         this.context = context;
+        this.parentFragmentManager = parentFragmentManager;
         db = Database.getInstance();
         String deviceID = DeviceID.getDeviceID(context);
         selfAttendeeTask = db.attendees.get(deviceID).addOnSuccessListener(attendee -> {
