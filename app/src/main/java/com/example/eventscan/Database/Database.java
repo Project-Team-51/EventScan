@@ -721,16 +721,16 @@ public class Database {
                     return Tasks.forException(getTaskException(task));
                 }
                 if(task.getResult().exists()){
-                    HashMap<Long,Announcement> fetchedAnnouncements = (HashMap<Long,Announcement>)task.getResult().get("announcements");
+                    HashMap<String,Announcement> fetchedAnnouncements = (HashMap<String,Announcement>)task.getResult().get("announcements");
                     Long newAnnouncementIndex = fetchedAnnouncements.keySet().size()-1L;
                     return owner.announcementsCollection.document(event.getEventID()).update(
                             FieldPath.of("announcements",String.valueOf(newAnnouncementIndex)),
                             announcement);
                 }
                 // create a new one
-                HashMap<String, HashMap<Long,Announcement>> newDocument = new HashMap<>();
-                HashMap<Long,Announcement> newDocumentAnnouncements = new HashMap<>();
-                newDocumentAnnouncements.put(0L, announcement);
+                HashMap<String, HashMap<String,Announcement>> newDocument = new HashMap<>();
+                HashMap<String,Announcement> newDocumentAnnouncements = new HashMap<>();
+                newDocumentAnnouncements.put("0", announcement);
                 newDocument.put("announcements", newDocumentAnnouncements);
                 return owner.announcementsCollection.document(event.getEventID()).set(newDocument);
             });
@@ -742,10 +742,10 @@ public class Database {
                         if(!task.isSuccessful()){
                             return Tasks.forException(getTaskException(task));
                         }
-                        HashMap<Long,Announcement> fetchedAnnouncements = (HashMap<Long, Announcement>)task.getResult().get("announcements");
+                        HashMap<String,Announcement> fetchedAnnouncements = (HashMap<String, Announcement>)task.getResult().get("announcements");
                         ArrayList<Announcement> toReturnAnnouncements = new ArrayList<>();
                         for(long i=0L; i<fetchedAnnouncements.keySet().size(); i++){
-                            toReturnAnnouncements.add(fetchedAnnouncements.get(i));
+                            toReturnAnnouncements.add(fetchedAnnouncements.get(String.valueOf(i)));
                         }
                         return Tasks.forResult(toReturnAnnouncements);
                     });
