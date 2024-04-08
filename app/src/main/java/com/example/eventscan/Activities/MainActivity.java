@@ -36,6 +36,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -188,6 +189,8 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
 
         db = Database.getInstance();
 
+        eventsCollection = db.getEventsCollection();
+//        try {
         eventsCollection.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable QuerySnapshot querySnapshots, @Nullable FirebaseFirestoreException error) {
@@ -197,15 +200,21 @@ public class MainActivity extends AppCompatActivity implements AddEvent.OnEventA
                 }
                 if (querySnapshots != null) { // if there is an update then..
                     for (QueryDocumentSnapshot doc : querySnapshots) {
-                        Event event = (Event) querySnapshots.toObjects(Event.class);
+                        Event event = doc.toObject(Event.class);
                         String deviceID = DeviceID.getDeviceID(getApplicationContext());
-                        if (event.getCheckedInAttendeesList().size() == event.getAttendeeLimit() && event.getOrganizer().getDeviceID() == deviceID) {
+                        if (event.getAttendeeLimit() == 200) { // test if statement
+                        // below is actual if statement
+                        // if (event.getCheckedInAttendeesList().size() == event.getAttendeeLimit() && event.getOrganizer().getDeviceID() == deviceID) {
                             makeNotification(event);
                         }
                     }
                 }
             }
         });
+//        } catch (NullPointerException npe) {
+//            Log.e("Firestore", "ERROR");
+//
+//        }
     }
 
     /**

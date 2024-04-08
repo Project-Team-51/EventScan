@@ -176,8 +176,8 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                             }
                             Event event = task.getResult();
 
-                            ownedEventsAdapter.add(event);
-                            inEventsAdapter.add(event);
+
+
                             Log.d("EventLimit for " + event.getName(), "Attendee Limit: " + event.getAttendeeLimit());
 
                             if (!Objects.equals(userType, "Organizer")) {
