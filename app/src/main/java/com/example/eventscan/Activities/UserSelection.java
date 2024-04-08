@@ -59,6 +59,10 @@ public class UserSelection extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(UserSelection.this, LoginActivity.class);
                 saveUserSelection("Admin");
+                String deviceID = DeviceID.getDeviceID(getApplicationContext());
+                Attendee attendee = new Attendee();
+                attendee.setDeviceID(deviceID);
+                db.attendees.set(attendee);
                 startActivity(intent);
             }
         });

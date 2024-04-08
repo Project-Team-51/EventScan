@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
@@ -79,6 +80,10 @@ public class ViewEvent extends DialogFragment {
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         db = Database.getInstance();
+
+        ConstraintLayout constraintLayout = view.findViewById(R.id.status_event_container);
+        constraintLayout.setVisibility(View.GONE);
+
 
         StorageReference storageRef = storage.getReference().child("poster_pics");
         StorageReference posterRef = storageRef.child(selectedEvent.getEventID());

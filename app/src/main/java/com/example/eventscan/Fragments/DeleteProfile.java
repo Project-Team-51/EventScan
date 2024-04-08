@@ -94,5 +94,7 @@ public class DeleteProfile extends DialogFragment {
     public void setDeleteProfileListener(DeleteProfileListener listener) {
         this.deleteProfileListener = listener;
     }
+
+
 }
 
