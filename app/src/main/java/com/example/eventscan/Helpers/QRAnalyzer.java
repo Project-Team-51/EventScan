@@ -191,7 +191,7 @@ public class QRAnalyzer{
                         dialogButton.setVisibility(View.VISIBLE);
                         // set the onclick of the button to sign you up
                         dialogButton.setOnClickListener(v -> {
-                            if (event.getAttendeeLimit().equals(event.getCheckedInAttendeesList().size())) {
+                            if (event.getCheckedInAttendeesList().size() >= event.getAttendeeLimit()) {
                                 // Event is full, show a toast message and return
                                 Toast.makeText(context, "Event is full. No more attendees can check in.", Toast.LENGTH_SHORT).show();
                             } else {
