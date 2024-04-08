@@ -22,6 +22,9 @@ import com.example.eventscan.R;
 
 import java.util.ArrayList;
 
+/**
+ * a DialogFragment subclass for displaying the list of signed-up attendees.
+ */
 public class SignupsListFragment extends DialogFragment {
     Database db = Database.getInstance();
     private static final String ARG_EVENT_ID = "event_id";

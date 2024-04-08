@@ -15,6 +15,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.List;
 
+/**
+ * A helper class for displaying images.
+ */
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
 
     private Context context;

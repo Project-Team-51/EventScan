@@ -34,6 +34,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * a DialogFragment subclass for displaying all events
+ */
 public class organizerAllEvent extends DialogFragment {
     private ArrayList<Event> allEvents;
     private EventArrayAdapter alLEventsAdapter;

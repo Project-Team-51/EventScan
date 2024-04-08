@@ -16,6 +16,9 @@ import static org.junit.Assert.*;
 
 import com.example.eventscan.Entities.PicGen;
 
+/**
+ * Testing class for Picture Generation
+ */
 public class PicGenTest {
 
     private Context context;

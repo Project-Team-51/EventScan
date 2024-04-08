@@ -1,7 +1,7 @@
 package com.example.eventscan.Entities;
 
 import java.util.ArrayList;
-/*
+/**
  * Organizer subclass of the user class. As is, doesnt have any extra features. The ownedEvents attribute and getter
  *  is only for testing purposes, and will be removed in a future build.
  */

@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.eventscan.Database.Database;
 import com.example.eventscan.R;
 import com.google.firebase.FirebaseApp;
-/*
+/**
  * This activity handles the logging in of an admin. Prompts the user to enter a user and password, and checks the inputted
  * text to the admin credentials stored in Firestore. Has error handling for incorrect credentials and a failure to connect to firestore.
  * Sign up button is unused, and will likely be removed in a future build.

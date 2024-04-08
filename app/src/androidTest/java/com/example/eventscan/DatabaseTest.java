@@ -14,6 +14,9 @@ import static org.junit.Assert.*;
 
 import java.util.concurrent.ExecutionException;
 
+/**
+ * Testing class for Database implementation
+ */
 public class DatabaseTest extends Database {
 
     private static final DatabaseTest instance = new DatabaseTest();

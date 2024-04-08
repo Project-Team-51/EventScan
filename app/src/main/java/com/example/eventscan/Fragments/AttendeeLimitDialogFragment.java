@@ -19,6 +19,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+/**
+ * This class represents a dialog fragment sed to set attendee limits.
+ * Allows users to input an integer value for the attendee limit and confirms the input.
+ */
 public class AttendeeLimitDialogFragment extends DialogFragment {
 
     public interface AttendeeLimitListener {

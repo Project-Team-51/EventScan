@@ -31,6 +31,9 @@ import java.util.Observer;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
+/**
+ * This class represents a fragment used for scanning QR codes.
+ */
 public class QrScannerFragment extends Fragment {
     //https://developer.android.com/media/camera/camerax/preview
     private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;

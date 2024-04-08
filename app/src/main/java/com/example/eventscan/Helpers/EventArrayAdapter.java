@@ -14,7 +14,7 @@ import com.example.eventscan.Entities.Event;
 import com.example.eventscan.R;
 
 import java.util.ArrayList;
-/*
+/**
 Just a simple subclass that extends ArrayAdapter, retrieves the needed info from the Event class, and displays it.
 For use in the ListView of all events, or events attending.
  */

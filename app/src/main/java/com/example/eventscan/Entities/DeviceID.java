@@ -9,7 +9,9 @@ import java.util.UUID;
 import android.content.Context;
 import android.content.SharedPreferences;
 import java.util.UUID;
-
+/**
+ * Provides methods for retrieving the device ID and user type from shared preferences.
+ */
 public class DeviceID {
     private static final String PREF_USER_SELECTION = "UserSelection";
     private static final String KEY_SELECTION = "Selection";

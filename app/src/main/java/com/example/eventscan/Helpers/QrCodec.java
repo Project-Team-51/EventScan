@@ -1,6 +1,6 @@
 package com.example.eventscan.Helpers;
 
-/*
+/**
 Helper class that parses the string encoded to and decoded from a QR Code.
  */
 

@@ -39,7 +39,7 @@ import java.util.List;
 
 
 import java.util.Objects;
-/*
+/**
  * A simple dialogfragment that displays some basic info about the Event that is passed into it, and gives
  * the user the ability to delete the profile from the app.
  */

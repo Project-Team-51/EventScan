@@ -20,6 +20,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import java.util.UUID;
 
+/**
+ * The UserSelection activity allows users to select their role (Organizer, Attendee, or Admin)
+ * and navigates them to the appropriate activity based on their selection.
+ */
 public class UserSelection extends AppCompatActivity {
 
     private static final String PREF_USER_SELECTION = "UserSelection";

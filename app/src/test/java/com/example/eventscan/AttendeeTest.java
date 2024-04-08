@@ -5,6 +5,9 @@ import com.example.eventscan.Entities.Attendee;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+/**
+ * Testing class for Attendee usertype
+ */
 public class AttendeeTest {
     @Test
     public void attendee_equals(){
