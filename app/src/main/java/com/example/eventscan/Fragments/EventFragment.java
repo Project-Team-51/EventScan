@@ -160,7 +160,7 @@ public class EventFragment extends Fragment implements DeleteEvent.DeleteEventLi
                                 return;
                             }
                             Event event = task.getResult();
-                            if (Objects.equals(userType, "Attendee") || Objects.equals(userType, "Administrator")) {
+                            if (!Objects.equals(userType, "Organizer")) {
                                 ownedEventsAdapter.add(event);
                             }
 
