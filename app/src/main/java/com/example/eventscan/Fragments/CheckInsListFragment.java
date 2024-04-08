@@ -17,10 +17,13 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import com.example.eventscan.Database.Database;
+import com.example.eventscan.Database.EventDatabaseRepresentation;
 import com.example.eventscan.Entities.Attendee;
 import com.example.eventscan.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * a DialogFragment subclass for displaying the list of signed-up attendees.
@@ -68,48 +71,51 @@ public class CheckInsListFragment extends DialogFragment {
     private void fillSignedUpAttendeesList(String eventId, ListView attendeesListView) {
         db.events.get(eventId)
                 .addOnSuccessListener(event -> {
-                    ArrayList<Attendee> attendeesList = event.getCheckedInAttendeesList();
-                    if (attendeesList != null && !attendeesList.isEmpty()) {
-                        // Create a list to hold attendee names
-                        ArrayList<String> attendeeNames = new ArrayList<>();
-                        // Retrieve names for each attendee ID
-                        for (Attendee attendee : attendeesList) {
-                            db.attendees.get(attendee.getDeviceID())
-                                    .addOnSuccessListener(att -> {
-                                        // Add attendee name to the list
-                                        attendeeNames.add(att.getName());
-                                        // If names for all attendees are retrieved, update the list view
-                                        if (attendeeNames.size() == attendeesList.size()) {
-                                            // Create an adapter with attendee names
-                                            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.signups_list_item, attendeeNames);
+                    EventDatabaseRepresentation eventDatabaseRepresentation = new EventDatabaseRepresentation(event);
+
+                    // Retrieve checked-in attendee IDs and their check-in counts
+                    HashMap<String, Integer> checkedInAttendeeIDs = eventDatabaseRepresentation.getCheckedInAttendeeIDs();
+
+                    if (!checkedInAttendeeIDs.isEmpty()) {
+                        // Create a list to hold attendee names with check-in counts
+                        ArrayList<String> attendeeInfoList = new ArrayList<>();
+
+                        // Retrieve names and check-in counts for each attendee ID
+                        for (Map.Entry<String, Integer> entry : checkedInAttendeeIDs.entrySet()) {
+                            String attendeeID = entry.getKey();
+                            int checkInCount = entry.getValue();
+
+                            db.attendees.get(attendeeID)
+                                    .addOnSuccessListener(attendee -> {
+                                        // Construct attendee information string with name and check-in count
+                                        String attendeeInfo = attendee.getName() + " : Checked In #: " + checkInCount;
+                                        // Add attendee information to the list
+                                        attendeeInfoList.add(attendeeInfo);
+
+                                        // If info for all attendees are retrieved, update the list view
+                                        if (attendeeInfoList.size() == checkedInAttendeeIDs.size()) {
+                                            // Create an adapter with attendee info
+                                            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.signups_list_item, attendeeInfoList);
                                             attendeesListView.setAdapter(adapter);
-                                            Toast.makeText(requireContext(), "Checked in attendees retrieved successfully", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(requireContext(), "Checked-in attendees retrieved successfully", Toast.LENGTH_SHORT).show();
                                         }
                                     })
                                     .addOnFailureListener(e -> {
-                                        // Handle failure for retrieving attendee name
+                                        // Handle failure for retrieving attendee info
                                         Log.e("Database", "Error getting attendee: " + e.getMessage());
-                                        Toast.makeText(requireContext(), "Failed to retrieve attendee name", Toast.LENGTH_SHORT).show();
-                                        // If retrieving name fails, remove this attendee from the list
-                                        attendeesList.remove(attendee);
-                                        // If names for all attendees are retrieved or failed, update the list view
-                                        if (attendeeNames.size() + attendeesList.size() == attendeesList.size()) {
-                                            // Create an adapter with attendee names
-                                            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), R.layout.signups_list_item, attendeeNames);
-                                            attendeesListView.setAdapter(adapter);
-                                            Toast.makeText(requireContext(), "Failed to retrieve names for some attendees", Toast.LENGTH_SHORT).show();
-                                        }
+                                        Toast.makeText(requireContext(), "Failed to retrieve attendee info", Toast.LENGTH_SHORT).show();
                                     });
                         }
                     } else {
-                        Toast.makeText(requireContext(), "No signed-up attendees found for this event", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "No checked-in attendees found for this event", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(e -> {
                     // Handle errors that occur while retrieving the event
                     Log.e("Database", "Error getting event: " + e.getMessage());
-                    Toast.makeText(requireContext(), "Failed to retrieve signed-up attendees", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Failed to retrieve event information", Toast.LENGTH_SHORT).show();
                 });
     }
+
 }
 
