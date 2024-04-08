@@ -23,7 +23,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
@@ -209,9 +208,9 @@ public class DeleteEvent extends DialogFragment {
             });
             // rest of fragment setup
             // Create and show the dialog
-            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(getActivity());
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
             builder.setView(dialogView);
-            AlertDialog dialog2 = builder.create();
+            androidx.appcompat.app.AlertDialog dialog2 = builder.create();
             dialog2.show();
 
             // Set click listener for the "Save to Camera Roll" button
