@@ -53,17 +53,21 @@ public class QRAnalyzer{
     Database db;
     Task<Attendee> selfAttendeeTask = null;
     Attendee selfAttendee = null;
-    boolean qrScanComplete = false;
+    private boolean qrScanComplete = false;
+
+    private final boolean scanReadOrScanForReuse; // false for read, true for reuse
+    QRDatabaseEventLink reuseEventLink;
 
     FragmentManager parentFragmentManager;
 
-    public QRAnalyzer(Context context, FragmentManager parentFragmentManager){
+    public QRAnalyzer(Context context, FragmentManager parentFragmentManager, boolean scanReadOrScanForReuse){
         BarcodeScannerOptions options =
                 new BarcodeScannerOptions.Builder()
                         .setBarcodeFormats(Barcode.FORMAT_QR_CODE).build();
         scanner = BarcodeScanning.getClient(options);
         this.context = context;
         this.parentFragmentManager = parentFragmentManager;
+        this.scanReadOrScanForReuse = scanReadOrScanForReuse;
         db = Database.getInstance();
         String deviceID = DeviceID.getDeviceID(context);
         selfAttendeeTask = db.attendees.get(deviceID).addOnSuccessListener(attendee -> {
@@ -92,10 +96,10 @@ public class QRAnalyzer{
                         ArrayList<QRDatabaseEventLink> fetchedLinks = new ArrayList<>();
                         AtomicBoolean hasError = new AtomicBoolean(false);
                         for(Barcode barcode: barcodes){
-                            qrScanComplete = true;
-                            if(barcode.getRawValue() == null || !QrCodec.verifyQRStringDecodable(barcode.getRawValue())){
+                            if(barcode.getRawValue() == null){
                                 continue;
                             }
+                            qrScanComplete = true;
                             // else this QR code is most likely from us (fits the encoding scheme)
                             String barcodeContent = QrCodec.decodeQRString(barcode.getRawValue());
                             Task<QRDatabaseEventLink> getQRTask = Database.getInstance().qr_codes.get(barcodeContent);
@@ -141,6 +145,33 @@ public class QRAnalyzer{
                         imageProxy.close();
                     });
         }
+    }
+
+    private void analyzeForReuse(@NonNull ImageProxy imageProxy, QRDatabaseEventLink linkToWrite){
+        @OptIn(markerClass = ExperimentalGetImage.class) Image mediaImage = imageProxy.getImage();
+        if(qrScanComplete){
+            return;
+        }
+        if(mediaImage != null) {
+            InputImage image = InputImage.fromMediaImage(mediaImage, imageProxy.getImageInfo().getRotationDegrees());
+            scanner.process(image).addOnSuccessListener(barcodes -> {
+                for(Barcode barcode: barcodes){
+                    if(barcode.getRawValue() == null){
+                        continue;
+                    }
+                    qrScanComplete = true;
+                    String barcodeContent = QrCodec.decodeQRString(barcode.getRawValue());
+                    // now write the link
+                    db.qr_codes.set(barcodeContent, linkToWrite).addOnSuccessListener(ret -> {
+                        Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
+                    }).addOnFailureListener(e -> {
+                        Toast.makeText(context, "Failed to reuse the barcode, please try again later", Toast.LENGTH_SHORT).show();
+                    });
+                }
+
+            });
+        }
+
     }
 
     private void createScanResultDialog(QRDatabaseEventLink link){
@@ -261,6 +292,10 @@ public class QRAnalyzer{
         });
     }
 
+    public void setReuseEventLink(QRDatabaseEventLink link){
+        this.reuseEventLink = link;
+    }
+
     /**
      * Retrieves the image analysis use case.
      *
@@ -270,10 +305,17 @@ public class QRAnalyzer{
         //https://beakutis.medium.com/using-googles-mlkit-and-camerax-for-lightweight-barcode-scanning-bb2038164cdc
         //https://developers.google.com/ml-kit/vision/barcode-scanning/android
         ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
-        imageAnalysis.setAnalyzer(
-                Executors.newSingleThreadExecutor(),
-                        (ImageProxy imageProxy) -> analyze(imageProxy)
-        );
+        if(!this.scanReadOrScanForReuse) {
+            imageAnalysis.setAnalyzer(
+                    Executors.newSingleThreadExecutor(),
+                    (ImageProxy imageProxy) -> analyze(imageProxy)
+            );
+        } else {
+            imageAnalysis.setAnalyzer(
+                    Executors.newSingleThreadExecutor(),
+                    (ImageProxy imageProxy) -> analyzeForReuse(imageProxy, reuseEventLink)
+            );
+        }
         return imageAnalysis;
     }
 }

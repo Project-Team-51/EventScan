@@ -29,16 +29,6 @@ public class QrCodec {
     }
 
     /**
-     * Verifies if the QR string is decodable.
-     *
-     * @param toDecode The string to decode.
-     * @return True if the QR string is decodable, false otherwise.
-     */
-    public static boolean verifyQRStringDecodable(String toDecode){
-        return toDecode.startsWith("EventScan_event");
-    }
-
-    /**
      * Decodes the QR string.
      *
      * @param toDecode The string to decode.
@@ -46,10 +36,10 @@ public class QrCodec {
      * @throws RuntimeException if attempting to decode a non-decodable QR string.
      */
     public static String decodeQRString(String toDecode){
-        if(!verifyQRStringDecodable(toDecode)){
-            throw new RuntimeException("Attempted to decode a non-decodable QR string");
+        if(toDecode.startsWith("EventScan_event")){
+            return toDecode.substring(15); // "EventScan_event" is 15 chars long
         }
-        return toDecode.substring(15); // "EventScan_event" is 15 chars long
+        return toDecode;
     }
 
     /**

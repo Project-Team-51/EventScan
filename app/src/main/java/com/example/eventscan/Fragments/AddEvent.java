@@ -26,8 +26,13 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.camera.core.CameraSelector;
+import androidx.camera.core.Preview;
+import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.view.PreviewView;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.example.eventscan.Activities.MainActivity;
 
@@ -38,6 +43,7 @@ import com.example.eventscan.Database.Database;
 import com.example.eventscan.Database.QRDatabaseEventLink;
 import com.example.eventscan.Entities.DeviceID;
 import com.example.eventscan.Entities.Event;
+import com.example.eventscan.Helpers.QRAnalyzer;
 import com.example.eventscan.Helpers.QrCodec;
 import com.example.eventscan.Entities.Organizer;
 import com.example.eventscan.R;
@@ -54,6 +60,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 /**
  * A dialog fragment that allows us to add a new event. The organizer who makes the event is designated the event owner,
@@ -144,6 +151,9 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
             ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
             Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
             Button buttonShareQR = dialogView.findViewById(R.id.buttonShareQRCode);
+            Button buttonReuseCode = dialogView.findViewById(R.id.buttonReuseQRCode);
+            PreviewView QRPreview = dialogView.findViewById(R.id.CameraPreview);
+            buttonReuseCode.setVisibility(View.VISIBLE);
             int linkType = QRDatabaseEventLink.DIRECT_CHECK_IN;
 
             // setup the task to run as early as possible
@@ -179,6 +189,23 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                     //dialog.dismiss(); // Dismiss the dialog after saving
                 }
             });
+            buttonReuseCode.setOnClickListener(v1 -> {
+                QRPreview.setVisibility(View.VISIBLE);
+                QRAnalyzer qrAnalyzer = new QRAnalyzer(requireContext(), getParentFragmentManager(), true);
+                qrAnalyzer.setReuseEventLink(new QRDatabaseEventLink(linkType, event));
+                QrScannerFragment.checkCameraPermissions(requireContext());
+                CameraSelector cameraSelector = new CameraSelector.Builder()
+                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                        .build();
+                try {
+                    Preview preview = new Preview.Builder().build();
+                    preview.setSurfaceProvider(QRPreview.getSurfaceProvider());
+                    ProcessCameraProvider.getInstance(this.requireContext()).get().unbindAll();
+                    ProcessCameraProvider.getInstance(this.requireContext()).get().bindToLifecycle((LifecycleOwner) this, cameraSelector, preview, qrAnalyzer.getUseCase());
+                } catch (ExecutionException | InterruptedException e) {
+                    Toast.makeText(requireContext(), "Unknown error opening the QR scanner, please try again", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         generateQRCodeDetailsButton.setOnClickListener(v -> {
@@ -186,6 +213,9 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
             ImageView imageViewDialog = dialogView.findViewById(R.id.imageView);
             Button buttonSaveToCamera = dialogView.findViewById(R.id.buttonSave);
             Button buttonShareQR = dialogView.findViewById(R.id.buttonShareQRCode);
+            Button buttonReuseCode = dialogView.findViewById(R.id.buttonReuseQRCode);
+            PreviewView QRPreview = dialogView.findViewById(R.id.CameraPreview);
+            buttonReuseCode.setVisibility(View.VISIBLE);
             int linkType = QRDatabaseEventLink.DIRECT_SEE_DETAILS;
 
             // setup the task to run as early as possible
@@ -219,6 +249,23 @@ public class AddEvent extends DialogFragment implements AttendeeLimitDialogFragm
                 public void onClick(View v) {
                     saveQRCodeToCameraRoll(getQRTask.getResult());
                     //dialog.dismiss(); // Dismiss the dialog after saving
+                }
+            });
+            buttonReuseCode.setOnClickListener(v1 -> {
+                QRPreview.setVisibility(View.VISIBLE);
+                QRAnalyzer qrAnalyzer = new QRAnalyzer(requireContext(), getParentFragmentManager(), true);
+                qrAnalyzer.setReuseEventLink(new QRDatabaseEventLink(linkType, event));
+                QrScannerFragment.checkCameraPermissions(requireContext());
+                CameraSelector cameraSelector = new CameraSelector.Builder()
+                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+                        .build();
+                try {
+                    Preview preview = new Preview.Builder().build();
+                    preview.setSurfaceProvider(QRPreview.getSurfaceProvider());
+                    ProcessCameraProvider.getInstance(this.requireContext()).get().unbindAll();
+                    ProcessCameraProvider.getInstance(this.requireContext()).get().bindToLifecycle((LifecycleOwner) this, cameraSelector, preview, qrAnalyzer.getUseCase());
+                } catch (ExecutionException | InterruptedException e) {
+                    Toast.makeText(requireContext(), "Unknown error opening the QR scanner, please try again", Toast.LENGTH_SHORT).show();
                 }
             });
         });
